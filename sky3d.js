@@ -57,9 +57,9 @@ const dome = new THREE.Mesh(
 scene.add(dome);
 
 const backgroundStars = new THREE.Group();
-const starCloudNear = createBackgroundStars(1800, 116, 148, 1.05, 0.78);
-const starCloudMid = createBackgroundStars(1500, 148, 196, 0.95, 0.56);
-const starCloudFar = createBackgroundStars(1200, 196, 254, 0.9, 0.42);
+const starCloudNear = createBackgroundStars(760, 116, 148, 1.15, 0.82);
+const starCloudMid = createBackgroundStars(540, 148, 196, 0.95, 0.42);
+const starCloudFar = createBackgroundStars(320, 196, 254, 0.8, 0.28);
 backgroundStars.add(starCloudNear, starCloudMid, starCloudFar);
 scene.add(backgroundStars);
 
@@ -698,7 +698,7 @@ function createMilkyWayShell() {
       map: texture,
       side: THREE.BackSide,
       transparent: true,
-      opacity: 0.54,
+      opacity: 0.38,
       depthWrite: false,
       blending: THREE.AdditiveBlending
     })
@@ -732,7 +732,7 @@ function createMilkyWayTexture() {
     ctx.fillRect(0, y, canvas.width, 1);
   }
 
-  for (let i = 0; i < 15000; i += 1) {
+  for (let i = 0; i < 4200; i += 1) {
     const x = Math.random() * canvas.width;
     const jitter = (Math.random() - 0.5) * width * 1.8;
     const y = centerY + jitter;
@@ -740,17 +740,17 @@ function createMilkyWayTexture() {
     const density = Math.exp(-dy * dy);
     if (Math.random() > density) continue;
 
-    const size = 0.4 + Math.random() * 1.8 * density;
-    const alpha = 0.05 + Math.random() * 0.36 * density;
+    const size = 0.35 + Math.random() * 1.2 * density;
+    const alpha = 0.02 + Math.random() * 0.16 * density;
     ctx.fillStyle = `rgba(240, 245, 255, ${alpha})`;
     ctx.fillRect(x, y, size, size);
   }
 
-  for (let i = 0; i < 140; i += 1) {
+  for (let i = 0; i < 70; i += 1) {
     const x = Math.random() * canvas.width;
     const y = centerY + (Math.random() - 0.5) * width * 1.3;
     const size = 20 + Math.random() * 58;
-    const alpha = 0.012 + Math.random() * 0.028;
+    const alpha = 0.008 + Math.random() * 0.016;
     const color = i % 3 === 0 ? "190, 170, 150" : "160, 178, 210";
     const g = ctx.createRadialGradient(x, y, 0, x, y, size);
     g.addColorStop(0, `rgba(${color}, ${alpha})`);
