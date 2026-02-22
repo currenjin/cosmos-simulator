@@ -3,6 +3,7 @@
   --bg-soft: #0b1628;
   --panel: rgba(9, 19, 34, 0.84);
   --line: rgba(131, 173, 246, 0.22);
+  --line-strong: rgba(157, 202, 255, 0.42);
   --text: #ecf3ff;
   --muted: #9eb6dc;
   --accent: #73d2ff;
@@ -11,6 +12,8 @@
   --brand-ink: #081224;
   --danger: #ff8c8c;
   --radius: 18px;
+  --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.26);
+  --shadow-strong: 0 16px 36px rgba(0, 0, 0, 0.38);
 }
 
 * {
@@ -28,6 +31,7 @@ body {
   position: relative;
   overflow-x: hidden;
   transition: background 500ms ease;
+  line-height: 1.4;
 }
 
 .bg-glow {
@@ -56,7 +60,8 @@ body {
 .hero,
 main,
 .simulator-view,
-.journey-view {
+.kepler-view,
+.dynamics-view {
   position: relative;
   z-index: 1;
 }
@@ -108,6 +113,12 @@ h1 {
   gap: 8px;
   flex-wrap: wrap;
   align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(143, 186, 255, 0.22);
+  background: rgba(8, 17, 31, 0.5);
+  width: fit-content;
+  box-shadow: var(--shadow-soft);
 }
 
 .brand-settings label {
@@ -148,6 +159,7 @@ h1 {
   padding: 4px;
   gap: 4px;
   backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-soft);
 }
 
 .mode-tab {
@@ -158,11 +170,18 @@ h1 {
   font-weight: 600;
   padding: 8px 13px;
   font-size: 0.9rem;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.16s ease;
+}
+
+.mode-tab:hover {
+  color: #d9ebff;
+  background: rgba(120, 168, 239, 0.14);
 }
 
 .mode-tab.is-active {
   background: linear-gradient(90deg, #69cfff, #f2c87b);
   color: var(--brand-ink);
+  box-shadow: 0 6px 16px rgba(104, 203, 255, 0.3);
 }
 
 main {
@@ -219,6 +238,17 @@ button {
   color: var(--text);
   font: inherit;
   padding: 10px 12px;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid rgba(132, 204, 255, 0.76);
+  outline-offset: 2px;
+}
+
+input[type="range"] {
+  accent-color: #8ed8ff;
 }
 
 button {
@@ -278,9 +308,13 @@ button:hover {
 .viewer-controls {
   margin-top: 12px;
   display: flex;
-  gap: 14px;
+  gap: 10px;
   flex-wrap: wrap;
   align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(138, 182, 255, 0.2);
+  background: rgba(7, 16, 28, 0.56);
 }
 
 .toggle {
@@ -297,19 +331,20 @@ button:hover {
 }
 
 .sim-time {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: grid;
+  gap: 4px;
   color: var(--muted);
+  font-size: 0.84rem;
 }
 
 .sim-time input {
-  width: 110px;
+  width: 120px;
   padding: 8px 10px;
+  font-size: 0.88rem;
 }
 
 #date {
-  width: 150px;
+  width: 160px;
 }
 
 #latitude,
@@ -321,6 +356,7 @@ button:hover {
   border-color: rgba(255, 211, 123, 0.48);
   color: var(--warm);
   padding: 8px 11px;
+  background: rgba(38, 29, 12, 0.34);
 }
 
 .sky-status {
@@ -481,6 +517,10 @@ canvas {
   padding: 0 20px 24px;
 }
 
+.sim-toolbar h2 {
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+}
+
 .sim-toolbar {
   margin: 0 auto;
   display: flex;
@@ -516,175 +556,6 @@ body.simulator-mode .hero > p {
   margin-top: 0;
 }
 
-.journey-view {
-  position: relative;
-  z-index: 1;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 4px 20px 28px;
-}
-
-.journey-hero {
-  border: 1px solid rgba(133, 180, 255, 0.22);
-  border-radius: 16px;
-  padding: 18px;
-  background: linear-gradient(120deg, rgba(11, 27, 47, 0.92), rgba(37, 25, 47, 0.82));
-}
-
-.journey-kicker {
-  margin: 0;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--warm);
-  font-size: 0.76rem;
-}
-
-.journey-hero h2 {
-  margin-top: 6px;
-  font-size: clamp(1.2rem, 2.4vw, 2rem);
-}
-
-.journey-hero p {
-  margin-top: 8px;
-  color: var(--muted);
-  max-width: 860px;
-}
-
-.journey-grid {
-  margin-top: 14px;
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 1.05fr 1.45fr;
-}
-
-.journey-panel {
-  border-radius: 16px;
-  border: 1px solid rgba(136, 180, 255, 0.22);
-  padding: 14px;
-  background: linear-gradient(150deg, rgba(8, 17, 31, 0.92), rgba(12, 15, 30, 0.82));
-}
-
-.stage-panel {
-  grid-column: 1;
-}
-
-.visual-panel {
-  grid-column: 2;
-  grid-row: span 2;
-  padding: 0;
-  overflow: hidden;
-}
-
-.insight-panel {
-  grid-column: 1;
-}
-
-.stage-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: center;
-}
-
-#journey-autoplay {
-  border-color: rgba(255, 211, 123, 0.45);
-  color: var(--warm);
-  padding: 8px 10px;
-  font-size: 0.86rem;
-}
-
-.stage-slider-label {
-  margin-top: 10px;
-  color: var(--muted);
-}
-
-#journey-scale {
-  margin-top: 8px;
-  width: 100%;
-  accent-color: #8ed8ff;
-}
-
-.journey-stage-name {
-  margin-top: 12px;
-  font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
-  font-size: 1.06rem;
-  color: #dce8ff;
-}
-
-.journey-stage-description {
-  margin-top: 6px;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-.stage-metrics {
-  margin-top: 10px;
-  display: grid;
-  gap: 8px;
-}
-
-.stage-metrics div {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.stage-metrics strong {
-  color: #e6efff;
-}
-
-.journey-scale-bar {
-  margin-top: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: rgba(129, 167, 239, 0.16);
-  position: relative;
-  overflow: hidden;
-}
-
-.journey-scale-bar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  width: var(--scale-fill, 8%);
-  border-radius: 999px;
-  background: linear-gradient(90deg, #68cbff, #ffd47f);
-  transition: width 500ms ease;
-}
-
-#journey-canvas {
-  width: 100%;
-  height: 100%;
-  min-height: 520px;
-  display: block;
-}
-
-.insight-panel h3 {
-  font-size: 1rem;
-  margin-top: 0;
-}
-
-.insight-panel p {
-  margin-top: 8px;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-#journey-awe-list {
-  margin: 10px 0 0;
-  padding-left: 18px;
-  color: #c9dcff;
-  display: grid;
-  gap: 8px;
-}
-
-body.journey-mode #planner-view,
-body.journey-mode #simulator-view {
-  display: none;
-}
-
 body.kepler-mode #planner-view,
 body.kepler-mode #simulator-view,
 body.kepler-mode #journey-view {
@@ -696,20 +567,6 @@ body.dynamics-mode #simulator-view,
 body.dynamics-mode #journey-view,
 body.dynamics-mode #kepler-view {
   display: none;
-}
-
-body.journey-mode .hero h1,
-body.journey-mode .hero p.eyebrow {
-  display: none;
-}
-
-body.journey-mode .hero {
-  padding-top: 18px;
-  padding-bottom: 10px;
-}
-
-body.journey-mode .hero > p {
-  margin-top: 0;
 }
 
 body.kepler-mode .hero h1,
@@ -749,10 +606,11 @@ body.dynamics-mode .hero > p {
 }
 
 .dynamics-hero {
-  border: 1px solid rgba(133, 180, 255, 0.22);
+  border: 1px solid rgba(133, 180, 255, 0.26);
   border-radius: 16px;
   padding: 18px;
   background: linear-gradient(120deg, rgba(11, 27, 47, 0.92), rgba(37, 27, 54, 0.82));
+  box-shadow: var(--shadow-soft);
 }
 
 .dynamics-hero p {
@@ -778,9 +636,10 @@ body.dynamics-mode .hero > p {
   border-radius: 14px;
   border: 1px solid rgba(144, 188, 255, 0.36);
   background: linear-gradient(155deg, rgba(8, 16, 29, 0.95), rgba(14, 20, 36, 0.93));
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.44);
+  box-shadow: var(--shadow-strong);
   padding: 12px;
   z-index: 25;
+  animation: revealUp 220ms ease;
 }
 
 .lab-tutorial-overlay[hidden] {
@@ -841,10 +700,16 @@ body.dynamics-mode .hero > p {
 
 .dynamics-panel {
   border-radius: 16px;
-  border: 1px solid rgba(136, 180, 255, 0.22);
+  border: 1px solid rgba(136, 180, 255, 0.24);
   padding: 14px;
   background: linear-gradient(150deg, rgba(8, 17, 31, 0.92), rgba(12, 15, 30, 0.82));
   grid-column: span 4;
+  box-shadow: var(--shadow-soft);
+}
+
+.dynamics-panel h3,
+.kepler-panel h3 {
+  margin-bottom: 10px;
 }
 
 .dynamics-panel.dynamics-orbit-panel {
@@ -911,10 +776,11 @@ body.dynamics-mode .hero > p {
 }
 
 .kepler-hero {
-  border: 1px solid rgba(133, 180, 255, 0.22);
+  border: 1px solid rgba(133, 180, 255, 0.26);
   border-radius: 16px;
   padding: 18px;
   background: linear-gradient(120deg, rgba(11, 27, 47, 0.92), rgba(31, 36, 56, 0.82));
+  box-shadow: var(--shadow-soft);
 }
 
 .kepler-hero p {
@@ -931,10 +797,11 @@ body.dynamics-mode .hero > p {
 
 .kepler-panel {
   border-radius: 16px;
-  border: 1px solid rgba(136, 180, 255, 0.22);
+  border: 1px solid rgba(136, 180, 255, 0.24);
   padding: 14px;
   background: linear-gradient(150deg, rgba(8, 17, 31, 0.92), rgba(12, 15, 30, 0.82));
   grid-column: span 4;
+  box-shadow: var(--shadow-soft);
 }
 
 .kepler-panel.kepler-visual {
@@ -974,6 +841,11 @@ body.dynamics-mode .hero > p {
   font-size: 0.9rem;
 }
 
+.kepler-panel label,
+.dynamics-panel label {
+  margin-top: 4px;
+}
+
 #kepler-canvas {
   width: 100%;
   min-height: 420px;
@@ -1000,22 +872,10 @@ body.dynamics-mode .hero > p {
   width: 42%;
 }
 
-body.planner-mode {
-  background: radial-gradient(circle at 12% 14%, #15355f, transparent 30%),
-    radial-gradient(circle at 92% 8%, #533418, transparent 34%),
-    linear-gradient(140deg, #050913 0%, #091327 44%, #0c1228 100%);
-}
-
 body.simulator-mode {
   background: radial-gradient(circle at 13% 12%, #0e3255, transparent 32%),
     radial-gradient(circle at 88% 18%, #204a34, transparent 40%),
     linear-gradient(140deg, #040910 0%, #081222 42%, #0a1c1f 100%);
-}
-
-body.journey-mode {
-  background: radial-gradient(circle at 12% 16%, #3d295f, transparent 35%),
-    radial-gradient(circle at 88% 12%, #5b2d3f, transparent 38%),
-    linear-gradient(140deg, #060711 0%, #0f1225 43%, #1a1024 100%);
 }
 
 body.kepler-mode {
@@ -1087,37 +947,12 @@ body.dynamics-mode {
 }
 
 @media (max-width: 960px) {
-  .controls,
-  .summary,
-  .results {
-    grid-column: 1 / -1;
-  }
-
-  .cards {
-    grid-template-columns: 1fr;
-  }
-
   #sky-viewer {
     min-height: calc(100vh - 250px);
   }
 
   .sim-toolbar {
     flex-direction: column;
-  }
-
-  .journey-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .visual-panel,
-  .insight-panel,
-  .stage-panel {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  #journey-canvas {
-    min-height: 360px;
   }
 
   .kepler-panel,
@@ -1141,25 +976,25 @@ body.dynamics-mode {
   #dyn-orbit-canvas {
     min-height: 300px;
   }
+
+  .lab-tutorial-overlay {
+    right: 12px;
+    bottom: 12px;
+    width: min(420px, calc(100vw - 16px));
+  }
 }
 
 @media (max-width: 560px) {
-  form {
-    grid-template-columns: 1fr;
-  }
-
-  .buttons {
-    grid-column: span 1;
-    flex-direction: column;
-  }
-
   .mode-tabs {
     width: 100%;
-    justify-content: space-between;
+    justify-content: stretch;
+    flex-wrap: wrap;
+    border-radius: 14px;
   }
 
   .mode-tab {
-    width: 100%;
+    flex: 1 1 30%;
+    text-align: center;
   }
 
   .brand-lockup {
@@ -1174,5 +1009,29 @@ body.dynamics-mode {
   .brand-mark img {
     width: 34px;
     height: 34px;
+  }
+
+  .viewer-controls {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .sim-time {
+    min-width: calc(50% - 6px);
+  }
+
+  #date,
+  #latitude,
+  #longitude,
+  .sim-time input {
+    width: 100%;
+  }
+
+  .lab-tutorial-actions {
+    justify-content: stretch;
+  }
+
+  .lab-tutorial-actions button {
+    flex: 1;
   }
 }
