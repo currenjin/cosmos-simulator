@@ -31,20 +31,6 @@ const COPY = {
     "equipment.naked": "맨눈",
     "equipment.binocular": "쌍안경",
     "equipment.scope": "소형 망원경",
-    "mission.title": "관측 미션",
-    "mission.refresh": "미션 확인",
-    "mission.pending": "진행 중",
-    "mission.done": "완료",
-    "mission.empty": "추천 계산을 실행하면 미션이 표시됩니다.",
-    "mission.m1.title": "입문 관측 워밍업",
-    "mission.m1.desc": "오늘 밤 추천 대상이 3개 이상인지 확인하세요.",
-    "mission.m2.title": "오리온 대성운 포착",
-    "mission.m2.desc": "추천 목록에 M42 오리온 대성운이 등장하면 달성입니다.",
-    "mission.m3.title": "고고도 타깃 찾기",
-    "mission.m3.desc": "최대 고도 60° 이상 대상을 최소 1개 찾으세요.",
-    "mission.m4.title": "장비 적합도 체크",
-    "mission.m4.desc": "현재 장비로 바로 볼 수 있는 대상을 5개 이상 확보하세요.",
-    "mission.progress": "진행도 {done}/{total}",
     "sim.title": "3D 하늘 시뮬레이터",
     "sim.subtitle": "드래그로 회전, 휠로 확대/축소. 별자리와 천체 레이어를 제어하세요.",
     "sim.focusOrion": "오리온",
@@ -98,20 +84,6 @@ const COPY = {
     "equipment.naked": "Naked-eye",
     "equipment.binocular": "Binocular",
     "equipment.scope": "Small Scope",
-    "mission.title": "Observation Missions",
-    "mission.refresh": "Check Missions",
-    "mission.pending": "In Progress",
-    "mission.done": "Done",
-    "mission.empty": "Run recommendation to load missions.",
-    "mission.m1.title": "Warm-up",
-    "mission.m1.desc": "Verify that tonight has at least 3 recommended targets.",
-    "mission.m2.title": "Catch Orion Nebula",
-    "mission.m2.desc": "Mission completes when M42 appears in recommendations.",
-    "mission.m3.title": "High Altitude Target",
-    "mission.m3.desc": "Find at least one target above 60° peak altitude.",
-    "mission.m4.title": "Gear Fit Check",
-    "mission.m4.desc": "Secure at least 5 targets suitable for your current gear.",
-    "mission.progress": "Progress {done}/{total}",
     "sim.title": "3D Sky Simulator",
     "sim.subtitle": "Drag to rotate, scroll to zoom. Toggle constellation and object layers.",
     "sim.focusOrion": "Orion",
@@ -151,44 +123,9 @@ const plannerView = document.querySelector("#planner-view");
 const simulatorView = document.querySelector("#simulator-view");
 const journeyView = document.querySelector("#journey-view");
 const modeTabs = document.querySelectorAll(".mode-tab");
-const missionList = document.querySelector("#mission-list");
-const missionRefreshBtn = document.querySelector("#mission-refresh");
 
 let lastRecommendations = [];
 let lastContext = null;
-
-const MISSIONS = [
-  {
-    id: "m1",
-    titleKey: "mission.m1.title",
-    descKey: "mission.m1.desc",
-    check: (recommendations) => recommendations.length >= 3
-  },
-  {
-    id: "m2",
-    titleKey: "mission.m2.title",
-    descKey: "mission.m2.desc",
-    check: (recommendations) => recommendations.some((item) => item.id === "m42")
-  },
-  {
-    id: "m3",
-    titleKey: "mission.m3.title",
-    descKey: "mission.m3.desc",
-    check: (recommendations) => recommendations.some((item) => item.maxAlt >= 60)
-  },
-  {
-    id: "m4",
-    titleKey: "mission.m4.title",
-    descKey: "mission.m4.desc",
-    check: (recommendations, context) =>
-      recommendations.filter(
-        (item) =>
-          context &&
-          EQUIPMENT_ORDER[context.equipment] >= EQUIPMENT_ORDER[item.minEquipment] &&
-          item.maxAlt >= 25
-      ).length >= 5
-  }
-];
 
 initializeDefaults();
 initializeModeTabs();
@@ -199,15 +136,10 @@ form.addEventListener("submit", (event) => {
   calculateRecommendations();
 });
 
-missionRefreshBtn?.addEventListener("click", () => {
-  renderMissions(lastRecommendations, lastContext);
-});
-
 window.addEventListener("cosmos:settings-changed", () => {
   applyI18n();
   renderSummary(lastRecommendations, lastContext?.nightMinutes || 0, lastContext?.lat || 0, lastContext?.lon || 0);
   renderCards(lastRecommendations, lastContext?.lat || 0, lastContext?.lon || 0, lastContext?.nightTimes || []);
-  renderMissions(lastRecommendations, lastContext);
 });
 
 useLocationBtn.addEventListener("click", () => {
@@ -303,7 +235,6 @@ function calculateRecommendations() {
 
   renderSummary(recommendations, nightTimes.length * 10, lat, lon);
   renderCards(recommendations, lat, lon, nightTimes);
-  renderMissions(recommendations, lastContext);
 }
 
 function buildSampleTimes(dateStr, stepMinutes) {
@@ -471,35 +402,6 @@ function renderCards(recommendations, lat, lon, nightTimes) {
     drawAltitudeChart(node.querySelector("canvas"), item.trace, lat, lon, nightTimes);
     resultCards.appendChild(node);
   });
-}
-
-function renderMissions(recommendations, context) {
-  if (!missionList) return;
-
-  if (!recommendations.length) {
-    missionList.innerHTML = `<p class="mission-empty">${t("mission.empty")}</p>`;
-    return;
-  }
-
-  let completed = 0;
-
-  const html = MISSIONS.map((mission) => {
-    const done = Boolean(mission.check(recommendations, context));
-    if (done) completed += 1;
-
-    return `
-      <article class="mission-item ${done ? "is-done" : ""}">
-        <div class="mission-item-head">
-          <h3>${t(mission.titleKey)}</h3>
-          <span class="mission-state">${done ? t("mission.done") : t("mission.pending")}</span>
-        </div>
-        <p>${t(mission.descKey)}</p>
-      </article>
-    `;
-  }).join("");
-
-  const progress = `<p class="mission-progress">${format(t("mission.progress"), { done: completed, total: MISSIONS.length })}</p>`;
-  missionList.innerHTML = progress + html;
 }
 
 function drawAltitudeChart(canvas, trace, lat, lon, nightTimes) {
