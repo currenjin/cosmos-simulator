@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tonight Sky Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow glow-a"></div>
+    <div class="bg-glow glow-b"></div>
+    <header class="hero">
+      <p class="eyebrow">Night Observation Assistant</p>
+      <h1>오늘 밤 관측 플래너</h1>
+      <p>
+        위치와 날짜를 넣으면, 오늘 밤 실제로 보기 쉬운 천체를 우선순위로 추천합니다.
+      </p>
+    </header>
+
+    <main>
+      <section class="panel controls">
+        <h2>관측 조건</h2>
+        <form id="planner-form">
+          <label>
+            위도
+            <input id="latitude" type="number" min="-90" max="90" step="0.0001" required />
+          </label>
+          <label>
+            경도
+            <input id="longitude" type="number" min="-180" max="180" step="0.0001" required />
+          </label>
+          <label>
+            날짜
+            <input id="date" type="date" required />
+          </label>
+          <label>
+            장비
+            <select id="equipment">
+              <option value="naked-eye">맨눈</option>
+              <option value="binocular" selected>쌍안경</option>
+              <option value="small-scope">소형 망원경</option>
+            </select>
+          </label>
+          <div class="buttons">
+            <button type="button" id="use-location">내 위치 사용</button>
+            <button type="submit" class="primary">추천 계산</button>
+          </div>
+        </form>
+        <p class="hint">
+          기준: 태양 고도 -12° 이하(어두운 하늘), 대상 고도 25° 이상일 때 관측 가능으로 판단.
+        </p>
+      </section>
+
+      <section class="panel summary" id="summary"></section>
+
+      <section class="panel checklist">
+        <h2>오늘 체크리스트</h2>
+        <ul id="checklist-items"></ul>
+      </section>
+
+      <section class="panel results">
+        <div class="results-head">
+          <h2>추천 대상</h2>
+          <span id="result-count"></span>
+        </div>
+        <div id="result-cards" class="cards"></div>
+      </section>
+    </main>
+
+    <template id="card-template">
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <h3 class="target-name"></h3>
+            <p class="target-meta"></p>
+          </div>
+          <div class="score-chip"></div>
+        </div>
+        <div class="stats"></div>
+        <div class="chart-wrap">
+          <canvas width="320" height="120"></canvas>
+        </div>
+        <div class="card-actions">
+          <label class="check-item">
+            <input type="checkbox" class="check-target" />
+            오늘 관측 예정
+          </label>
+          <button type="button" class="log-btn">관측 기록</button>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
