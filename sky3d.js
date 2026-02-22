@@ -372,6 +372,9 @@ let scaleTransitionFrom = null;
 let scaleTransitionTo = null;
 let scaleTransitionStart = 0;
 let scaleTransitionDuration = 1450;
+let scaleOrbitYaw = 0;
+let scaleOrbitPitch = 0.35;
+let scaleOrbitRadius = 120;
 
 const scaleScene = createScaleScenes();
 setScaleMode("sky", false);
@@ -562,16 +565,22 @@ function wireControls() {
   });
 
   renderer.domElement.addEventListener("pointermove", (event) => {
-    if (!isDragging || scaleMode !== "sky") return;
+    if (!isDragging) return;
 
     const dx = event.clientX - lastX;
     const dy = event.clientY - lastY;
     lastX = event.clientX;
     lastY = event.clientY;
 
-    yaw -= dx * 0.0055;
-    pitch += dy * 0.0042;
-    pitch = clamp(pitch, toRad(-12), toRad(86));
+    if (scaleMode === "sky") {
+      yaw -= dx * 0.0055;
+      pitch += dy * 0.0042;
+      pitch = clamp(pitch, toRad(-12), toRad(86));
+    } else {
+      scaleOrbitYaw -= dx * 0.0042;
+      scaleOrbitPitch += dy * 0.0036;
+      scaleOrbitPitch = clamp(scaleOrbitPitch, toRad(-78), toRad(78));
+    }
   });
 
   renderer.domElement.addEventListener("pointerup", (event) => {
@@ -583,8 +592,12 @@ function wireControls() {
     "wheel",
     (event) => {
       event.preventDefault();
-      camera.fov = clamp(camera.fov + event.deltaY * 0.02, 30, 90);
-      camera.updateProjectionMatrix();
+      if (scaleMode === "sky") {
+        camera.fov = clamp(camera.fov + event.deltaY * 0.02, 30, 90);
+        camera.updateProjectionMatrix();
+      } else {
+        scaleOrbitRadius = clamp(scaleOrbitRadius + event.deltaY * 0.08, 18, 620);
+      }
     },
     { passive: false }
   );
@@ -800,7 +813,7 @@ function createGalaxyScaleScene() {
     new THREE.MeshBasicMaterial({
       color: 0x6f8fd4,
       transparent: true,
-      opacity: 0.2,
+      opacity: 0.28,
       side: THREE.DoubleSide
     })
   );
@@ -812,14 +825,14 @@ function createGalaxyScaleScene() {
     new THREE.MeshBasicMaterial({
       color: 0xffd9a3,
       transparent: true,
-      opacity: 0.78
+      opacity: 0.9
     })
   );
   core.position.y = 0.6;
   galaxyScaleGroup.add(core);
 
   const sunMarker = new THREE.Mesh(
-    new THREE.SphereGeometry(1.8, 14, 10),
+    new THREE.SphereGeometry(2.4, 14, 10),
     new THREE.MeshBasicMaterial({
       color: 0x8fdfff
     })
@@ -836,7 +849,7 @@ function createLocalGroupScaleScene() {
     new THREE.MeshBasicMaterial({
       color: 0xa6b9ff,
       transparent: true,
-      opacity: 0.34
+      opacity: 0.46
     })
   );
   mw.rotation.x = -Math.PI / 2;
@@ -848,7 +861,7 @@ function createLocalGroupScaleScene() {
     new THREE.MeshBasicMaterial({
       color: 0xffd7b1,
       transparent: true,
-      opacity: 0.3
+      opacity: 0.42
     })
   );
   andromeda.rotation.x = -Math.PI / 2;
@@ -897,6 +910,9 @@ function setScaleMode(mode, animated = true) {
 
   const from = captureCameraState(prevMode);
   const to = getCameraPreset(scaleMode);
+  if (scaleMode !== "sky") {
+    setScaleOrbitFromPreset(scaleMode, to);
+  }
   if (animated) {
     scaleTransition = 0;
     scaleTransitionFrom = from;
@@ -911,6 +927,15 @@ function setScaleMode(mode, animated = true) {
   }
 }
 
+function setScaleOrbitFromPreset(mode, preset) {
+  const center = getScaleCenter(mode);
+  const offset = preset.position.clone().sub(center);
+  const radius = Math.max(0.001, offset.length());
+  scaleOrbitRadius = radius;
+  scaleOrbitYaw = Math.atan2(offset.x, offset.z);
+  scaleOrbitPitch = Math.asin(clamp(offset.y / radius, -1, 1));
+}
+
 function updateScaleButtons() {
   scaleButtons.forEach((button) => {
     button.classList.toggle("is-active", button.getAttribute("data-scale") === scaleMode);
@@ -922,20 +947,20 @@ function updateScaleAweText() {
   const lang = getLanguage();
   const textByMode = {
     sky: {
-      ko: "지금 보는 별빛의 대부분은 과거에서 온 메시지입니다.",
-      en: "Most starlight above you is a message from the past."
+      ko: "하늘 모드: 드래그 회전, 휠 확대/축소로 관측 시점을 확인하세요.",
+      en: "Sky mode: drag to rotate and use wheel zoom to inspect your observing view."
     },
     solar: {
-      ko: "같은 하늘도 태양계 규모로 보면 행성들이 거대한 시간의 춤을 춥니다.",
-      en: "At solar-system scale, planets dance through vast cycles of time."
+      ko: "태양계 모드: 태양 중심 궤도(대략)입니다. 드래그/휠로 직접 검증하세요.",
+      en: "Solar mode: approximate heliocentric orbits. Drag and zoom to inspect directly."
     },
     galaxy: {
-      ko: "태양계는 우리은하 가장자리의 작은 점 하나에 불과합니다.",
-      en: "Our solar system is just a tiny point near the edge of the Milky Way."
+      ko: "은하 모드: 태양계는 원반 가장자리의 작은 지점입니다. 드래그로 구조를 보세요.",
+      en: "Galaxy mode: our system is a tiny outer-disk point. Drag to inspect structure."
     },
     local: {
-      ko: "안드로메다를 본다는 건 250만 년 전 우주를 보는 일입니다.",
-      en: "Seeing Andromeda means looking 2.5 million years into the past."
+      ko: "국부은하군 모드: 안드로메다는 약 250만 광년 거리(개념적 배치)입니다.",
+      en: "Local Group mode: Andromeda is about 2.5 million light-years away (conceptual layout)."
     }
   };
   scaleAweEl.textContent = textByMode[scaleMode][lang];
@@ -983,6 +1008,11 @@ function getCameraPreset(mode) {
   return presets[mode] || presets.sky;
 }
 
+function getScaleCenter(mode) {
+  if (mode === "local") return new THREE.Vector3(12, 0, -10);
+  return new THREE.Vector3(0, 0, 0);
+}
+
 function updateScaleTransition(ts) {
   if (scaleTransition >= 1 || !scaleTransitionFrom || !scaleTransitionTo) return;
   const t = clamp((ts - scaleTransitionStart) / scaleTransitionDuration, 0, 1);
@@ -1000,14 +1030,26 @@ function applyCameraForScale() {
     return;
   }
 
-  const from = scaleTransitionFrom || getCameraPreset(scaleMode);
-  const to = scaleTransitionTo || getCameraPreset(scaleMode);
-  const position = from.position.clone().lerp(to.position, scaleTransition);
-  const lookAt = from.lookAt.clone().lerp(to.lookAt, scaleTransition);
-  camera.position.copy(position);
-  camera.fov = from.fov + (to.fov - from.fov) * scaleTransition;
-  camera.updateProjectionMatrix();
-  camera.lookAt(lookAt);
+  if (scaleTransition < 1) {
+    const from = scaleTransitionFrom || getCameraPreset(scaleMode);
+    const to = scaleTransitionTo || getCameraPreset(scaleMode);
+    const position = from.position.clone().lerp(to.position, scaleTransition);
+    const lookAt = from.lookAt.clone().lerp(to.lookAt, scaleTransition);
+    camera.position.copy(position);
+    camera.fov = from.fov + (to.fov - from.fov) * scaleTransition;
+    camera.updateProjectionMatrix();
+    camera.lookAt(lookAt);
+    return;
+  }
+
+  const center = getScaleCenter(scaleMode);
+  const orbitalPos = new THREE.Vector3(
+    center.x + scaleOrbitRadius * Math.cos(scaleOrbitPitch) * Math.sin(scaleOrbitYaw),
+    center.y + scaleOrbitRadius * Math.sin(scaleOrbitPitch),
+    center.z + scaleOrbitRadius * Math.cos(scaleOrbitPitch) * Math.cos(scaleOrbitYaw)
+  );
+  camera.position.copy(orbitalPos);
+  camera.lookAt(center);
 }
 
 function applyCameraState(state) {
@@ -1030,15 +1072,15 @@ function updateScaleScene(ts) {
 
 function updateSolarScalePositions() {
   const d = daysSinceJ2000(currentContext.date);
-  const earth = getHeliocentricEclipticXYZ("Earth", d);
 
   planetTargets.forEach((planet) => {
     const node = scaleScene.solar.planetMeshes.get(planet.key);
     if (!node) return;
     const h = getHeliocentricEclipticXYZ(planet.key, d);
-    const x = (h.x - earth.x) * scaleScene.solar.scale;
-    const z = (h.y - earth.y) * scaleScene.solar.scale;
-    node.position.set(x, 0.7, z);
+    const x = h.x * scaleScene.solar.scale;
+    const y = h.z * scaleScene.solar.scale * 0.55;
+    const z = h.y * scaleScene.solar.scale;
+    node.position.set(x, y, z);
   });
 }
 
