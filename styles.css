@@ -25,7 +25,7 @@ body {
   font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", sans-serif;
   color: var(--text);
   background-color: #050913;
-  background-image: linear-gradient(rgba(5, 9, 19, 0.28), rgba(5, 9, 19, 0.28)), url("assets/jwst-bg.png");
+  background-image: linear-gradient(rgba(5, 9, 19, 0.5), rgba(5, 9, 19, 0.5)), url("assets/jwst-bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -95,12 +95,14 @@ h1 {
   font-size: clamp(1.6rem, 2.8vw, 2.5rem);
   line-height: 1.14;
   max-width: 760px;
+  text-shadow: 0 8px 26px rgba(0, 0, 0, 0.72);
 }
 
 .hero-copy {
   margin-top: 12px;
   color: var(--muted);
   max-width: 800px;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.62);
 }
 
 .brand-lockup {
@@ -760,6 +762,7 @@ canvas {
 .sim-toolbar p {
   margin: 8px 0 0;
   color: var(--muted);
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.58);
 }
 
 .scale-jump {
@@ -1221,7 +1224,7 @@ body.dynamics-mode .hero > p {
 
 body.simulator-mode {
   background-color: #050913;
-  background-image: linear-gradient(rgba(5, 9, 19, 0.24), rgba(5, 9, 19, 0.24)), url("assets/jwst-bg.png");
+  background-image: linear-gradient(rgba(5, 9, 19, 0.46), rgba(5, 9, 19, 0.46)), url("assets/jwst-bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1229,7 +1232,7 @@ body.simulator-mode {
 
 body.kepler-mode {
   background-color: #050913;
-  background-image: linear-gradient(rgba(5, 9, 19, 0.24), rgba(5, 9, 19, 0.24)), url("assets/jwst-bg.png");
+  background-image: linear-gradient(rgba(5, 9, 19, 0.46), rgba(5, 9, 19, 0.46)), url("assets/jwst-bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1237,7 +1240,7 @@ body.kepler-mode {
 
 body.dynamics-mode {
   background-color: #050913;
-  background-image: linear-gradient(rgba(5, 9, 19, 0.24), rgba(5, 9, 19, 0.24)), url("assets/jwst-bg.png");
+  background-image: linear-gradient(rgba(5, 9, 19, 0.46), rgba(5, 9, 19, 0.46)), url("assets/jwst-bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
