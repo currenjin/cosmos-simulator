@@ -25,7 +25,7 @@ body {
   font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", sans-serif;
   color: var(--text);
   background-color: #050913;
-  background-image: url("assets/jwst-bg.png");
+  background-image: linear-gradient(rgba(5, 9, 19, 0.28), rgba(5, 9, 19, 0.28)), url("assets/jwst-bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1221,7 +1221,7 @@ body.dynamics-mode .hero > p {
 
 body.simulator-mode {
   background-color: #050913;
-  background-image: url("assets/jwst-bg.png");
+  background-image: linear-gradient(rgba(5, 9, 19, 0.24), rgba(5, 9, 19, 0.24)), url("assets/jwst-bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1229,7 +1229,7 @@ body.simulator-mode {
 
 body.kepler-mode {
   background-color: #050913;
-  background-image: url("assets/jwst-bg.png");
+  background-image: linear-gradient(rgba(5, 9, 19, 0.24), rgba(5, 9, 19, 0.24)), url("assets/jwst-bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1237,7 +1237,7 @@ body.kepler-mode {
 
 body.dynamics-mode {
   background-color: #050913;
-  background-image: url("assets/jwst-bg.png");
+  background-image: linear-gradient(rgba(5, 9, 19, 0.24), rgba(5, 9, 19, 0.24)), url("assets/jwst-bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
