@@ -7,7 +7,7 @@ const COPY = {
     "tab.planner": "플래너",
     "tab.simulator": "3D 시뮬레이터",
     "tab.journey": "코스믹 저니",
-    "tab.kepler": "Kepler Lab",
+    "tab.kepler": "케플러 랩",
     "tab.dynamics": "동역학 랩",
     "planner.conditions": "관측 조건",
     "planner.latitude": "위도",
