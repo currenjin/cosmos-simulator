@@ -343,6 +343,12 @@ button:hover {
   font-size: 0.88rem;
 }
 
+.sim-time select {
+  width: 92px;
+  padding: 8px 10px;
+  font-size: 0.88rem;
+}
+
 #date {
   width: 160px;
 }
@@ -350,6 +356,30 @@ button:hover {
 #latitude,
 #longitude {
   width: 116px;
+}
+
+.sim-search {
+  display: flex;
+  align-items: end;
+  gap: 6px;
+}
+
+.sim-search label {
+  display: inline;
+  align-self: center;
+  white-space: nowrap;
+  font-size: 0.84rem;
+  color: var(--muted);
+  margin-right: 2px;
+}
+
+#sky-search {
+  width: 180px;
+  padding: 8px 10px;
+}
+
+#sky-search-btn {
+  padding: 8px 12px;
 }
 
 #sync-sky-now {
@@ -433,6 +463,12 @@ button:hover {
   color: #9fd8ff;
   font-weight: 700;
   font-size: 0.78rem;
+}
+
+.viewer-label.search-hit {
+  color: #ffe39f;
+  text-shadow: 0 0 14px rgba(255, 216, 126, 0.75);
+  font-weight: 700;
 }
 
 #result-count {
@@ -1024,6 +1060,19 @@ body.dynamics-mode {
   #latitude,
   #longitude,
   .sim-time input {
+    width: 100%;
+  }
+
+  .sim-time select {
+    width: 100%;
+  }
+
+  .sim-search {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  #sky-search {
     width: 100%;
   }
 

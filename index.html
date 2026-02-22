@@ -85,6 +85,14 @@
           <input type="time" id="sky-time" step="60" />
         </label>
         <label class="sim-time">
+          <span data-i18n="sim.speed">배속</span>
+          <select id="sky-speed">
+            <option value="1">x1</option>
+            <option value="10">x10</option>
+            <option value="60">x60</option>
+          </select>
+        </label>
+        <label class="sim-time">
           <span data-i18n="sim.date">날짜</span>
           <input id="date" type="date" required />
         </label>
@@ -100,6 +108,12 @@
           <input type="checkbox" id="sky-live-time" checked />
           <span data-i18n="sim.live">현재 시간 실시간</span>
         </label>
+        <div class="sim-search">
+          <label for="sky-search" data-i18n="sim.search">천체 찾기</label>
+          <input id="sky-search" type="search" list="sky-search-list" placeholder="Orion / M42 / Vega" />
+          <datalist id="sky-search-list"></datalist>
+          <button type="button" id="sky-search-btn" data-i18n="sim.searchBtn">찾기</button>
+        </div>
         <button type="button" id="sync-sky-now" data-i18n="sim.sync">현재 위치/시간 맞추기</button>
       </div>
       <p id="sky-status" class="sky-status"></p>

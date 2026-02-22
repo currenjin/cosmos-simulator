@@ -11,7 +11,11 @@ const latitudeInput = document.querySelector("#latitude");
 const longitudeInput = document.querySelector("#longitude");
 const dateInput = document.querySelector("#date");
 const skyTimeInput = document.querySelector("#sky-time");
+const skySpeedInput = document.querySelector("#sky-speed");
 const liveTimeInput = document.querySelector("#sky-live-time");
+const skySearchInput = document.querySelector("#sky-search");
+const skySearchBtn = document.querySelector("#sky-search-btn");
+const skySearchList = document.querySelector("#sky-search-list");
 const syncSkyNowBtn = document.querySelector("#sync-sky-now");
 const skyStatus = document.querySelector("#sky-status");
 
@@ -212,6 +216,21 @@ const nebulaPoints = new THREE.Points(
 );
 nebulaGroup.add(nebulaPoints);
 
+const searchableTargets = [
+  ...starEntries.map(([key, star]) => ({
+    key: `star:${key}`,
+    name: star.name,
+    raHours: star.raHours,
+    decDeg: star.decDeg
+  })),
+  ...nebulaTargets.map((target) => ({
+    key: `nebula:${target.id}`,
+    name: target.name,
+    raHours: target.raHours,
+    decDeg: target.decDeg
+  }))
+];
+
 let started = false;
 let pendingStart = false;
 let isDragging = false;
@@ -219,7 +238,12 @@ let yaw = toRad(180);
 let pitch = toRad(35);
 let lastX = 0;
 let lastY = 0;
+let lastFrameTs = 0;
 let lastStatusUpdate = 0;
+let timeSpeed = 1;
+let searchHitKey = "";
+let statusHint = "";
+let statusHintUntil = 0;
 let currentContext = {
   date: new Date(),
   lat: 37.5665,
@@ -237,10 +261,17 @@ const fogTwilightColor = new THREE.Color(0x2e4d72);
 
 initializeObserverInputs();
 initializeSkyTime();
+timeSpeed = Number(skySpeedInput?.value || "1");
 buildLabels();
+initializeSearchOptions();
+updateSearchPlaceholder();
 wireControls();
 window.addEventListener("simulator:activate", ensureStarted);
 window.addEventListener("resize", resizeRenderer);
+window.addEventListener("cosmos:settings-changed", () => {
+  updateSearchPlaceholder();
+  updateStatus();
+});
 
 if (simulatorView && !simulatorView.hidden) {
   ensureStarted();
@@ -319,6 +350,25 @@ function wireControls() {
   });
 
   syncSkyNowBtn?.addEventListener("click", syncSkyToNow);
+  skySpeedInput?.addEventListener("change", () => {
+    const next = Number(skySpeedInput.value);
+    timeSpeed = Number.isFinite(next) && next > 0 ? next : 1;
+    if (timeSpeed > 1 && liveTimeInput.checked) {
+      liveTimeInput.checked = false;
+      currentContext.date = new Date();
+      syncInputsFromContext();
+    }
+    updateCelestialPositions();
+    updateStatus();
+  });
+
+  skySearchBtn?.addEventListener("click", focusSearchTarget);
+  skySearchInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      focusSearchTarget();
+    }
+  });
 
   renderer.domElement.addEventListener("pointerdown", (event) => {
     isDragging = true;
@@ -419,6 +469,12 @@ function updateContextFromInputs() {
   };
 }
 
+function syncInputsFromContext() {
+  const d = currentContext.date;
+  dateInput.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  skyTimeInput.value = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
 function moveViewToFocus(mode) {
   const focus = {
     orion: { raHours: 5.5, decDeg: -1.5 },
@@ -436,9 +492,60 @@ function moveViewToFocus(mode) {
     currentContext.lon
   );
 
+  moveViewToHorizontal(altDeg, azDeg);
+}
+
+function moveViewToHorizontal(altDeg, azDeg) {
   const v = horizontalToVector(altDeg, azDeg, 1).normalize();
   pitch = Math.asin(v.y);
   yaw = Math.atan2(v.x, -v.z);
+}
+
+function initializeSearchOptions() {
+  if (!skySearchList) return;
+  const names = Array.from(new Set(searchableTargets.map((item) => item.name))).sort((a, b) => a.localeCompare(b));
+  skySearchList.innerHTML = names.map((name) => `<option value="${name}"></option>`).join("");
+}
+
+function updateSearchPlaceholder() {
+  if (!skySearchInput) return;
+  skySearchInput.placeholder = getLanguage() === "en" ? "Orion / M42 / Vega" : "오리온 / M42 / Vega";
+}
+
+function focusSearchTarget() {
+  const raw = skySearchInput?.value?.trim();
+  if (!raw) return;
+
+  const target = findSearchTarget(raw);
+  if (!target) {
+    setStatusHint(getLanguage() === "en" ? `No match for "${raw}"` : `"${raw}"에 해당하는 천체를 찾지 못했습니다.`);
+    searchHitKey = "";
+    return;
+  }
+
+  const { altDeg, azDeg } = raDecToHorizontal(target.raHours, target.decDeg, currentContext.date, currentContext.lat, currentContext.lon);
+  moveViewToHorizontal(altDeg, azDeg);
+  searchHitKey = target.key;
+  setStatusHint(getLanguage() === "en" ? `Focused: ${target.name}` : `포커스: ${target.name}`, 2200);
+}
+
+function findSearchTarget(query) {
+  const q = normalizeSearch(query);
+  if (!q) return null;
+
+  const exact = searchableTargets.find((target) => normalizeSearch(target.name) === q);
+  if (exact) return exact;
+
+  return searchableTargets.find((target) => normalizeSearch(target.name).includes(q)) || null;
+}
+
+function normalizeSearch(value) {
+  return value.toLowerCase().replace(/\s+/g, "");
+}
+
+function setStatusHint(text, ttlMs = 2800) {
+  statusHint = text;
+  statusHintUntil = Date.now() + ttlMs;
 }
 
 function createHorizonRing() {
@@ -617,13 +724,24 @@ function ensureStarted() {
 function animate(ts) {
   if (!started) return;
 
-  if (liveTimeInput.checked) {
+  const dt = Math.min(0.25, Math.max(0, (ts - (lastFrameTs || ts)) / 1000));
+  lastFrameTs = ts;
+
+  if (liveTimeInput.checked && timeSpeed === 1) {
     updateContextFromInputs();
+  } else {
+    if (liveTimeInput.checked && timeSpeed > 1) {
+      liveTimeInput.checked = false;
+      currentContext.date = new Date();
+      syncInputsFromContext();
+    }
+    currentContext.date = new Date(currentContext.date.getTime() + dt * 1000 * timeSpeed);
+    syncInputsFromContext();
   }
 
-  if (ts - lastStatusUpdate > 800) {
-    updateStatus();
+  if (ts - lastStatusUpdate > 400) {
     updateCelestialPositions();
+    updateStatus();
     lastStatusUpdate = ts;
   }
 
@@ -670,11 +788,13 @@ function updateStatus() {
   const hh = String(d.getHours()).padStart(2, "0");
   const min = String(d.getMinutes()).padStart(2, "0");
   const darknessLabel = getSkyConditionLabel(currentSkyState.sunAltDeg);
+  const speedLabel = timeSpeed === 1 ? "" : ` | ${getLanguage() === "en" ? "Speed" : "배속"} x${timeSpeed}`;
+  const activeHint = Date.now() < statusHintUntil ? ` | ${statusHint}` : "";
 
   if (getLanguage() === "en") {
-    skyStatus.textContent = `Observer ${formatLatLon(currentContext.lat, currentContext.lon)} | Time ${yyyy}-${mm}-${dd} ${hh}:${min} | ${darknessLabel}`;
+    skyStatus.textContent = `Observer ${formatLatLon(currentContext.lat, currentContext.lon)} | Time ${yyyy}-${mm}-${dd} ${hh}:${min} | ${darknessLabel}${speedLabel}${activeHint}`;
   } else {
-    skyStatus.textContent = `관측 위치 ${formatLatLon(currentContext.lat, currentContext.lon)} | 기준 시각 ${yyyy}-${mm}-${dd} ${hh}:${min} | ${darknessLabel}`;
+    skyStatus.textContent = `관측 위치 ${formatLatLon(currentContext.lat, currentContext.lon)} | 기준 시각 ${yyyy}-${mm}-${dd} ${hh}:${min} | ${darknessLabel}${speedLabel}${activeHint}`;
   }
 }
 
@@ -698,10 +818,12 @@ function updateLabels() {
     const aboveHorizon = point.y > 0 || type === "cardinal";
     if (!visible || !aboveHorizon) {
       element.style.opacity = "0";
+      element.classList.remove("search-hit");
       return;
     }
 
     element.style.opacity = "1";
+    element.classList.toggle("search-hit", key === searchHitKey);
     element.style.left = `${x}px`;
     element.style.top = `${y}px`;
   });
