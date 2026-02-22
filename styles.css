@@ -511,10 +511,10 @@ button:hover {
 
 .scale-cinematic {
   position: absolute;
-  left: 38px;
-  top: 142px;
-  z-index: 12;
-  max-width: min(640px, calc(100% - 72px));
+  left: 18px;
+  top: 14px;
+  z-index: 4;
+  max-width: min(640px, calc(100% - 36px));
   pointer-events: none;
   opacity: 0;
   transform: translateY(8px);
