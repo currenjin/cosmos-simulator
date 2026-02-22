@@ -653,6 +653,13 @@ body.kepler-mode #journey-view {
   display: none;
 }
 
+body.dynamics-mode #planner-view,
+body.dynamics-mode #simulator-view,
+body.dynamics-mode #journey-view,
+body.dynamics-mode #kepler-view {
+  display: none;
+}
+
 body.journey-mode .hero h1,
 body.journey-mode .hero p.eyebrow {
   display: none;
@@ -679,6 +686,110 @@ body.kepler-mode .hero {
 
 body.kepler-mode .hero > p {
   margin-top: 0;
+}
+
+body.dynamics-mode .hero h1,
+body.dynamics-mode .hero p.eyebrow {
+  display: none;
+}
+
+body.dynamics-mode .hero {
+  padding-top: 18px;
+  padding-bottom: 10px;
+}
+
+body.dynamics-mode .hero > p {
+  margin-top: 0;
+}
+
+.dynamics-view {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 4px 20px 28px;
+}
+
+.dynamics-hero {
+  border: 1px solid rgba(133, 180, 255, 0.22);
+  border-radius: 16px;
+  padding: 18px;
+  background: linear-gradient(120deg, rgba(11, 27, 47, 0.92), rgba(37, 27, 54, 0.82));
+}
+
+.dynamics-hero p {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.dynamics-grid {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(12, 1fr);
+}
+
+.dynamics-panel {
+  border-radius: 16px;
+  border: 1px solid rgba(136, 180, 255, 0.22);
+  padding: 14px;
+  background: linear-gradient(150deg, rgba(8, 17, 31, 0.92), rgba(12, 15, 30, 0.82));
+  grid-column: span 4;
+}
+
+.dynamics-panel.dynamics-orbit-panel {
+  grid-column: span 8;
+}
+
+.dynamics-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.dynamics-metrics {
+  margin-top: 10px;
+  display: grid;
+  gap: 7px;
+}
+
+.dynamics-metrics.two-col {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dynamics-metrics p {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.dynamics-metrics strong {
+  color: #e8f2ff;
+}
+
+.dynamics-note {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+#dyn-thrust-canvas,
+#dyn-orbit-canvas {
+  width: 100%;
+  display: block;
+  margin-top: 10px;
+  border: 1px solid rgba(126, 160, 221, 0.24);
+  border-radius: 10px;
+}
+
+#dyn-thrust-canvas {
+  min-height: 240px;
+}
+
+#dyn-orbit-canvas {
+  min-height: 360px;
 }
 
 .kepler-view {
@@ -803,6 +914,12 @@ body.kepler-mode {
     linear-gradient(140deg, #050811 0%, #0b1225 43%, #181023 100%);
 }
 
+body.dynamics-mode {
+  background: radial-gradient(circle at 12% 16%, #2b3f59, transparent 35%),
+    radial-gradient(circle at 88% 12%, #4b2d44, transparent 38%),
+    linear-gradient(140deg, #050811 0%, #0c1427 43%, #181023 100%);
+}
+
 .site-footer {
   max-width: 1280px;
   margin: 0 auto;
@@ -900,6 +1017,19 @@ body.kepler-mode {
 
   #kepler-canvas {
     min-height: 320px;
+  }
+
+  .dynamics-panel,
+  .dynamics-panel.dynamics-orbit-panel {
+    grid-column: 1 / -1;
+  }
+
+  #dyn-thrust-canvas {
+    min-height: 220px;
+  }
+
+  #dyn-orbit-canvas {
+    min-height: 300px;
   }
 }
 

@@ -17,6 +17,7 @@
 - COSMOS ATLAS 브랜딩: 로고, 통일된 컬러 시스템, 탭별 분위기 테마
 - 전역 설정: 언어(한국어/English), 단위(천문 단위/마일 혼합) 전환
 - Kepler Lab: 케플러 1·2·3법칙 학습, 뉴턴 연결, 실제 행성 데이터 비교
+- Dynamics Lab: 뉴턴 3법칙, 에너지 보존, 각운동량 보존 시뮬레이션
 
 ## 로컬 실행
 
@@ -52,3 +53,4 @@ python3 -m http.server 4173
 - `assets/cosmos-atlas-logo.svg`: COSMOS ATLAS 브랜드 로고
 - `settings.js`: 전역 설정(언어/단위) 상태 관리
 - `kepler-lab.js`: 케플러 학습(1/2/5/6) 시뮬레이션
+- `dynamics-lab.js`: 뉴턴 3법칙 + 보존법칙 학습 시뮬레이션

@@ -53,6 +53,9 @@
         <button type="button" class="mode-tab" data-tab="kepler" role="tab" aria-selected="false" data-i18n="tab.kepler">
           Kepler Lab
         </button>
+        <button type="button" class="mode-tab" data-tab="dynamics" role="tab" aria-selected="false" data-i18n="tab.dynamics">
+          Dynamics Lab
+        </button>
       </div>
     </header>
 
@@ -273,6 +276,47 @@
       </section>
     </section>
 
+    <section id="dynamics-view" class="dynamics-view" hidden>
+      <div class="dynamics-hero">
+        <h2 data-i18n="dyn.title">Dynamics Lab: 뉴턴 + 보존법칙</h2>
+        <p data-i18n="dyn.subtitle">뉴턴 3법칙, 에너지 보존, 각운동량 보존을 하나의 상호작용으로 학습합니다.</p>
+      </div>
+
+      <section class="dynamics-grid">
+        <article class="dynamics-panel">
+          <h3 data-i18n="dyn.n123">1) 뉴턴 운동 3법칙</h3>
+          <label for="dyn-mass" data-i18n="dyn.mass">질량 m</label>
+          <input id="dyn-mass" type="range" min="0.5" max="8" step="0.1" value="2" />
+          <label for="dyn-force" data-i18n="dyn.forceInput">추력 F</label>
+          <input id="dyn-force" type="range" min="0" max="24" step="0.5" value="8" />
+          <div class="dynamics-actions">
+            <button type="button" id="dyn-thrust-btn" data-i18n="dyn.applyForce">추력 1초 적용</button>
+            <button type="button" id="dyn-reset-btn" data-i18n="dyn.reset">리셋</button>
+          </div>
+          <div class="dynamics-metrics">
+            <p><span data-i18n="dyn.acc">가속도 a</span> <strong id="dyn-acc"></strong></p>
+            <p><span data-i18n="dyn.vel">속도 v</span> <strong id="dyn-vel"></strong></p>
+            <p><span data-i18n="dyn.reaction">작용-반작용</span> <strong id="dyn-reaction"></strong></p>
+          </div>
+          <canvas id="dyn-thrust-canvas" width="620" height="240"></canvas>
+        </article>
+
+        <article class="dynamics-panel dynamics-orbit-panel">
+          <h3 data-i18n="dyn.conservation">2) 에너지/각운동량 보존</h3>
+          <p class="dynamics-note" data-i18n="dyn.conservationDesc">중력장 궤도에서 총 에너지 E와 각운동량 L이 거의 일정하게 유지되는지 확인하세요.</p>
+          <canvas id="dyn-orbit-canvas" width="860" height="420"></canvas>
+          <div class="dynamics-metrics two-col">
+            <p><span>K</span> <strong id="dyn-k"></strong></p>
+            <p><span>U</span> <strong id="dyn-u"></strong></p>
+            <p><span>E = K + U</span> <strong id="dyn-e"></strong></p>
+            <p><span>L</span> <strong id="dyn-l"></strong></p>
+            <p><span data-i18n="dyn.eDrift">E 변동</span> <strong id="dyn-e-drift"></strong></p>
+            <p><span data-i18n="dyn.lDrift">L 변동</span> <strong id="dyn-l-drift"></strong></p>
+          </div>
+        </article>
+      </section>
+    </section>
+
     <footer class="site-footer">
       <p>COSMOS ATLAS | Observe. Understand. Feel The Scale.</p>
     </footer>
@@ -281,5 +325,6 @@
     <script type="module" src="sky3d.js"></script>
     <script type="module" src="cosmic-journey.js"></script>
     <script type="module" src="kepler-lab.js"></script>
+    <script type="module" src="dynamics-lab.js"></script>
   </body>
 </html>

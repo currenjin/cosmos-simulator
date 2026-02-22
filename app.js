@@ -8,6 +8,7 @@ const COPY = {
     "tab.simulator": "3D 시뮬레이터",
     "tab.journey": "코스믹 저니",
     "tab.kepler": "Kepler Lab",
+    "tab.dynamics": "Dynamics Lab",
     "planner.conditions": "관측 조건",
     "planner.latitude": "위도",
     "planner.longitude": "경도",
@@ -78,6 +79,21 @@ const COPY = {
     "kepler.realT": "실측 T",
     "kepler.theoryT": "이론 T(3법칙)",
     "kepler.error": "오차"
+    ,
+    "dyn.title": "Dynamics Lab: 뉴턴 + 보존법칙",
+    "dyn.subtitle": "뉴턴 3법칙, 에너지 보존, 각운동량 보존을 하나의 상호작용으로 학습합니다.",
+    "dyn.n123": "1) 뉴턴 운동 3법칙",
+    "dyn.mass": "질량 m",
+    "dyn.forceInput": "추력 F",
+    "dyn.applyForce": "추력 1초 적용",
+    "dyn.reset": "리셋",
+    "dyn.acc": "가속도 a",
+    "dyn.vel": "속도 v",
+    "dyn.reaction": "작용-반작용",
+    "dyn.conservation": "2) 에너지/각운동량 보존",
+    "dyn.conservationDesc": "중력장 궤도에서 총 에너지 E와 각운동량 L이 거의 일정하게 유지되는지 확인하세요.",
+    "dyn.eDrift": "E 변동",
+    "dyn.lDrift": "L 변동"
   },
   en: {
     "settings.language": "Language",
@@ -86,6 +102,7 @@ const COPY = {
     "tab.simulator": "3D Sky",
     "tab.journey": "Cosmic Journey",
     "tab.kepler": "Kepler Lab",
+    "tab.dynamics": "Dynamics Lab",
     "planner.conditions": "Observation Conditions",
     "planner.latitude": "Latitude",
     "planner.longitude": "Longitude",
@@ -154,7 +171,21 @@ const COPY = {
     "kepler.selectPlanet": "Planet",
     "kepler.realT": "Observed T",
     "kepler.theoryT": "Theoretical T (3rd law)",
-    "kepler.error": "Error"
+    "kepler.error": "Error",
+    "dyn.title": "Dynamics Lab: Newton + Conservation",
+    "dyn.subtitle": "Learn Newton's 3 laws, energy conservation, and angular momentum conservation interactively.",
+    "dyn.n123": "1) Newton's Three Laws",
+    "dyn.mass": "Mass m",
+    "dyn.forceInput": "Thrust F",
+    "dyn.applyForce": "Apply Thrust (1s)",
+    "dyn.reset": "Reset",
+    "dyn.acc": "Acceleration a",
+    "dyn.vel": "Velocity v",
+    "dyn.reaction": "Action-Reaction",
+    "dyn.conservation": "2) Energy/Angular Momentum Conservation",
+    "dyn.conservationDesc": "Check whether total energy E and angular momentum L stay nearly constant in orbit.",
+    "dyn.eDrift": "E Drift",
+    "dyn.lDrift": "L Drift"
   }
 };
 
@@ -172,6 +203,7 @@ const plannerView = document.querySelector("#planner-view");
 const simulatorView = document.querySelector("#simulator-view");
 const journeyView = document.querySelector("#journey-view");
 const keplerView = document.querySelector("#kepler-view");
+const dynamicsView = document.querySelector("#dynamics-view");
 const modeTabs = document.querySelectorAll(".mode-tab");
 
 let lastRecommendations = [];
@@ -221,15 +253,40 @@ function initializeDefaults() {
 
 function initializeModeTabs() {
   const modeFromHash =
-    location.hash === "#simulator" ? "simulator" : location.hash === "#journey" ? "journey" : location.hash === "#kepler" ? "kepler" : "planner";
+    location.hash === "#simulator"
+      ? "simulator"
+      : location.hash === "#journey"
+        ? "journey"
+        : location.hash === "#kepler"
+          ? "kepler"
+          : location.hash === "#dynamics"
+            ? "dynamics"
+            : "planner";
   setMode(modeFromHash);
 
   modeTabs.forEach((tab) => {
     tab.addEventListener("click", () => {
       const mode =
-        tab.dataset.tab === "simulator" ? "simulator" : tab.dataset.tab === "journey" ? "journey" : tab.dataset.tab === "kepler" ? "kepler" : "planner";
+        tab.dataset.tab === "simulator"
+          ? "simulator"
+          : tab.dataset.tab === "journey"
+            ? "journey"
+            : tab.dataset.tab === "kepler"
+              ? "kepler"
+              : tab.dataset.tab === "dynamics"
+                ? "dynamics"
+                : "planner";
       setMode(mode);
-      const hash = mode === "simulator" ? "#simulator" : mode === "journey" ? "#journey" : mode === "kepler" ? "#kepler" : "#planner";
+      const hash =
+        mode === "simulator"
+          ? "#simulator"
+          : mode === "journey"
+            ? "#journey"
+            : mode === "kepler"
+              ? "#kepler"
+              : mode === "dynamics"
+                ? "#dynamics"
+                : "#planner";
       history.replaceState(null, "", hash);
     });
   });
@@ -239,16 +296,19 @@ function setMode(mode) {
   const simulatorMode = mode === "simulator";
   const journeyMode = mode === "journey";
   const keplerMode = mode === "kepler";
-  const plannerMode = !simulatorMode && !journeyMode && !keplerMode;
+  const dynamicsMode = mode === "dynamics";
+  const plannerMode = !simulatorMode && !journeyMode && !keplerMode && !dynamicsMode;
 
   document.body.classList.toggle("planner-mode", plannerMode);
   document.body.classList.toggle("simulator-mode", simulatorMode);
   document.body.classList.toggle("journey-mode", journeyMode);
   document.body.classList.toggle("kepler-mode", keplerMode);
+  document.body.classList.toggle("dynamics-mode", dynamicsMode);
   plannerView.hidden = !plannerMode;
   simulatorView.hidden = !simulatorMode;
   journeyView.hidden = !journeyMode;
   keplerView.hidden = !keplerMode;
+  dynamicsView.hidden = !dynamicsMode;
 
   modeTabs.forEach((tab) => {
     const active = tab.dataset.tab === mode;
@@ -264,6 +324,9 @@ function setMode(mode) {
   }
   if (keplerMode) {
     window.dispatchEvent(new CustomEvent("kepler:activate"));
+  }
+  if (dynamicsMode) {
+    window.dispatchEvent(new CustomEvent("dynamics:activate"));
   }
 }
 
