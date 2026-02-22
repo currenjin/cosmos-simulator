@@ -1455,6 +1455,27 @@ function createGalaxyScaleScene() {
   coreGlow.position.y = 0.6;
   galaxyScaleGroup.add(coreGlow);
 
+  const spiralArms = [];
+  const armColors = [0x8cb8ff, 0x9bc4ff, 0x87b0f8, 0xa7ceff];
+  for (let i = 0; i < 4; i += 1) {
+    const arm = createSpiralArm(22, 126, i * (Math.PI / 2), armColors[i], 0.26);
+    arm.position.y = 0.8;
+    galaxyScaleGroup.add(arm);
+    spiralArms.push(arm);
+  }
+
+  const centralBar = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.2, 1.2, 24, 20),
+    new THREE.MeshBasicMaterial({
+      color: 0xffc892,
+      transparent: true,
+      opacity: 0.5
+    })
+  );
+  centralBar.rotation.z = Math.PI / 2;
+  centralBar.position.y = 0.9;
+  galaxyScaleGroup.add(centralBar);
+
   const sunMarker = new THREE.Mesh(
     new THREE.SphereGeometry(2.4, 14, 10),
     new THREE.MeshBasicMaterial({
@@ -1463,6 +1484,22 @@ function createGalaxyScaleScene() {
   );
   sunMarker.position.set(68, 1, 18);
   galaxyScaleGroup.add(sunMarker);
+
+  const sunOrbitPath = new THREE.Mesh(
+    new THREE.RingGeometry(70, 72, 200),
+    new THREE.MeshBasicMaterial({
+      color: 0x9dd0ff,
+      transparent: true,
+      opacity: 0.2,
+      side: THREE.DoubleSide
+    })
+  );
+  sunOrbitPath.rotation.x = -Math.PI / 2;
+  galaxyScaleGroup.add(sunOrbitPath);
+
+  const globularHalo = createScaleDepthParticles(220, 34, 122, 1.2, 0xc9dcff, 0.2);
+  globularHalo.position.y = 3.2;
+  galaxyScaleGroup.add(globularHalo);
 
   const distanceLine = new THREE.Line(
     new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.8, 0), sunMarker.position.clone()]),
@@ -1474,11 +1511,31 @@ function createGalaxyScaleScene() {
   );
   galaxyScaleGroup.add(distanceLine);
 
+  const ring26kly = new THREE.Mesh(
+    new THREE.RingGeometry(69.4, 70.6, 220),
+    new THREE.MeshBasicMaterial({
+      color: 0xffd395,
+      transparent: true,
+      opacity: 0.16,
+      side: THREE.DoubleSide
+    })
+  );
+  ring26kly.rotation.x = -Math.PI / 2;
+  galaxyScaleGroup.add(ring26kly);
+
   return {
     disk,
     core,
     sunMarker,
-    pulseMaterials: [disk.material, coreGlow.material, distanceLine.material]
+    pulseMaterials: [
+      disk.material,
+      coreGlow.material,
+      distanceLine.material,
+      sunOrbitPath.material,
+      ring26kly.material,
+      ...spiralArms.map((arm) => arm.material),
+      centralBar.material
+    ]
   };
 }
 
@@ -1513,6 +1570,66 @@ function createLocalGroupScaleScene() {
   andromedaGlow.position.copy(andromeda.position);
   localScaleGroup.add(andromedaGlow);
 
+  const triangulum = new THREE.Mesh(
+    new THREE.CircleGeometry(14, 30),
+    new THREE.MeshBasicMaterial({
+      color: 0xc8d8ff,
+      transparent: true,
+      opacity: 0.4
+    })
+  );
+  triangulum.rotation.x = -Math.PI / 2;
+  triangulum.position.set(72, 0, 36);
+  localScaleGroup.add(triangulum);
+
+  const lmc = new THREE.Mesh(
+    new THREE.CircleGeometry(9, 24),
+    new THREE.MeshBasicMaterial({
+      color: 0x9fd1ff,
+      transparent: true,
+      opacity: 0.38
+    })
+  );
+  lmc.rotation.x = -Math.PI / 2;
+  lmc.position.set(-52, 0, -22);
+  localScaleGroup.add(lmc);
+
+  const smc = new THREE.Mesh(
+    new THREE.CircleGeometry(6, 20),
+    new THREE.MeshBasicMaterial({
+      color: 0xb4daff,
+      transparent: true,
+      opacity: 0.34
+    })
+  );
+  smc.rotation.x = -Math.PI / 2;
+  smc.position.set(-38, 0, -34);
+  localScaleGroup.add(smc);
+
+  const m32 = new THREE.Mesh(
+    new THREE.CircleGeometry(5, 18),
+    new THREE.MeshBasicMaterial({
+      color: 0xffe0be,
+      transparent: true,
+      opacity: 0.38
+    })
+  );
+  m32.rotation.x = -Math.PI / 2;
+  m32.position.set(98, 0, -20);
+  localScaleGroup.add(m32);
+
+  const m110 = new THREE.Mesh(
+    new THREE.CircleGeometry(6, 18),
+    new THREE.MeshBasicMaterial({
+      color: 0xffd8b4,
+      transparent: true,
+      opacity: 0.32
+    })
+  );
+  m110.rotation.x = -Math.PI / 2;
+  m110.position.set(127, 0, -49);
+  localScaleGroup.add(m110);
+
   const bridge = new THREE.Line(
     new THREE.BufferGeometry().setFromPoints([mw.position.clone(), andromeda.position.clone()]),
     new THREE.LineBasicMaterial({
@@ -1523,10 +1640,39 @@ function createLocalGroupScaleScene() {
   );
   localScaleGroup.add(bridge);
 
+  const bridgeTri = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([mw.position.clone(), triangulum.position.clone()]),
+    new THREE.LineBasicMaterial({
+      color: 0x8db2e2,
+      transparent: true,
+      opacity: 0.2
+    })
+  );
+  localScaleGroup.add(bridgeTri);
+
+  const bridgeAndTri = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([andromeda.position.clone(), triangulum.position.clone()]),
+    new THREE.LineBasicMaterial({
+      color: 0x93b8ea,
+      transparent: true,
+      opacity: 0.2
+    })
+  );
+  localScaleGroup.add(bridgeAndTri);
+
   return {
     mw,
     andromeda,
-    pulseMaterials: [bridge.material, mwGlow.material, andromedaGlow.material]
+    pulseMaterials: [
+      bridge.material,
+      bridgeTri.material,
+      bridgeAndTri.material,
+      mwGlow.material,
+      andromedaGlow.material,
+      triangulum.material,
+      lmc.material,
+      smc.material
+    ]
   };
 }
 
@@ -1621,12 +1767,12 @@ function updateScaleAweText() {
       en: "Solar mode: approximate heliocentric orbits. Drag and zoom to inspect directly."
     },
     galaxy: {
-      ko: "은하 모드: 태양계는 원반 가장자리의 작은 지점입니다. 드래그로 구조를 보세요.",
-      en: "Galaxy mode: our system is a tiny outer-disk point. Drag to inspect structure."
+      ko: "은하 모드: 중심 팽대부, 나선팔, 태양 궤도(약 2.6만 광년)를 함께 확인해보세요.",
+      en: "Galaxy mode: inspect the bulge, spiral arms, and the Sun's orbit (~26k ly)."
     },
     local: {
-      ko: "국부은하군 모드: 안드로메다는 약 250만 광년 거리(개념적 배치)입니다.",
-      en: "Local Group mode: Andromeda is about 2.5 million light-years away (conceptual layout)."
+      ko: "국부은하군 모드: 우리은하-안드로메다-삼각형자리은하와 위성은하 연결을 확인하세요.",
+      en: "Local Group mode: inspect MW-Andromeda-Triangulum and satellite galaxy links."
     }
   };
   scaleAweEl.textContent = textByMode[scaleMode][lang];
@@ -1987,6 +2133,30 @@ function createGlowSphere(radius, color, opacity) {
       opacity,
       blending: THREE.AdditiveBlending,
       depthWrite: false
+    })
+  );
+}
+
+function createSpiralArm(startRadius, endRadius, phase, color, opacity) {
+  const points = [];
+  const turns = 1.65;
+  const segments = 140;
+  for (let i = 0; i <= segments; i += 1) {
+    const t = i / segments;
+    const radius = startRadius + (endRadius - startRadius) * t;
+    const theta = phase + t * Math.PI * 2 * turns;
+    const x = Math.cos(theta) * radius;
+    const z = Math.sin(theta) * radius;
+    const y = (Math.sin(t * Math.PI * 3 + phase) * 1.8) * (1 - t * 0.55);
+    points.push(new THREE.Vector3(x, y, z));
+  }
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  return new THREE.Line(
+    geometry,
+    new THREE.LineBasicMaterial({
+      color,
+      transparent: true,
+      opacity
     })
   );
 }
