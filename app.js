@@ -70,6 +70,7 @@ function setMode(mode) {
   const journeyMode = mode === "journey";
   const plannerMode = !simulatorMode && !journeyMode;
 
+  document.body.classList.toggle("planner-mode", plannerMode);
   document.body.classList.toggle("simulator-mode", simulatorMode);
   document.body.classList.toggle("journey-mode", journeyMode);
   plannerView.hidden = !plannerMode;

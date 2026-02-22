@@ -1,12 +1,14 @@
 :root {
-  --bg: #020710;
-  --bg-soft: #091628;
-  --panel: rgba(9, 20, 34, 0.78);
-  --line: rgba(139, 180, 255, 0.2);
-  --text: #e4ecff;
-  --muted: #9cb2d9;
-  --accent: #7be0ff;
-  --warm: #ffd37b;
+  --bg: #050913;
+  --bg-soft: #0b1628;
+  --panel: rgba(9, 19, 34, 0.84);
+  --line: rgba(131, 173, 246, 0.22);
+  --text: #ecf3ff;
+  --muted: #9eb6dc;
+  --accent: #73d2ff;
+  --accent-strong: #4fb7f0;
+  --warm: #f8ca78;
+  --brand-ink: #081224;
   --danger: #ff8c8c;
   --radius: 18px;
 }
@@ -19,12 +21,13 @@ body {
   margin: 0;
   font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at 12% 18%, #163460, transparent 30%),
-    radial-gradient(circle at 90% 10%, #4e2f14, transparent 35%),
-    linear-gradient(135deg, #020710 0%, #06101e 45%, #090f24 100%);
+  background: radial-gradient(circle at 12% 14%, #15355f, transparent 30%),
+    radial-gradient(circle at 92% 8%, #533418, transparent 34%),
+    linear-gradient(140deg, #050913 0%, #091327 44%, #0c1228 100%);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  transition: background 500ms ease;
 }
 
 .bg-glow {
@@ -51,7 +54,9 @@ body {
 }
 
 .hero,
-main {
+main,
+.simulator-view,
+.journey-view {
   position: relative;
   z-index: 1;
 }
@@ -59,15 +64,16 @@ main {
 .hero {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 54px 20px 24px;
+  padding: 44px 20px 20px;
 }
 
 .eyebrow {
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.15em;
   color: var(--warm);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
+  font-weight: 600;
 }
 
 h1,
@@ -78,25 +84,50 @@ h3 {
 }
 
 h1 {
-  margin-top: 10px;
-  font-size: clamp(1.8rem, 3vw, 2.9rem);
+  margin-top: 8px;
+  font-size: clamp(1.6rem, 2.8vw, 2.5rem);
   line-height: 1.14;
+  max-width: 760px;
 }
 
-.hero p {
+.hero-copy {
   margin-top: 12px;
   color: var(--muted);
-  max-width: 720px;
+  max-width: 800px;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: 1px solid rgba(140, 185, 255, 0.4);
+  background: linear-gradient(160deg, rgba(115, 210, 255, 0.32), rgba(248, 202, 120, 0.16));
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 8px 30px rgba(69, 153, 237, 0.18);
+}
+
+.brand-mark img {
+  width: 40px;
+  height: 40px;
+  animation: logoFloat 3.4s ease-in-out infinite alternate;
 }
 
 .mode-tabs {
-  margin-top: 18px;
+  margin-top: 16px;
   display: inline-flex;
-  background: rgba(7, 16, 28, 0.78);
-  border: 1px solid rgba(145, 185, 255, 0.28);
+  background: rgba(8, 17, 31, 0.92);
+  border: 1px solid rgba(138, 182, 255, 0.3);
   border-radius: 999px;
-  padding: 5px;
+  padding: 4px;
   gap: 4px;
+  backdrop-filter: blur(6px);
 }
 
 .mode-tab {
@@ -105,12 +136,13 @@ h1 {
   background: transparent;
   color: var(--muted);
   font-weight: 600;
-  padding: 8px 14px;
+  padding: 8px 13px;
+  font-size: 0.9rem;
 }
 
 .mode-tab.is-active {
-  background: linear-gradient(90deg, #6ecfff, #9fd8ff);
-  color: #061123;
+  background: linear-gradient(90deg, #69cfff, #f2c87b);
+  color: var(--brand-ink);
 }
 
 main {
@@ -129,6 +161,7 @@ main {
   padding: 18px;
   backdrop-filter: blur(8px);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: revealUp 420ms ease;
 }
 
 .controls {
@@ -161,7 +194,7 @@ input,
 select,
 button {
   border-radius: 10px;
-  border: 1px solid rgba(145, 185, 255, 0.3);
+  border: 1px solid rgba(146, 186, 255, 0.34);
   background: rgba(8, 16, 28, 0.8);
   color: var(--text);
   font: inherit;
@@ -179,8 +212,8 @@ button:hover {
 }
 
 .primary {
-  background: linear-gradient(90deg, #68ccff, #9dd4ff);
-  color: #061123;
+  background: linear-gradient(90deg, #68cbff, #f6cb7d);
+  color: var(--brand-ink);
   font-weight: 700;
   border: none;
 }
@@ -437,7 +470,7 @@ body.simulator-mode .hero > p {
   border: 1px solid rgba(133, 180, 255, 0.22);
   border-radius: 16px;
   padding: 18px;
-  background: linear-gradient(120deg, rgba(12, 27, 47, 0.9), rgba(22, 21, 44, 0.82));
+  background: linear-gradient(120deg, rgba(11, 27, 47, 0.92), rgba(37, 25, 47, 0.82));
 }
 
 .journey-kicker {
@@ -470,7 +503,7 @@ body.simulator-mode .hero > p {
   border-radius: 16px;
   border: 1px solid rgba(136, 180, 255, 0.22);
   padding: 14px;
-  background: linear-gradient(150deg, rgba(8, 17, 31, 0.9), rgba(6, 13, 25, 0.8));
+  background: linear-gradient(150deg, rgba(8, 17, 31, 0.92), rgba(12, 15, 30, 0.82));
 }
 
 .stage-panel {
@@ -608,12 +641,66 @@ body.journey-mode .hero > p {
   margin-top: 0;
 }
 
+body.planner-mode {
+  background: radial-gradient(circle at 12% 14%, #15355f, transparent 30%),
+    radial-gradient(circle at 92% 8%, #533418, transparent 34%),
+    linear-gradient(140deg, #050913 0%, #091327 44%, #0c1228 100%);
+}
+
+body.simulator-mode {
+  background: radial-gradient(circle at 13% 12%, #0e3255, transparent 32%),
+    radial-gradient(circle at 88% 18%, #204a34, transparent 40%),
+    linear-gradient(140deg, #040910 0%, #081222 42%, #0a1c1f 100%);
+}
+
+body.journey-mode {
+  background: radial-gradient(circle at 12% 16%, #3d295f, transparent 35%),
+    radial-gradient(circle at 88% 12%, #5b2d3f, transparent 38%),
+    linear-gradient(140deg, #060711 0%, #0f1225 43%, #1a1024 100%);
+}
+
+.site-footer {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 4px 20px 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.site-footer p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 @keyframes drift {
   from {
     transform: translate3d(0, 0, 0);
   }
   to {
     transform: translate3d(30px, 20px, 0);
+  }
+}
+
+@keyframes logoFloat {
+  from {
+    transform: translateY(-1px) scale(1);
+  }
+  to {
+    transform: translateY(1px) scale(1.03);
+  }
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -680,5 +767,19 @@ body.journey-mode .hero > p {
 
   .mode-tab {
     width: 100%;
+  }
+
+  .brand-lockup {
+    align-items: flex-start;
+  }
+
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+  }
+
+  .brand-mark img {
+    width: 34px;
+    height: 34px;
   }
 }

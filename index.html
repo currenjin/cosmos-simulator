@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tonight Sky Planner</title>
+    <title>COSMOS ATLAS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,10 +16,17 @@
     <div class="bg-glow glow-a"></div>
     <div class="bg-glow glow-b"></div>
     <header class="hero">
-      <p class="eyebrow">Night Observation Assistant</p>
-      <h1>오늘 밤 관측 플래너</h1>
-      <p>
-        위치와 날짜를 넣으면, 오늘 밤 실제로 보기 쉬운 천체를 우선순위로 추천합니다.
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">
+          <img src="assets/cosmos-atlas-logo.svg" alt="" />
+        </div>
+        <div>
+          <p class="eyebrow">COSMOS ATLAS</p>
+          <h1>우주를 체험하는 관측 시뮬레이션 스튜디오</h1>
+        </div>
+      </div>
+      <p class="hero-copy">
+        관측 플래너, 3D 하늘 시점, 코스믹 저니를 하나의 브랜드 경험으로 연결합니다.
       </p>
       <div class="mode-tabs" role="tablist" aria-label="앱 모드 선택">
         <button type="button" class="mode-tab is-active" data-tab="planner" role="tab" aria-selected="true">
@@ -184,6 +191,9 @@
       </section>
     </section>
 
+    <footer class="site-footer">
+      <p>COSMOS ATLAS | Observe. Understand. Feel The Scale.</p>
+    </footer>
     <script type="module" src="app.js"></script>
     <script type="module" src="sky3d.js"></script>
     <script type="module" src="cosmic-journey.js"></script>
