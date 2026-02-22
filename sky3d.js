@@ -28,6 +28,7 @@ const scaleCinematicEl = document.querySelector("#scale-cinematic");
 const scaleStoryEl = document.querySelector("#scale-story");
 const scaleCounterEl = document.querySelector("#scale-counter");
 const scaleButtons = document.querySelectorAll(".scale-btn");
+const scaleTourBtn = document.querySelector("#scale-tour-btn");
 
 const toggleConstellations = document.querySelector("#toggle-constellations");
 const toggleNebulae = document.querySelector("#toggle-nebulae");
@@ -642,6 +643,10 @@ let scaleCounterFromLy = 1 / 63241;
 let scaleCounterToLy = 1 / 63241;
 let scaleCounterStart = performance.now();
 let scaleCounterDuration = 1500;
+let autoTourActive = false;
+let autoTourIndex = -1;
+let autoTourHoldUntil = 0;
+let autoTourLastStage = "";
 
 const scaleScene = createScaleScenes();
 setScaleMode("sky", false);
@@ -660,6 +665,7 @@ initializeConstellationSelect();
 renderSearchResults([]);
 updateSearchPlaceholder();
 wireControls();
+updateScaleTourButtonText();
 window.addEventListener("simulator:activate", ensureStarted);
 window.addEventListener("resize", resizeRenderer);
 window.addEventListener("cosmos:settings-changed", () => {
@@ -669,6 +675,7 @@ window.addEventListener("cosmos:settings-changed", () => {
   updateScaleAweText();
   updateScaleStoryText();
   updateScaleAccuracyBadge();
+  updateScaleTourButtonText();
   renderSearchResults(getSearchMatches(skySearchInput?.value || ""));
   updateStatus();
 });
@@ -804,6 +811,7 @@ function wireControls() {
 
   focusButtons.forEach((button) => {
     button.addEventListener("click", () => {
+      stopAutoScaleTour();
       if (scaleMode !== "sky") {
         setScaleMode("sky", false);
       }
@@ -815,10 +823,18 @@ function wireControls() {
   syncSkyNowBtn?.addEventListener("click", syncSkyToNow);
   scaleButtons.forEach((button) => {
     button.addEventListener("click", () => {
+      stopAutoScaleTour();
       const mode = button.getAttribute("data-scale");
       if (!mode) return;
       setScaleMode(mode, true);
     });
+  });
+  scaleTourBtn?.addEventListener("click", () => {
+    if (autoTourActive) {
+      stopAutoScaleTour();
+    } else {
+      startAutoScaleTour();
+    }
   });
   skyPresetDayBtn?.addEventListener("click", () => applyTimePreset("day"));
   skyPresetYearBtn?.addEventListener("click", () => applyTimePreset("year"));
@@ -832,6 +848,7 @@ function wireControls() {
   skySearchInput?.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
+      stopAutoScaleTour();
       focusSearchTarget();
     }
   });
@@ -841,10 +858,12 @@ function wireControls() {
   constellationSelect?.addEventListener("change", () => {
     const id = constellationSelect.value;
     if (!id) return;
+    stopAutoScaleTour();
     focusConstellationById(id, true);
   });
 
   renderer.domElement.addEventListener("pointerdown", (event) => {
+    stopAutoScaleTour();
     isDragging = true;
     lastX = event.clientX;
     lastY = event.clientY;
@@ -882,6 +901,7 @@ function wireControls() {
   renderer.domElement.addEventListener(
     "wheel",
     (event) => {
+      stopAutoScaleTour();
       event.preventDefault();
       if (scaleMode === "sky") {
         camera.fov = clamp(camera.fov + event.deltaY * 0.02, 30, 90);
@@ -1058,6 +1078,7 @@ function focusConstellationById(id, smooth = true) {
 }
 
 function focusSearchTarget() {
+  stopAutoScaleTour();
   const raw = skySearchInput?.value?.trim();
   if (!raw) return;
   const matches = getSearchMatches(raw, 8);
@@ -1202,6 +1223,76 @@ function normalizeSearch(value) {
 function setStatusHint(text, ttlMs = 2800) {
   statusHint = text;
   statusHintUntil = Date.now() + ttlMs;
+}
+
+function updateScaleTourButtonText() {
+  if (!scaleTourBtn) return;
+  const lang = getLanguage();
+  scaleTourBtn.classList.toggle("is-active", autoTourActive);
+  scaleTourBtn.textContent = autoTourActive
+    ? lang === "en"
+      ? "Stop Tour"
+      : "투어 중지"
+    : lang === "en"
+      ? "Start Scale Tour"
+      : "스케일 투어 시작";
+}
+
+function startAutoScaleTour() {
+  autoTourActive = true;
+  autoTourIndex = -1;
+  autoTourHoldUntil = performance.now();
+  autoTourLastStage = "";
+  updateScaleTourButtonText();
+  setStatusHint(getLanguage() === "en" ? "Scale tour started" : "스케일 투어를 시작합니다", 2200);
+}
+
+function stopAutoScaleTour() {
+  if (!autoTourActive) return;
+  autoTourActive = false;
+  autoTourIndex = -1;
+  autoTourHoldUntil = 0;
+  autoTourLastStage = "";
+  updateScaleTourButtonText();
+  setStatusHint(getLanguage() === "en" ? "Scale tour stopped" : "스케일 투어를 중지했습니다", 1800);
+}
+
+function updateAutoScaleTour(ts) {
+  if (!autoTourActive) return;
+  const sequence = ["sky", "solar", "galaxy", "local"];
+
+  if (autoTourIndex < 0) {
+    autoTourIndex = 0;
+    autoTourLastStage = sequence[0];
+    if (scaleMode !== sequence[0]) {
+      setScaleMode(sequence[0], true);
+    }
+    autoTourHoldUntil = ts + 1900;
+    return;
+  }
+
+  const currentStage = sequence[autoTourIndex];
+  if (scaleMode !== currentStage) {
+    setScaleMode(currentStage, true);
+    autoTourHoldUntil = ts + 1900;
+    return;
+  }
+
+  if (scaleTransition < 1) return;
+  if (ts < autoTourHoldUntil) return;
+
+  autoTourIndex += 1;
+  if (autoTourIndex >= sequence.length) {
+    autoTourActive = false;
+    autoTourIndex = -1;
+    autoTourHoldUntil = 0;
+    updateScaleTourButtonText();
+    setStatusHint(getLanguage() === "en" ? "Scale tour completed" : "스케일 투어를 완료했습니다", 2200);
+    return;
+  }
+  autoTourLastStage = sequence[autoTourIndex];
+  setScaleMode(autoTourLastStage, true);
+  autoTourHoldUntil = ts + 2300;
 }
 
 function applyTimePreset(preset) {
@@ -1632,6 +1723,18 @@ function updateScaleAccuracyBadge() {
 }
 
 function captureCameraState(mode) {
+  const currentDirection = new THREE.Vector3();
+  camera.getWorldDirection(currentDirection);
+  const currentState = {
+    position: camera.position.clone(),
+    lookAt: camera.position.clone().add(currentDirection),
+    fov: camera.fov
+  };
+
+  if (mode !== "sky") {
+    return currentState;
+  }
+
   if (mode === "sky") {
     const lookDirection = new THREE.Vector3(
       Math.cos(pitch) * Math.sin(yaw),
@@ -1644,7 +1747,7 @@ function captureCameraState(mode) {
       fov: camera.fov
     };
   }
-  return getCameraPreset(mode);
+  return currentState;
 }
 
 function getCameraPreset(mode) {
@@ -2102,6 +2205,7 @@ function animate(ts) {
     }
   }
 
+  updateAutoScaleTour(ts);
   updateScaleTransition(ts);
 
   backgroundStars.rotation.y += 0.000045;

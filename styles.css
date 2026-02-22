@@ -780,6 +780,23 @@ canvas {
   color: #eaf5ff;
 }
 
+.scale-tour-btn {
+  margin-left: 4px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 213, 138, 0.52);
+  background: linear-gradient(100deg, rgba(255, 203, 125, 0.22), rgba(124, 185, 255, 0.18));
+  color: #ffe7ba;
+  font-size: 0.83rem;
+  font-weight: 600;
+}
+
+.scale-tour-btn.is-active {
+  border-color: rgba(255, 233, 177, 0.72);
+  color: #fff4da;
+  box-shadow: 0 0 16px rgba(255, 214, 132, 0.28);
+}
+
 .sim-controls {
   margin-top: 12px;
 }
