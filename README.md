@@ -15,6 +15,8 @@
 - 실시간 시간 동기화, 현재 위치/시간 맞추기 버튼
 - 코스믹 저니: 우주 스케일 슬라이더, 빛의 시간 체험, 자동 항해 비주얼
 - COSMOS ATLAS 브랜딩: 로고, 통일된 컬러 시스템, 탭별 분위기 테마
+- 관측 미션 시스템: 추천 결과 기반 4단계 미션 자동 판정
+- 전역 설정: 언어(한국어/English), 단위(천문 단위/마일 혼합) 전환
 
 ## 로컬 실행
 
@@ -48,3 +50,4 @@ python3 -m http.server 4173
 - `sky3d.js`: Three.js 기반 3D 하늘 시뮬레이터
 - `cosmic-journey.js`: 우주 스케일/빛의 시간 시각화 시뮬레이터
 - `assets/cosmos-atlas-logo.svg`: COSMOS ATLAS 브랜드 로고
+- `settings.js`: 전역 설정(언어/단위) 상태 관리

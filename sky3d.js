@@ -579,7 +579,11 @@ function updateStatus() {
   const hh = String(d.getHours()).padStart(2, "0");
   const min = String(d.getMinutes()).padStart(2, "0");
 
-  skyStatus.textContent = `관측 위치 ${formatLatLon(currentContext.lat, currentContext.lon)} | 기준 시각 ${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  if (getLanguage() === "en") {
+    skyStatus.textContent = `Observer ${formatLatLon(currentContext.lat, currentContext.lon)} | Time ${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  } else {
+    skyStatus.textContent = `관측 위치 ${formatLatLon(currentContext.lat, currentContext.lon)} | 기준 시각 ${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  }
 }
 
 function updateLabels() {
@@ -755,4 +759,8 @@ function normalizeDeg(deg) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function getLanguage() {
+  return window.cosmosSettings?.get()?.language === "en" ? "en" : "ko";
 }

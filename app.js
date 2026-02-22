@@ -1,5 +1,142 @@
 import { TARGETS, EQUIPMENT_ORDER } from "./targets.js";
 
+const COPY = {
+  ko: {
+    "settings.language": "언어",
+    "settings.unit": "단위",
+    "tab.planner": "플래너",
+    "tab.simulator": "3D 시뮬레이터",
+    "tab.journey": "코스믹 저니",
+    "planner.conditions": "관측 조건",
+    "planner.latitude": "위도",
+    "planner.longitude": "경도",
+    "planner.date": "날짜",
+    "planner.equipment": "장비",
+    "planner.useLocation": "내 위치 사용",
+    "planner.calculate": "추천 계산",
+    "planner.hint": "기준: 태양 고도 -12° 이하(어두운 하늘), 대상 고도 25° 이상일 때 관측 가능으로 판단.",
+    "planner.recommendations": "추천 대상",
+    "planner.summaryTitle": "오늘 밤 요약",
+    "planner.summaryNight": "{latlon} 기준, 어두운 하늘 구간은 약 {hours}시간입니다.",
+    "planner.summaryTop": "최우선 추천은 {name} (점수 {score})이며, 최고 고도는 약 {alt}° 입니다.",
+    "planner.summaryEmpty": "조건에 맞는 대상이 없습니다. 날짜 또는 장비를 조정해보세요.",
+    "planner.resultCount": "{count}개",
+    "planner.cardAlt": "최대 고도",
+    "planner.cardVisible": "관측 가능",
+    "planner.cardBest": "최적 시각",
+    "planner.cardEquipment": "필요 장비",
+    "planner.cardScore": "점수 {score}",
+    "planner.noNight": "야간 구간 없음",
+    "planner.locationBasis": "{latlon} 기준",
+    "equipment.naked": "맨눈",
+    "equipment.binocular": "쌍안경",
+    "equipment.scope": "소형 망원경",
+    "mission.title": "관측 미션",
+    "mission.refresh": "미션 확인",
+    "mission.pending": "진행 중",
+    "mission.done": "완료",
+    "mission.empty": "추천 계산을 실행하면 미션이 표시됩니다.",
+    "mission.m1.title": "입문 관측 워밍업",
+    "mission.m1.desc": "오늘 밤 추천 대상이 3개 이상인지 확인하세요.",
+    "mission.m2.title": "오리온 대성운 포착",
+    "mission.m2.desc": "추천 목록에 M42 오리온 대성운이 등장하면 달성입니다.",
+    "mission.m3.title": "고고도 타깃 찾기",
+    "mission.m3.desc": "최대 고도 60° 이상 대상을 최소 1개 찾으세요.",
+    "mission.m4.title": "장비 적합도 체크",
+    "mission.m4.desc": "현재 장비로 바로 볼 수 있는 대상을 5개 이상 확보하세요.",
+    "mission.progress": "진행도 {done}/{total}",
+    "sim.title": "3D 하늘 시뮬레이터",
+    "sim.subtitle": "드래그로 회전, 휠로 확대/축소. 별자리와 천체 레이어를 제어하세요.",
+    "sim.focusOrion": "오리온",
+    "sim.focusUrsa": "북두칠성",
+    "sim.focusSummer": "여름 삼각형",
+    "sim.constellations": "별자리 선",
+    "sim.messier": "천체(Messier)",
+    "sim.labels": "이름 라벨",
+    "sim.time": "시간",
+    "sim.live": "현재 시간 실시간",
+    "sim.sync": "현재 위치/시간 맞추기",
+    "journey.kicker": "Cosmic Perspective",
+    "journey.title": "우주의 위대함을 체감하는 코스믹 저니",
+    "journey.subtitle": "지구에서 출발해 관측 가능한 우주까지 스케일을 확장해보세요. 슬라이더를 움직이면 거리와 빛의 시간이 함께 변합니다.",
+    "journey.scaleTitle": "우주 스케일 시뮬레이터",
+    "journey.autoplayStart": "자동 항해 시작",
+    "journey.scaleLabel": "스케일 단계",
+    "journey.distance": "거리",
+    "journey.lightTime": "빛의 시간",
+    "journey.metaphor": "규모 비유",
+    "journey.insightTitle": "빛의 시간 체험",
+    "journey.aweTitle": "경이 포인트"
+  },
+  en: {
+    "settings.language": "Language",
+    "settings.unit": "Units",
+    "tab.planner": "Planner",
+    "tab.simulator": "3D Sky",
+    "tab.journey": "Cosmic Journey",
+    "planner.conditions": "Observation Conditions",
+    "planner.latitude": "Latitude",
+    "planner.longitude": "Longitude",
+    "planner.date": "Date",
+    "planner.equipment": "Equipment",
+    "planner.useLocation": "Use My Location",
+    "planner.calculate": "Calculate",
+    "planner.hint": "Rule: visible when Sun altitude <= -12° and target altitude >= 25°.",
+    "planner.recommendations": "Recommended Targets",
+    "planner.summaryTitle": "Tonight Summary",
+    "planner.summaryNight": "At {latlon}, dark-sky window is about {hours} hours.",
+    "planner.summaryTop": "Top pick is {name} (score {score}), peaking near {alt}° altitude.",
+    "planner.summaryEmpty": "No targets matched. Try another date or equipment.",
+    "planner.resultCount": "{count} targets",
+    "planner.cardAlt": "Peak Altitude",
+    "planner.cardVisible": "Visible Time",
+    "planner.cardBest": "Best Time",
+    "planner.cardEquipment": "Required Gear",
+    "planner.cardScore": "Score {score}",
+    "planner.noNight": "No dark window",
+    "planner.locationBasis": "At {latlon}",
+    "equipment.naked": "Naked-eye",
+    "equipment.binocular": "Binocular",
+    "equipment.scope": "Small Scope",
+    "mission.title": "Observation Missions",
+    "mission.refresh": "Check Missions",
+    "mission.pending": "In Progress",
+    "mission.done": "Done",
+    "mission.empty": "Run recommendation to load missions.",
+    "mission.m1.title": "Warm-up",
+    "mission.m1.desc": "Verify that tonight has at least 3 recommended targets.",
+    "mission.m2.title": "Catch Orion Nebula",
+    "mission.m2.desc": "Mission completes when M42 appears in recommendations.",
+    "mission.m3.title": "High Altitude Target",
+    "mission.m3.desc": "Find at least one target above 60° peak altitude.",
+    "mission.m4.title": "Gear Fit Check",
+    "mission.m4.desc": "Secure at least 5 targets suitable for your current gear.",
+    "mission.progress": "Progress {done}/{total}",
+    "sim.title": "3D Sky Simulator",
+    "sim.subtitle": "Drag to rotate, scroll to zoom. Toggle constellation and object layers.",
+    "sim.focusOrion": "Orion",
+    "sim.focusUrsa": "Big Dipper",
+    "sim.focusSummer": "Summer Triangle",
+    "sim.constellations": "Constellation Lines",
+    "sim.messier": "Messier Objects",
+    "sim.labels": "Labels",
+    "sim.time": "Time",
+    "sim.live": "Live Time",
+    "sim.sync": "Sync To Current",
+    "journey.kicker": "Cosmic Perspective",
+    "journey.title": "Cosmic Journey Through Scale",
+    "journey.subtitle": "Start from Earth and zoom to the observable universe. Move the slider to feel distance and light-time.",
+    "journey.scaleTitle": "Scale Simulator",
+    "journey.autoplayStart": "Start Auto Cruise",
+    "journey.scaleLabel": "Scale Stage",
+    "journey.distance": "Distance",
+    "journey.lightTime": "Light Travel Time",
+    "journey.metaphor": "Scale Metaphor",
+    "journey.insightTitle": "Light-Time Insight",
+    "journey.aweTitle": "Awe Notes"
+  }
+};
+
 const form = document.querySelector("#planner-form");
 const latitudeInput = document.querySelector("#latitude");
 const longitudeInput = document.querySelector("#longitude");
@@ -14,18 +151,68 @@ const plannerView = document.querySelector("#planner-view");
 const simulatorView = document.querySelector("#simulator-view");
 const journeyView = document.querySelector("#journey-view");
 const modeTabs = document.querySelectorAll(".mode-tab");
+const missionList = document.querySelector("#mission-list");
+const missionRefreshBtn = document.querySelector("#mission-refresh");
+
+let lastRecommendations = [];
+let lastContext = null;
+
+const MISSIONS = [
+  {
+    id: "m1",
+    titleKey: "mission.m1.title",
+    descKey: "mission.m1.desc",
+    check: (recommendations) => recommendations.length >= 3
+  },
+  {
+    id: "m2",
+    titleKey: "mission.m2.title",
+    descKey: "mission.m2.desc",
+    check: (recommendations) => recommendations.some((item) => item.id === "m42")
+  },
+  {
+    id: "m3",
+    titleKey: "mission.m3.title",
+    descKey: "mission.m3.desc",
+    check: (recommendations) => recommendations.some((item) => item.maxAlt >= 60)
+  },
+  {
+    id: "m4",
+    titleKey: "mission.m4.title",
+    descKey: "mission.m4.desc",
+    check: (recommendations, context) =>
+      recommendations.filter(
+        (item) =>
+          context &&
+          EQUIPMENT_ORDER[context.equipment] >= EQUIPMENT_ORDER[item.minEquipment] &&
+          item.maxAlt >= 25
+      ).length >= 5
+  }
+];
 
 initializeDefaults();
 initializeModeTabs();
+applyI18n();
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   calculateRecommendations();
 });
 
+missionRefreshBtn?.addEventListener("click", () => {
+  renderMissions(lastRecommendations, lastContext);
+});
+
+window.addEventListener("cosmos:settings-changed", () => {
+  applyI18n();
+  renderSummary(lastRecommendations, lastContext?.nightMinutes || 0, lastContext?.lat || 0, lastContext?.lon || 0);
+  renderCards(lastRecommendations, lastContext?.lat || 0, lastContext?.lon || 0, lastContext?.nightTimes || []);
+  renderMissions(lastRecommendations, lastContext);
+});
+
 useLocationBtn.addEventListener("click", () => {
   if (!navigator.geolocation) {
-    alert("이 브라우저에서는 위치 기능을 지원하지 않습니다.");
+    alert(getLanguage() === "en" ? "Geolocation is unavailable in this browser." : "이 브라우저에서는 위치 기능을 지원하지 않습니다.");
     return;
   }
 
@@ -33,18 +220,17 @@ useLocationBtn.addEventListener("click", () => {
     (position) => {
       latitudeInput.value = position.coords.latitude.toFixed(4);
       longitudeInput.value = position.coords.longitude.toFixed(4);
+      calculateRecommendations();
     },
     () => {
-      alert("위치 정보를 가져오지 못했습니다. 직접 입력해주세요.");
+      alert(getLanguage() === "en" ? "Could not read location. Please enter manually." : "위치 정보를 가져오지 못했습니다. 직접 입력해주세요.");
     }
   );
 });
 
 function initializeDefaults() {
   const now = new Date();
-  const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
-    now.getDate()
-  ).padStart(2, "0")}`;
+  const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   dateInput.value = localDate;
   latitudeInput.value = "37.5665";
   longitudeInput.value = "126.9780";
@@ -106,17 +292,18 @@ function calculateRecommendations() {
 
   const recommendations = TARGETS.map((target) => {
     const visibility = evaluateTarget(target, nightTimes, lat, lon, equipment);
-    return {
-      ...target,
-      ...visibility
-    };
+    return { ...target, ...visibility };
   })
     .filter((item) => item.visibleMinutes > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 12);
 
+  lastRecommendations = recommendations;
+  lastContext = { lat, lon, equipment, nightMinutes: nightTimes.length * 10, nightTimes };
+
   renderSummary(recommendations, nightTimes.length * 10, lat, lon);
   renderCards(recommendations, lat, lon, nightTimes);
+  renderMissions(recommendations, lastContext);
 }
 
 function buildSampleTimes(dateStr, stepMinutes) {
@@ -232,8 +419,7 @@ function getLocalSiderealTime(date, lonDeg) {
     (t * t * t) / 38710000;
 
   gmst = normalizeDeg(gmst);
-  const lst = normalizeDeg(gmst + lonDeg);
-  return lst / 15;
+  return normalizeDeg(gmst + lonDeg) / 15;
 }
 
 function toJulianDay(date) {
@@ -241,45 +427,79 @@ function toJulianDay(date) {
 }
 
 function renderSummary(recommendations, nightMinutes, lat, lon) {
+  if (!summaryEl) return;
+
   const top = recommendations[0];
+  const summaryTitle = t("planner.summaryTitle");
+  const nightText = format(t("planner.summaryNight"), {
+    latlon: formatLatLon(lat, lon),
+    hours: Math.round(nightMinutes / 60)
+  });
+
+  const topText = top
+    ? format(t("planner.summaryTop"), {
+        name: top.name,
+        score: top.score,
+        alt: top.maxAlt.toFixed(1)
+      })
+    : t("planner.summaryEmpty");
 
   summaryEl.innerHTML = `
-    <h2>오늘 밤 요약</h2>
-    <p>${formatLatLon(lat, lon)} 기준, 어두운 하늘 구간은 약 ${Math.round(
-    nightMinutes / 60
-  )}시간입니다.</p>
-    <p>${
-      top
-        ? `최우선 추천은 <strong>${top.name}</strong> (점수 ${top.score})이며, 최고 고도는 약 ${top.maxAlt.toFixed(
-            1
-          )}° 입니다.`
-        : "조건에 맞는 대상이 없습니다. 날짜 또는 장비를 조정해보세요."
-    }</p>
+    <h2>${summaryTitle}</h2>
+    <p>${nightText}</p>
+    <p>${topText}</p>
   `;
 }
 
 function renderCards(recommendations, lat, lon, nightTimes) {
   resultCards.innerHTML = "";
-  resultCount.textContent = `${recommendations.length}개`;
+  resultCount.textContent = format(t("planner.resultCount"), { count: recommendations.length });
 
   recommendations.forEach((item) => {
     const node = cardTemplate.content.firstElementChild.cloneNode(true);
     node.querySelector(".target-name").textContent = item.name;
-    node.querySelector(
-      ".target-meta"
-    ).textContent = `${item.type} | ${item.constellation} | mag ${item.magnitude}`;
-    node.querySelector(".score-chip").textContent = `점수 ${item.score}`;
+    node.querySelector(".target-meta").textContent = `${item.type} | ${item.constellation} | mag ${item.magnitude}`;
+    node.querySelector(".score-chip").textContent = format(t("planner.cardScore"), { score: item.score });
 
     node.querySelector(".stats").innerHTML = `
-      <span>최대 고도 <strong>${item.maxAlt.toFixed(1)}°</strong></span>
-      <span>관측 가능 <strong>${item.visibleMinutes}분</strong></span>
-      <span>최적 시각 <strong>${item.bestTime ? formatTime(item.bestTime) : "-"}</strong></span>
-      <span>필요 장비 <strong>${toEquipmentLabel(item.minEquipment)}</strong></span>
+      <span>${t("planner.cardAlt")} <strong>${item.maxAlt.toFixed(1)}°</strong></span>
+      <span>${t("planner.cardVisible")} <strong>${item.visibleMinutes}${getLanguage() === "en" ? " min" : "분"}</strong></span>
+      <span>${t("planner.cardBest")} <strong>${item.bestTime ? formatTime(item.bestTime) : "-"}</strong></span>
+      <span>${t("planner.cardEquipment")} <strong>${toEquipmentLabel(item.minEquipment)}</strong></span>
     `;
 
     drawAltitudeChart(node.querySelector("canvas"), item.trace, lat, lon, nightTimes);
     resultCards.appendChild(node);
   });
+}
+
+function renderMissions(recommendations, context) {
+  if (!missionList) return;
+
+  if (!recommendations.length) {
+    missionList.innerHTML = `<p class="mission-empty">${t("mission.empty")}</p>`;
+    return;
+  }
+
+  let completed = 0;
+
+  const html = MISSIONS.map((mission) => {
+    const done = Boolean(mission.check(recommendations, context));
+    if (done) completed += 1;
+
+    return `
+      <article class="mission-item ${done ? "is-done" : ""}">
+        <div class="mission-item-head">
+          <h3>${t(mission.titleKey)}</h3>
+          <span class="mission-state">${done ? t("mission.done") : t("mission.pending")}</span>
+        </div>
+        <p>${t(mission.descKey)}</p>
+      </article>
+    `;
+  }).join("");
+
+  const progress = `<p class="mission-progress">${format(t("mission.progress"), { done: completed, total: MISSIONS.length })}</p>`;
+  missionList.innerHTML = progress + html;
 }
 
 function drawAltitudeChart(canvas, trace, lat, lon, nightTimes) {
@@ -288,7 +508,6 @@ function drawAltitudeChart(canvas, trace, lat, lon, nightTimes) {
   const height = canvas.height;
 
   ctx.clearRect(0, 0, width, height);
-
   ctx.fillStyle = "#07111f";
   ctx.fillRect(0, 0, width, height);
 
@@ -306,7 +525,7 @@ function drawAltitudeChart(canvas, trace, lat, lon, nightTimes) {
   if (!trace.length || !nightTimes.length) {
     ctx.fillStyle = "#f0c879";
     ctx.font = "12px Space Grotesk";
-    ctx.fillText("야간 구간 없음", 12, 20);
+    ctx.fillText(t("planner.noNight"), 12, 20);
     return;
   }
 
@@ -319,12 +538,8 @@ function drawAltitudeChart(canvas, trace, lat, lon, nightTimes) {
   trace.forEach((point, index) => {
     const x = ((point.time.getTime() - nightTimes[0].getTime()) / span) * width;
     const y = height - (clamp(point.altDeg, 0, 90) / 90) * height;
-
-    if (index === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
   });
 
   ctx.stroke();
@@ -343,13 +558,21 @@ function drawAltitudeChart(canvas, trace, lat, lon, nightTimes) {
 
   ctx.fillStyle = "#dce6ff";
   ctx.font = "11px IBM Plex Sans KR";
-  ctx.fillText(`${formatLatLon(lat, lon)} 기준`, 10, height - 8);
+  ctx.fillText(format(t("planner.locationBasis"), { latlon: formatLatLon(lat, lon) }), 10, height - 8);
+}
+
+function applyI18n() {
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    const key = element.getAttribute("data-i18n");
+    const value = t(key);
+    if (value) element.textContent = value;
+  });
 }
 
 function toEquipmentLabel(equipment) {
-  if (equipment === "naked-eye") return "맨눈";
-  if (equipment === "binocular") return "쌍안경";
-  return "소형 망원경";
+  if (equipment === "naked-eye") return t("equipment.naked");
+  if (equipment === "binocular") return t("equipment.binocular");
+  return t("equipment.scope");
 }
 
 function formatTime(date) {
@@ -362,6 +585,19 @@ function formatLatLon(lat, lon) {
   const ns = lat >= 0 ? "N" : "S";
   const ew = lon >= 0 ? "E" : "W";
   return `${Math.abs(lat).toFixed(2)}°${ns}, ${Math.abs(lon).toFixed(2)}°${ew}`;
+}
+
+function getLanguage() {
+  return window.cosmosSettings?.get()?.language === "en" ? "en" : "ko";
+}
+
+function t(key) {
+  const lang = getLanguage();
+  return COPY[lang][key] || COPY.ko[key] || key;
+}
+
+function format(template, vars) {
+  return Object.entries(vars).reduce((acc, [k, v]) => acc.replaceAll(`{${k}}`, String(v)), template);
 }
 
 function toRad(deg) {

@@ -102,6 +102,26 @@ h1 {
   gap: 14px;
 }
 
+.brand-settings {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.brand-settings label {
+  display: inline;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.brand-settings select {
+  padding: 7px 10px;
+  border-radius: 8px;
+  min-width: 120px;
+}
+
 .brand-mark {
   width: 52px;
   height: 52px;
@@ -170,6 +190,10 @@ main {
 
 .summary {
   grid-column: span 6;
+}
+
+.mission-panel {
+  grid-column: span 12;
 }
 
 .results {
@@ -243,6 +267,78 @@ button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.mission-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#mission-refresh {
+  border-color: rgba(255, 211, 123, 0.46);
+  color: var(--warm);
+  padding: 7px 10px;
+  font-size: 0.86rem;
+}
+
+.mission-list {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.mission-progress {
+  margin: 0;
+  color: var(--muted);
+}
+
+.mission-empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.mission-item {
+  border: 1px solid rgba(136, 181, 255, 0.25);
+  border-radius: 12px;
+  padding: 11px 12px;
+  background: rgba(8, 17, 30, 0.6);
+}
+
+.mission-item.is-done {
+  border-color: rgba(126, 237, 190, 0.46);
+  background: rgba(20, 46, 43, 0.55);
+}
+
+.mission-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.mission-item h3 {
+  font-size: 0.98rem;
+}
+
+.mission-item p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.mission-state {
+  font-size: 0.78rem;
+  border-radius: 999px;
+  padding: 4px 8px;
+  border: 1px solid rgba(151, 185, 238, 0.42);
+  color: #d4e6ff;
+}
+
+.mission-item.is-done .mission-state {
+  border-color: rgba(126, 237, 190, 0.52);
+  color: #a5f2d6;
 }
 
 .viewer-quick {
