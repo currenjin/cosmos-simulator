@@ -395,6 +395,13 @@ button:hover {
   font-size: 0.9rem;
 }
 
+.scale-awe {
+  margin: 6px 0 0;
+  color: #ffe0a5;
+  font-size: 0.9rem;
+  min-height: 1.2em;
+}
+
 #sky-viewer {
   margin-top: 10px;
   border: 1px solid rgba(126, 160, 221, 0.24);
@@ -573,6 +580,39 @@ canvas {
 .sim-toolbar p {
   margin: 8px 0 0;
   color: var(--muted);
+}
+
+.scale-jump {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(138, 182, 255, 0.22);
+  background: rgba(7, 16, 28, 0.56);
+}
+
+.scale-jump > span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  margin-right: 2px;
+}
+
+.scale-btn {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(12, 23, 39, 0.66);
+  color: #cfe4ff;
+  border: 1px solid rgba(141, 185, 255, 0.34);
+  font-size: 0.84rem;
+}
+
+.scale-btn.is-active {
+  background: linear-gradient(90deg, rgba(109, 202, 255, 0.2), rgba(246, 203, 125, 0.16));
+  border-color: rgba(201, 228, 255, 0.62);
+  color: #eaf5ff;
 }
 
 .sim-controls {
@@ -996,6 +1036,10 @@ body.dynamics-mode {
     flex-direction: column;
   }
 
+  .scale-jump {
+    margin-top: 12px;
+  }
+
   .kepler-panel,
   .kepler-panel.kepler-visual {
     grid-column: 1 / -1;
@@ -1059,6 +1103,11 @@ body.dynamics-mode {
 
   .sim-time {
     min-width: calc(50% - 6px);
+  }
+
+  .scale-btn {
+    flex: 1 1 calc(50% - 8px);
+    text-align: center;
   }
 
   #date,

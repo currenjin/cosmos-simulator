@@ -18,6 +18,8 @@ const skySearchBtn = document.querySelector("#sky-search-btn");
 const skySearchList = document.querySelector("#sky-search-list");
 const syncSkyNowBtn = document.querySelector("#sync-sky-now");
 const skyStatus = document.querySelector("#sky-status");
+const scaleAweEl = document.querySelector("#scale-awe");
+const scaleButtons = document.querySelectorAll(".scale-btn");
 
 const toggleConstellations = document.querySelector("#toggle-constellations");
 const toggleNebulae = document.querySelector("#toggle-nebulae");
@@ -84,6 +86,13 @@ const horizonAtmosphere = createHorizonAtmosphere();
 scene.add(horizonAtmosphere);
 const ground = createGround();
 scene.add(ground);
+
+const solarScaleGroup = new THREE.Group();
+const galaxyScaleGroup = new THREE.Group();
+const localScaleGroup = new THREE.Group();
+scene.add(solarScaleGroup);
+scene.add(galaxyScaleGroup);
+scene.add(localScaleGroup);
 
 const labelLayer = document.createElement("div");
 labelLayer.className = "viewer-layer";
@@ -357,6 +366,15 @@ let currentSkyState = {
   sunAltDeg: -24,
   darkness: 1
 };
+let scaleMode = "sky";
+let scaleTransition = 1;
+let scaleTransitionFrom = null;
+let scaleTransitionTo = null;
+let scaleTransitionStart = 0;
+let scaleTransitionDuration = 1450;
+
+const scaleScene = createScaleScenes();
+setScaleMode("sky", false);
 
 const skyNightColor = new THREE.Color(0x071425);
 const skyTwilightColor = new THREE.Color(0x2c3d58);
@@ -375,6 +393,7 @@ window.addEventListener("resize", resizeRenderer);
 window.addEventListener("cosmos:settings-changed", () => {
   updateSearchPlaceholder();
   refreshLabelTexts();
+  updateScaleAweText();
   updateStatus();
 });
 
@@ -499,12 +518,22 @@ function wireControls() {
 
   focusButtons.forEach((button) => {
     button.addEventListener("click", () => {
+      if (scaleMode !== "sky") {
+        setScaleMode("sky", true);
+      }
       const mode = button.getAttribute("data-focus");
       moveViewToFocus(mode);
     });
   });
 
   syncSkyNowBtn?.addEventListener("click", syncSkyToNow);
+  scaleButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const mode = button.getAttribute("data-scale");
+      if (!mode) return;
+      setScaleMode(mode, true);
+    });
+  });
   skySpeedInput?.addEventListener("change", () => {
     const next = Number(skySpeedInput.value);
     timeSpeed = Number.isFinite(next) && next > 0 ? next : 1;
@@ -533,7 +562,7 @@ function wireControls() {
   });
 
   renderer.domElement.addEventListener("pointermove", (event) => {
-    if (!isDragging) return;
+    if (!isDragging || scaleMode !== "sky") return;
 
     const dx = event.clientX - lastX;
     const dy = event.clientY - lastY;
@@ -670,6 +699,9 @@ function updateSearchPlaceholder() {
 function focusSearchTarget() {
   const raw = skySearchInput?.value?.trim();
   if (!raw) return;
+  if (scaleMode !== "sky") {
+    setScaleMode("sky", true);
+  }
 
   const target = findSearchTarget(raw);
   if (!target) {
@@ -711,6 +743,316 @@ function normalizeSearch(value) {
 function setStatusHint(text, ttlMs = 2800) {
   statusHint = text;
   statusHintUntil = Date.now() + ttlMs;
+}
+
+function createScaleScenes() {
+  const solar = createSolarScaleScene();
+  const galaxy = createGalaxyScaleScene();
+  const local = createLocalGroupScaleScene();
+  return { solar, galaxy, local };
+}
+
+function createSolarScaleScene() {
+  const planetMeshes = new Map();
+  const scale = 6.5;
+
+  const sun = new THREE.Mesh(
+    new THREE.SphereGeometry(2.6, 28, 20),
+    new THREE.MeshStandardMaterial({
+      color: 0xffc978,
+      emissive: 0x8a4a00,
+      emissiveIntensity: 0.35
+    })
+  );
+  solarScaleGroup.add(sun);
+
+  planetTargets.forEach((planet) => {
+    const orbit = new THREE.Mesh(
+      new THREE.RingGeometry(scale * (getOrbitRadius(planet.key) - 0.05), scale * (getOrbitRadius(planet.key) + 0.05), 128),
+      new THREE.MeshBasicMaterial({
+        color: 0x6b8fbe,
+        transparent: true,
+        opacity: 0.26,
+        side: THREE.DoubleSide
+      })
+    );
+    orbit.rotation.x = -Math.PI / 2;
+    solarScaleGroup.add(orbit);
+
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(planet.size * 0.18, 18, 14),
+      new THREE.MeshStandardMaterial({
+        color: planet.color,
+        emissive: 0x121212,
+        emissiveIntensity: 0.15
+      })
+    );
+    solarScaleGroup.add(mesh);
+    planetMeshes.set(planet.key, mesh);
+  });
+
+  return { planetMeshes, scale };
+}
+
+function createGalaxyScaleScene() {
+  const disk = new THREE.Mesh(
+    new THREE.CircleGeometry(130, 96),
+    new THREE.MeshBasicMaterial({
+      color: 0x6f8fd4,
+      transparent: true,
+      opacity: 0.2,
+      side: THREE.DoubleSide
+    })
+  );
+  disk.rotation.x = -Math.PI / 2;
+  galaxyScaleGroup.add(disk);
+
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(8.5, 28, 20),
+    new THREE.MeshBasicMaterial({
+      color: 0xffd9a3,
+      transparent: true,
+      opacity: 0.78
+    })
+  );
+  core.position.y = 0.6;
+  galaxyScaleGroup.add(core);
+
+  const sunMarker = new THREE.Mesh(
+    new THREE.SphereGeometry(1.8, 14, 10),
+    new THREE.MeshBasicMaterial({
+      color: 0x8fdfff
+    })
+  );
+  sunMarker.position.set(68, 1, 18);
+  galaxyScaleGroup.add(sunMarker);
+
+  return { disk, core, sunMarker };
+}
+
+function createLocalGroupScaleScene() {
+  const mw = new THREE.Mesh(
+    new THREE.CircleGeometry(30, 40),
+    new THREE.MeshBasicMaterial({
+      color: 0xa6b9ff,
+      transparent: true,
+      opacity: 0.34
+    })
+  );
+  mw.rotation.x = -Math.PI / 2;
+  mw.position.set(-86, 0, 0);
+  localScaleGroup.add(mw);
+
+  const andromeda = new THREE.Mesh(
+    new THREE.CircleGeometry(38, 48),
+    new THREE.MeshBasicMaterial({
+      color: 0xffd7b1,
+      transparent: true,
+      opacity: 0.3
+    })
+  );
+  andromeda.rotation.x = -Math.PI / 2;
+  andromeda.position.set(112, 0, -34);
+  localScaleGroup.add(andromeda);
+
+  const bridge = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([mw.position.clone(), andromeda.position.clone()]),
+    new THREE.LineBasicMaterial({
+      color: 0x7da7dd,
+      transparent: true,
+      opacity: 0.28
+    })
+  );
+  localScaleGroup.add(bridge);
+
+  return { mw, andromeda };
+}
+
+function setScaleMode(mode, animated = true) {
+  const validMode = ["sky", "solar", "galaxy", "local"].includes(mode) ? mode : "sky";
+  const prevMode = scaleMode;
+  scaleMode = validMode;
+  updateScaleButtons();
+  updateScaleAweText();
+
+  const skyVisible = scaleMode === "sky";
+  dome.visible = skyVisible;
+  backgroundStars.visible = skyVisible;
+  milkyWay.visible = skyVisible;
+  constellationGroup.visible = skyVisible;
+  nebulaGroup.visible = skyVisible;
+  planetGroup.visible = skyVisible;
+  horizonRing.visible = skyVisible;
+  horizonAtmosphere.visible = skyVisible;
+  ground.visible = skyVisible;
+
+  solarScaleGroup.visible = scaleMode === "solar";
+  galaxyScaleGroup.visible = scaleMode === "galaxy";
+  localScaleGroup.visible = scaleMode === "local";
+
+  if (scaleMode === "sky") {
+    updateContextFromInputs();
+    updateCelestialPositions();
+  }
+
+  const from = captureCameraState(prevMode);
+  const to = getCameraPreset(scaleMode);
+  if (animated) {
+    scaleTransition = 0;
+    scaleTransitionFrom = from;
+    scaleTransitionTo = to;
+    scaleTransitionStart = performance.now();
+    scaleTransitionDuration = 1450;
+  } else {
+    scaleTransition = 1;
+    scaleTransitionFrom = to;
+    scaleTransitionTo = to;
+    applyCameraState(to);
+  }
+}
+
+function updateScaleButtons() {
+  scaleButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.getAttribute("data-scale") === scaleMode);
+  });
+}
+
+function updateScaleAweText() {
+  if (!scaleAweEl) return;
+  const lang = getLanguage();
+  const textByMode = {
+    sky: {
+      ko: "지금 보는 별빛의 대부분은 과거에서 온 메시지입니다.",
+      en: "Most starlight above you is a message from the past."
+    },
+    solar: {
+      ko: "같은 하늘도 태양계 규모로 보면 행성들이 거대한 시간의 춤을 춥니다.",
+      en: "At solar-system scale, planets dance through vast cycles of time."
+    },
+    galaxy: {
+      ko: "태양계는 우리은하 가장자리의 작은 점 하나에 불과합니다.",
+      en: "Our solar system is just a tiny point near the edge of the Milky Way."
+    },
+    local: {
+      ko: "안드로메다를 본다는 건 250만 년 전 우주를 보는 일입니다.",
+      en: "Seeing Andromeda means looking 2.5 million years into the past."
+    }
+  };
+  scaleAweEl.textContent = textByMode[scaleMode][lang];
+}
+
+function captureCameraState(mode) {
+  if (mode === "sky") {
+    const lookDirection = new THREE.Vector3(
+      Math.cos(pitch) * Math.sin(yaw),
+      Math.sin(pitch),
+      -Math.cos(pitch) * Math.cos(yaw)
+    );
+    return {
+      position: camera.position.clone(),
+      lookAt: camera.position.clone().add(lookDirection),
+      fov: camera.fov
+    };
+  }
+  return getCameraPreset(mode);
+}
+
+function getCameraPreset(mode) {
+  const presets = {
+    sky: {
+      position: new THREE.Vector3(0, 2.2, 0),
+      lookAt: new THREE.Vector3(0, 12, -80),
+      fov: 70
+    },
+    solar: {
+      position: new THREE.Vector3(0, 24, 56),
+      lookAt: new THREE.Vector3(0, 0, 0),
+      fov: 58
+    },
+    galaxy: {
+      position: new THREE.Vector3(0, 118, 240),
+      lookAt: new THREE.Vector3(0, 0, 0),
+      fov: 52
+    },
+    local: {
+      position: new THREE.Vector3(48, 180, 430),
+      lookAt: new THREE.Vector3(12, 0, -10),
+      fov: 48
+    }
+  };
+  return presets[mode] || presets.sky;
+}
+
+function updateScaleTransition(ts) {
+  if (scaleTransition >= 1 || !scaleTransitionFrom || !scaleTransitionTo) return;
+  const t = clamp((ts - scaleTransitionStart) / scaleTransitionDuration, 0, 1);
+  scaleTransition = easeInOutCubic(t);
+}
+
+function applyCameraForScale() {
+  if (scaleMode === "sky" && scaleTransition >= 1) {
+    const lookDirection = new THREE.Vector3(
+      Math.cos(pitch) * Math.sin(yaw),
+      Math.sin(pitch),
+      -Math.cos(pitch) * Math.cos(yaw)
+    );
+    camera.lookAt(camera.position.clone().add(lookDirection));
+    return;
+  }
+
+  const from = scaleTransitionFrom || getCameraPreset(scaleMode);
+  const to = scaleTransitionTo || getCameraPreset(scaleMode);
+  const position = from.position.clone().lerp(to.position, scaleTransition);
+  const lookAt = from.lookAt.clone().lerp(to.lookAt, scaleTransition);
+  camera.position.copy(position);
+  camera.fov = from.fov + (to.fov - from.fov) * scaleTransition;
+  camera.updateProjectionMatrix();
+  camera.lookAt(lookAt);
+}
+
+function applyCameraState(state) {
+  camera.position.copy(state.position);
+  camera.fov = state.fov;
+  camera.updateProjectionMatrix();
+  camera.lookAt(state.lookAt);
+}
+
+function updateScaleScene(ts) {
+  if (scaleMode === "solar") {
+    updateSolarScalePositions();
+    solarScaleGroup.rotation.y += 0.00045;
+  } else if (scaleMode === "galaxy") {
+    galaxyScaleGroup.rotation.y += 0.00016;
+  } else if (scaleMode === "local") {
+    localScaleGroup.rotation.y += 0.00008;
+  }
+}
+
+function updateSolarScalePositions() {
+  const d = daysSinceJ2000(currentContext.date);
+  const earth = getHeliocentricEclipticXYZ("Earth", d);
+
+  planetTargets.forEach((planet) => {
+    const node = scaleScene.solar.planetMeshes.get(planet.key);
+    if (!node) return;
+    const h = getHeliocentricEclipticXYZ(planet.key, d);
+    const x = (h.x - earth.x) * scaleScene.solar.scale;
+    const z = (h.y - earth.y) * scaleScene.solar.scale;
+    node.position.set(x, 0.7, z);
+  });
+}
+
+function getOrbitRadius(planetKey) {
+  if (planetKey === "Mercury") return 0.39;
+  if (planetKey === "Venus") return 0.72;
+  if (planetKey === "Mars") return 1.52;
+  if (planetKey === "Jupiter") return 5.2;
+  if (planetKey === "Saturn") return 9.54;
+  return 1;
+}
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 function createHorizonRing() {
@@ -918,10 +1260,15 @@ function animate(ts) {
   }
 
   if (ts - lastStatusUpdate > 400) {
-    updateCelestialPositions();
+    if (scaleMode === "sky") {
+      updateCelestialPositions();
+    }
+    updateScaleScene(ts);
     updateStatus();
     lastStatusUpdate = ts;
   }
+
+  updateScaleTransition(ts);
 
   backgroundStars.rotation.y += 0.000045;
   starCloudNear.rotation.y -= 0.00002;
@@ -930,13 +1277,14 @@ function animate(ts) {
 
   const twinkle = 0.85 + Math.sin(ts * 0.0013) * 0.05;
   const darkness = currentSkyState.darkness;
-  starPoints.material.opacity = (0.14 + darkness * 0.84) * twinkle;
-  nebulaPoints.material.opacity = 0.02 + darkness * 0.88 + Math.sin(ts * 0.0008) * 0.02;
-  planetPoints.material.opacity = 0.22 + darkness * 0.76;
-  starCloudNear.material.opacity = 0.06 + darkness * 0.76;
-  starCloudMid.material.opacity = 0.04 + darkness * 0.4;
-  starCloudFar.material.opacity = 0.03 + darkness * 0.25;
-  milkyWay.material.opacity = 0.02 + darkness * 0.36;
+  const skyVisibility = scaleMode === "sky" ? 1 : 0;
+  starPoints.material.opacity = ((0.14 + darkness * 0.84) * twinkle) * skyVisibility;
+  nebulaPoints.material.opacity = (0.02 + darkness * 0.88 + Math.sin(ts * 0.0008) * 0.02) * skyVisibility;
+  planetPoints.material.opacity = (0.22 + darkness * 0.76) * skyVisibility;
+  starCloudNear.material.opacity = (0.06 + darkness * 0.76) * skyVisibility;
+  starCloudMid.material.opacity = (0.04 + darkness * 0.4) * skyVisibility;
+  starCloudFar.material.opacity = (0.03 + darkness * 0.25) * skyVisibility;
+  milkyWay.material.opacity = (0.02 + darkness * 0.36) * skyVisibility;
 
   const horizonLift = clamp((Math.sin(pitch) + 0.15) * 0.5, 0.05, 1);
   const twilightFactor = 1 - darkness;
@@ -946,12 +1294,7 @@ function animate(ts) {
   domeMaterial.color.lerpColors(skyTwilightColor, skyNightColor, darkness);
   scene.fog.color.lerpColors(fogTwilightColor, fogNightColor, darkness);
 
-  const lookDirection = new THREE.Vector3(
-    Math.cos(pitch) * Math.sin(yaw),
-    Math.sin(pitch),
-    -Math.cos(pitch) * Math.cos(yaw)
-  );
-  camera.lookAt(camera.position.clone().add(lookDirection));
+  applyCameraForScale();
 
   updateLabels();
   renderer.render(scene, camera);
@@ -968,18 +1311,33 @@ function updateStatus() {
   const min = String(d.getMinutes()).padStart(2, "0");
   const darknessLabel = getSkyConditionLabel(currentSkyState.sunAltDeg);
   const speedLabel = timeSpeed === 1 ? "" : ` | ${getLanguage() === "en" ? "Speed" : "배속"} x${timeSpeed}`;
+  const modeLabel = ` | ${getLanguage() === "en" ? "Scale" : "스케일"} ${getScaleModeName()}`;
   const activeHint = Date.now() < statusHintUntil ? ` | ${statusHint}` : "";
 
   if (getLanguage() === "en") {
-    skyStatus.textContent = `Observer ${formatLatLon(currentContext.lat, currentContext.lon)} | Time ${yyyy}-${mm}-${dd} ${hh}:${min} | ${darknessLabel}${speedLabel}${activeHint}`;
+    skyStatus.textContent = `Observer ${formatLatLon(currentContext.lat, currentContext.lon)} | Time ${yyyy}-${mm}-${dd} ${hh}:${min} | ${darknessLabel}${modeLabel}${speedLabel}${activeHint}`;
   } else {
-    skyStatus.textContent = `관측 위치 ${formatLatLon(currentContext.lat, currentContext.lon)} | 기준 시각 ${yyyy}-${mm}-${dd} ${hh}:${min} | ${darknessLabel}${speedLabel}${activeHint}`;
+    skyStatus.textContent = `관측 위치 ${formatLatLon(currentContext.lat, currentContext.lon)} | 기준 시각 ${yyyy}-${mm}-${dd} ${hh}:${min} | ${darknessLabel}${modeLabel}${speedLabel}${activeHint}`;
   }
+}
+
+function getScaleModeName() {
+  if (scaleMode === "solar") return getLanguage() === "en" ? "Solar" : "태양계";
+  if (scaleMode === "galaxy") return getLanguage() === "en" ? "Galaxy" : "은하";
+  if (scaleMode === "local") return getLanguage() === "en" ? "Local Group" : "국부은하군";
+  return getLanguage() === "en" ? "Sky" : "하늘";
 }
 
 function updateLabels() {
   const width = container.clientWidth;
   const height = container.clientHeight;
+
+  if (scaleMode !== "sky") {
+    labels.forEach(({ element }) => {
+      element.style.opacity = "0";
+    });
+    return;
+  }
 
   labels.forEach(({ element, key, type }) => {
     const point = vectorCache.get(key);

@@ -67,6 +67,13 @@
           <button type="button" data-focus="summer" data-i18n="sim.focusSummer">여름 삼각형</button>
         </div>
       </div>
+      <div class="scale-jump" role="group" aria-label="Scale Jump">
+        <span data-i18n="sim.scaleTitle">스케일 점프</span>
+        <button type="button" class="scale-btn is-active" data-scale="sky" data-i18n="sim.scaleSky">하늘</button>
+        <button type="button" class="scale-btn" data-scale="solar" data-i18n="sim.scaleSolar">태양계</button>
+        <button type="button" class="scale-btn" data-scale="galaxy" data-i18n="sim.scaleGalaxy">우리은하</button>
+        <button type="button" class="scale-btn" data-scale="local" data-i18n="sim.scaleLocal">국부은하군</button>
+      </div>
       <div class="sim-controls viewer-controls">
         <label class="toggle">
           <input type="checkbox" id="toggle-constellations" checked />
@@ -121,6 +128,7 @@
         <button type="button" id="sync-sky-now" data-i18n="sim.sync">현재 위치/시간 맞추기</button>
       </div>
       <p id="sky-status" class="sky-status"></p>
+      <p id="scale-awe" class="scale-awe"></p>
       <div id="sky-viewer"></div>
     </section>
 
