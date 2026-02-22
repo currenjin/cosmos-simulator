@@ -8,7 +8,7 @@ const COPY = {
     "tab.simulator": "3D 시뮬레이터",
     "tab.journey": "코스믹 저니",
     "tab.kepler": "Kepler Lab",
-    "tab.dynamics": "Dynamics Lab",
+    "tab.dynamics": "동역학 랩",
     "planner.conditions": "관측 조건",
     "planner.latitude": "위도",
     "planner.longitude": "경도",
@@ -80,7 +80,7 @@ const COPY = {
     "kepler.theoryT": "이론 T(3법칙)",
     "kepler.error": "오차"
     ,
-    "dyn.title": "Dynamics Lab: 뉴턴 + 보존법칙",
+    "dyn.title": "동역학 랩: 뉴턴 + 보존법칙",
     "dyn.subtitle": "뉴턴 3법칙, 에너지 보존, 각운동량 보존을 하나의 상호작용으로 학습합니다.",
     "dyn.n123": "1) 뉴턴 운동 3법칙",
     "dyn.mass": "질량 m",
