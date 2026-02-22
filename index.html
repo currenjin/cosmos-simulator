@@ -214,7 +214,19 @@
 
       <section class="kepler-grid">
         <article class="kepler-panel">
-          <h3 data-i18n="kepler.p2l">1) 현상 -> 법칙</h3>
+          <h3 data-i18n="kepler.l1">1) 케플러 1법칙</h3>
+          <label for="kepler-e" data-i18n="kepler.e">이심률 e</label>
+          <input id="kepler-e" type="range" min="0" max="0.85" step="0.01" value="0.45" />
+          <div class="kepler-metrics">
+            <p><span data-i18n="kepler.focusDistance">초점 거리 c</span> <strong id="kepler-c"></strong></p>
+            <p><span data-i18n="kepler.peri">근일점 q</span> <strong id="kepler-peri"></strong></p>
+            <p><span data-i18n="kepler.aphe">원일점 Q</span> <strong id="kepler-aphe"></strong></p>
+          </div>
+          <p id="kepler-l1-check" class="kepler-note"></p>
+        </article>
+
+        <article class="kepler-panel">
+          <h3 data-i18n="kepler.p2l">2) 현상 -> 2법칙</h3>
           <ol class="kepler-steps">
             <li data-i18n="kepler.step1">근일점에서 더 빨라지고 원일점에서 느려집니다.</li>
             <li data-i18n="kepler.step2">같은 시간 동안 쓸어가는 면적이 거의 같아집니다.</li>
@@ -223,7 +235,7 @@
         </article>
 
         <article class="kepler-panel">
-          <h3 data-i18n="kepler.k3">2) 케플러 3법칙</h3>
+          <h3 data-i18n="kepler.k3">3) 케플러 3법칙</h3>
           <label for="kepler-a" data-i18n="kepler.a">반장축 a (AU)</label>
           <input id="kepler-a" type="range" min="0.4" max="30" step="0.1" value="1" />
           <div class="kepler-metrics">

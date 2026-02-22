@@ -4,10 +4,15 @@ if (!view) {
 }
 
 const aInput = document.querySelector("#kepler-a");
+const eInput = document.querySelector("#kepler-e");
 const periodEl = document.querySelector("#kepler-period");
 const t2El = document.querySelector("#kepler-t2");
 const a3El = document.querySelector("#kepler-a3");
 const lawCheckEl = document.querySelector("#kepler-law-check");
+const cEl = document.querySelector("#kepler-c");
+const periEl = document.querySelector("#kepler-peri");
+const apheEl = document.querySelector("#kepler-aphe");
+const l1CheckEl = document.querySelector("#kepler-l1-check");
 const rEl = document.querySelector("#kepler-r");
 const forceEl = document.querySelector("#kepler-force");
 
@@ -43,6 +48,10 @@ const state = {
 
 aInput.addEventListener("input", () => {
   state.a = Number(aInput.value);
+  renderStaticInfo();
+});
+eInput.addEventListener("input", () => {
+  state.e = Number(eInput.value);
   renderStaticInfo();
 });
 
@@ -101,15 +110,23 @@ function renderStaticInfo() {
   const t2 = T * T;
   const a3 = state.a ** 3;
   const ratio = t2 / a3;
+  const c = state.a * state.e;
+  const q = state.a * (1 - state.e);
+  const Q = state.a * (1 + state.e);
 
   periodEl.textContent = `${T.toFixed(3)} ${yearLabel()}`;
   t2El.textContent = t2.toFixed(3);
   a3El.textContent = a3.toFixed(3);
+  cEl.textContent = `${c.toFixed(3)} AU`;
+  periEl.textContent = `${q.toFixed(3)} AU`;
+  apheEl.textContent = `${Q.toFixed(3)} AU`;
 
   if (getLanguage() === "en") {
     lawCheckEl.textContent = `Check: T²/a³ = ${ratio.toFixed(3)} (close to 1)`;
+    l1CheckEl.textContent = `Ellipse check: c/a = ${state.e.toFixed(2)} and Sun stays at one focus.`;
   } else {
     lawCheckEl.textContent = `검증: T²/a³ = ${ratio.toFixed(3)} (1에 가까움)`;
+    l1CheckEl.textContent = `타원 검증: c/a = ${state.e.toFixed(2)} 이고 태양은 한 초점에 위치합니다.`;
   }
 }
 
