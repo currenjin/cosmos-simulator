@@ -26,7 +26,11 @@ body {
   color: var(--text);
   background: radial-gradient(circle at 12% 14%, #15355f, transparent 30%),
     radial-gradient(circle at 92% 8%, #533418, transparent 34%),
-    linear-gradient(140deg, #050913 0%, #091327 44%, #0c1228 100%);
+    linear-gradient(140deg, rgba(5, 9, 19, 0.82) 0%, rgba(9, 19, 39, 0.76) 44%, rgba(12, 18, 40, 0.8) 100%),
+    url("assets/jwst-bg.png");
+  background-size: auto, auto, auto, cover;
+  background-position: center, center, center, center;
+  background-repeat: no-repeat;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
@@ -550,14 +554,10 @@ button:hover {
   overflow: hidden;
   min-height: calc(100vh - 220px);
   background:
-    linear-gradient(180deg, rgba(4, 10, 18, 0.7) 0%, rgba(3, 8, 15, 0.78) 100%),
+    linear-gradient(180deg, #070f1d 0%, #020811 66%, #02070d 100%),
     radial-gradient(circle at 22% 20%, rgba(33, 65, 106, 0.7), transparent 42%),
     radial-gradient(circle at 78% 30%, rgba(43, 31, 74, 0.45), transparent 38%),
-    url("assets/jwst-bg.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-blend-mode: normal, screen, screen, normal;
+    linear-gradient(180deg, #070f1d 0%, #020811 66%, #02070d 100%);
   position: relative;
 }
 
@@ -1224,19 +1224,31 @@ body.dynamics-mode .hero > p {
 body.simulator-mode {
   background: radial-gradient(circle at 13% 12%, #0e3255, transparent 32%),
     radial-gradient(circle at 88% 18%, #204a34, transparent 40%),
-    linear-gradient(140deg, #040910 0%, #081222 42%, #0a1c1f 100%);
+    linear-gradient(140deg, rgba(4, 9, 16, 0.8) 0%, rgba(8, 18, 34, 0.76) 42%, rgba(10, 28, 31, 0.78) 100%),
+    url("assets/jwst-bg.png");
+  background-size: auto, auto, auto, cover;
+  background-position: center, center, center, center;
+  background-repeat: no-repeat;
 }
 
 body.kepler-mode {
   background: radial-gradient(circle at 12% 16%, #2d355e, transparent 35%),
     radial-gradient(circle at 88% 12%, #4f3048, transparent 38%),
-    linear-gradient(140deg, #050811 0%, #0b1225 43%, #181023 100%);
+    linear-gradient(140deg, rgba(5, 8, 17, 0.8) 0%, rgba(11, 18, 37, 0.76) 43%, rgba(24, 16, 35, 0.78) 100%),
+    url("assets/jwst-bg.png");
+  background-size: auto, auto, auto, cover;
+  background-position: center, center, center, center;
+  background-repeat: no-repeat;
 }
 
 body.dynamics-mode {
   background: radial-gradient(circle at 12% 16%, #2b3f59, transparent 35%),
     radial-gradient(circle at 88% 12%, #4b2d44, transparent 38%),
-    linear-gradient(140deg, #050811 0%, #0c1427 43%, #181023 100%);
+    linear-gradient(140deg, rgba(5, 8, 17, 0.8) 0%, rgba(12, 20, 39, 0.76) 43%, rgba(24, 16, 35, 0.78) 100%),
+    url("assets/jwst-bg.png");
+  background-size: auto, auto, auto, cover;
+  background-position: center, center, center, center;
+  background-repeat: no-repeat;
 }
 
 .site-footer {
