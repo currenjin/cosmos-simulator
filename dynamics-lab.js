@@ -22,6 +22,7 @@ const eEl = document.querySelector("#dyn-e");
 const lEl = document.querySelector("#dyn-l");
 const eDriftEl = document.querySelector("#dyn-e-drift");
 const lDriftEl = document.querySelector("#dyn-l-drift");
+const tutorialOpenBtn = document.querySelector("#dyn-tutorial-open");
 
 const thrustState = {
   x: 80,
@@ -41,11 +42,82 @@ const orbitState = {
 
 let running = false;
 let lastTs = 0;
+let tutorialIndex = -1;
+
+const tutorialState = {
+  overlay: null,
+  stepEl: null,
+  titleEl: null,
+  bodyEl: null,
+  prevBtn: null,
+  nextBtn: null,
+  closeBtn: null,
+  activeTarget: null
+};
+
+const TUTORIAL_STEPS = [
+  {
+    selector: "#dyn-mass",
+    ko: {
+      title: "1단계: 질량과 가속도",
+      body: "질량 m을 올리고 내리며 같은 힘에서 가속도 a가 어떻게 달라지는지 확인하세요."
+    },
+    en: {
+      title: "Step 1: Mass vs Acceleration",
+      body: "Change mass m and observe how acceleration a changes under the same force."
+    }
+  },
+  {
+    selector: "#dyn-force",
+    ko: {
+      title: "2단계: 힘과 반작용",
+      body: "추력 F를 높인 뒤 적용 버튼을 누르면 속도 변화와 함께 작용-반작용 설명이 갱신됩니다."
+    },
+    en: {
+      title: "Step 2: Force and Reaction",
+      body: "Increase thrust F, apply it, and watch velocity change with action-reaction feedback."
+    }
+  },
+  {
+    selector: "#dyn-thrust-canvas",
+    ko: {
+      title: "3단계: 운동 상태 시각화",
+      body: "우주선 패널에서 연속 추력을 주며 속도 누적(관성)을 눈으로 확인하세요."
+    },
+    en: {
+      title: "Step 3: Motion Visualization",
+      body: "Apply repeated thrusts and watch inertia as velocity accumulates in the ship panel."
+    }
+  },
+  {
+    selector: "#dyn-orbit-canvas",
+    ko: {
+      title: "4단계: 궤도와 보존량",
+      body: "오른쪽 궤도 시뮬레이션에서 에너지 E와 각운동량 L이 거의 일정한지 봅니다."
+    },
+    en: {
+      title: "Step 4: Orbit and Conserved Quantities",
+      body: "In the orbit panel, verify that total energy E and angular momentum L remain nearly constant."
+    }
+  },
+  {
+    selector: "#dyn-e-drift",
+    ko: {
+      title: "5단계: 오차 읽기",
+      body: "E/L 변동률(drift)이 작은 값을 유지할수록 수치적으로 보존법칙이 잘 재현된 것입니다."
+    },
+    en: {
+      title: "Step 5: Read Drift",
+      body: "Lower E/L drift means conservation laws are being reproduced more faithfully numerically."
+    }
+  }
+];
 
 thrustBtn.addEventListener("click", applyThrust);
 resetBtn.addEventListener("click", resetThrust);
 massInput.addEventListener("input", updateNewtonPanel);
 forceInput.addEventListener("input", updateNewtonPanel);
+tutorialOpenBtn?.addEventListener("click", () => openTutorial(0));
 
 window.addEventListener("dynamics:activate", () => {
   ensureCanvasSizes();
@@ -58,6 +130,7 @@ window.addEventListener("dynamics:activate", () => {
 
 window.addEventListener("cosmos:settings-changed", () => {
   updateNewtonPanel();
+  refreshTutorialText();
 });
 
 window.addEventListener("resize", ensureCanvasSizes);
@@ -68,10 +141,107 @@ function initialize() {
   ensureCanvasSizes();
   updateNewtonPanel();
   initOrbitBaseline();
+  ensureTutorial();
 
   if (location.hash === "#dynamics") {
     running = true;
     requestAnimationFrame(loop);
+  }
+}
+
+function ensureTutorial() {
+  if (tutorialState.overlay) return;
+
+  const overlay = document.createElement("aside");
+  overlay.className = "lab-tutorial-overlay";
+  overlay.hidden = true;
+  overlay.innerHTML = `
+    <div class="lab-tutorial-head">
+      <strong>Dynamics Tutorial</strong>
+      <span class="lab-tutorial-step"></span>
+    </div>
+    <div class="lab-tutorial-body">
+      <h4></h4>
+      <p></p>
+    </div>
+    <div class="lab-tutorial-actions">
+      <button type="button" class="tutorial-prev"></button>
+      <button type="button" class="tutorial-next primary"></button>
+      <button type="button" class="tutorial-close"></button>
+    </div>
+  `;
+  view.appendChild(overlay);
+  tutorialState.overlay = overlay;
+  tutorialState.stepEl = overlay.querySelector(".lab-tutorial-step");
+  tutorialState.titleEl = overlay.querySelector("h4");
+  tutorialState.bodyEl = overlay.querySelector("p");
+  tutorialState.prevBtn = overlay.querySelector(".tutorial-prev");
+  tutorialState.nextBtn = overlay.querySelector(".tutorial-next");
+  tutorialState.closeBtn = overlay.querySelector(".tutorial-close");
+
+  tutorialState.prevBtn.addEventListener("click", () => openTutorial(tutorialIndex - 1));
+  tutorialState.nextBtn.addEventListener("click", () => {
+    if (tutorialIndex >= TUTORIAL_STEPS.length - 1) {
+      closeTutorial();
+    } else {
+      openTutorial(tutorialIndex + 1);
+    }
+  });
+  tutorialState.closeBtn.addEventListener("click", closeTutorial);
+  refreshTutorialText();
+}
+
+function refreshTutorialText() {
+  if (!tutorialState.overlay) return;
+  const lang = getLanguage();
+  if (tutorialOpenBtn) tutorialOpenBtn.textContent = lang === "en" ? "Start Tutorial" : "튜토리얼 시작";
+  tutorialState.prevBtn.textContent = lang === "en" ? "Previous" : "이전";
+  tutorialState.closeBtn.textContent = lang === "en" ? "Close" : "닫기";
+  tutorialState.nextBtn.textContent = lang === "en" ? "Next" : "다음";
+
+  if (tutorialIndex >= 0) renderTutorialStep();
+}
+
+function openTutorial(index) {
+  ensureTutorial();
+  tutorialIndex = clampIndex(index, 0, TUTORIAL_STEPS.length - 1);
+  tutorialState.overlay.hidden = false;
+  renderTutorialStep();
+}
+
+function renderTutorialStep() {
+  const step = TUTORIAL_STEPS[tutorialIndex];
+  const copy = getLanguage() === "en" ? step.en : step.ko;
+
+  tutorialState.stepEl.textContent = `${tutorialIndex + 1} / ${TUTORIAL_STEPS.length}`;
+  tutorialState.titleEl.textContent = copy.title;
+  tutorialState.bodyEl.textContent = copy.body;
+  tutorialState.prevBtn.disabled = tutorialIndex <= 0;
+  tutorialState.nextBtn.textContent =
+    tutorialIndex >= TUTORIAL_STEPS.length - 1 ? (getLanguage() === "en" ? "Finish" : "완료") : getLanguage() === "en" ? "Next" : "다음";
+
+  focusTutorialTarget(step.selector);
+}
+
+function focusTutorialTarget(selector) {
+  if (tutorialState.activeTarget) {
+    tutorialState.activeTarget.classList.remove("tutorial-focus");
+    tutorialState.activeTarget = null;
+  }
+
+  const target = document.querySelector(selector);
+  if (!target) return;
+  target.classList.add("tutorial-focus");
+  tutorialState.activeTarget = target;
+  target.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+}
+
+function closeTutorial() {
+  tutorialIndex = -1;
+  if (tutorialState.overlay) tutorialState.overlay.hidden = true;
+  if (tutorialState.activeTarget) {
+    tutorialState.activeTarget.classList.remove("tutorial-focus");
+    tutorialState.activeTarget = null;
   }
 }
 
@@ -271,4 +441,8 @@ function drawOrbitScene() {
 
 function getLanguage() {
   return window.cosmosSettings?.get()?.language === "en" ? "en" : "ko";
+}
+
+function clampIndex(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }

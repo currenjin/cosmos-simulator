@@ -81,6 +81,7 @@ const COPY = {
     "kepler.theoryT": "이론 T(3법칙)",
     "kepler.error": "오차"
     ,
+    "kepler.tutorialStart": "튜토리얼 시작",
     "dyn.title": "동역학 랩: 뉴턴 + 보존법칙",
     "dyn.subtitle": "뉴턴 3법칙, 에너지 보존, 각운동량 보존을 하나의 상호작용으로 학습합니다.",
     "dyn.n123": "1) 뉴턴 운동 3법칙",
@@ -94,7 +95,8 @@ const COPY = {
     "dyn.conservation": "2) 에너지/각운동량 보존",
     "dyn.conservationDesc": "중력장 궤도에서 총 에너지 E와 각운동량 L이 거의 일정하게 유지되는지 확인하세요.",
     "dyn.eDrift": "E 변동",
-    "dyn.lDrift": "L 변동"
+    "dyn.lDrift": "L 변동",
+    "dyn.tutorialStart": "튜토리얼 시작"
   },
   en: {
     "settings.language": "Language",
@@ -174,6 +176,7 @@ const COPY = {
     "kepler.realT": "Observed T",
     "kepler.theoryT": "Theoretical T (3rd law)",
     "kepler.error": "Error",
+    "kepler.tutorialStart": "Start Tutorial",
     "dyn.title": "Dynamics Lab: Newton + Conservation",
     "dyn.subtitle": "Learn Newton's 3 laws, energy conservation, and angular momentum conservation interactively.",
     "dyn.n123": "1) Newton's Three Laws",
@@ -187,7 +190,8 @@ const COPY = {
     "dyn.conservation": "2) Energy/Angular Momentum Conservation",
     "dyn.conservationDesc": "Check whether total energy E and angular momentum L stay nearly constant in orbit.",
     "dyn.eDrift": "E Drift",
-    "dyn.lDrift": "L Drift"
+    "dyn.lDrift": "L Drift",
+    "dyn.tutorialStart": "Start Tutorial"
   }
 };
 

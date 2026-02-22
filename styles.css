@@ -760,6 +760,78 @@ body.dynamics-mode .hero > p {
   color: var(--muted);
 }
 
+.lab-hero-actions {
+  margin-top: 12px;
+}
+
+.ghost-button {
+  border-color: rgba(148, 189, 255, 0.42);
+  color: #cfe5ff;
+  background: rgba(10, 24, 41, 0.62);
+}
+
+.lab-tutorial-overlay {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: min(420px, calc(100vw - 24px));
+  border-radius: 14px;
+  border: 1px solid rgba(144, 188, 255, 0.36);
+  background: linear-gradient(155deg, rgba(8, 16, 29, 0.95), rgba(14, 20, 36, 0.93));
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.44);
+  padding: 12px;
+  z-index: 25;
+}
+
+.lab-tutorial-overlay[hidden] {
+  display: none;
+}
+
+.lab-tutorial-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.lab-tutorial-head strong {
+  font-size: 0.95rem;
+}
+
+.lab-tutorial-step {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.lab-tutorial-body {
+  margin-top: 10px;
+}
+
+.lab-tutorial-body h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.lab-tutorial-body p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.lab-tutorial-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.tutorial-focus {
+  outline: 2px solid rgba(126, 204, 255, 0.82);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
 .dynamics-grid {
   margin-top: 14px;
   display: grid;
