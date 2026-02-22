@@ -16,6 +16,7 @@
 - 코스믹 저니: 우주 스케일 슬라이더, 빛의 시간 체험, 자동 항해 비주얼
 - COSMOS ATLAS 브랜딩: 로고, 통일된 컬러 시스템, 탭별 분위기 테마
 - 전역 설정: 언어(한국어/English), 단위(천문 단위/마일 혼합) 전환
+- Kepler Lab: 현상->법칙, 케플러 3법칙 슬라이더, 뉴턴 연결, 실제 행성 데이터 비교
 
 ## 로컬 실행
 
@@ -50,3 +51,4 @@ python3 -m http.server 4173
 - `cosmic-journey.js`: 우주 스케일/빛의 시간 시각화 시뮬레이터
 - `assets/cosmos-atlas-logo.svg`: COSMOS ATLAS 브랜드 로고
 - `settings.js`: 전역 설정(언어/단위) 상태 관리
+- `kepler-lab.js`: 케플러 학습(1/2/5/6) 시뮬레이션

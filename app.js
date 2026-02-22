@@ -7,6 +7,7 @@ const COPY = {
     "tab.planner": "플래너",
     "tab.simulator": "3D 시뮬레이터",
     "tab.journey": "코스믹 저니",
+    "tab.kepler": "Kepler Lab",
     "planner.conditions": "관측 조건",
     "planner.latitude": "위도",
     "planner.longitude": "경도",
@@ -53,6 +54,25 @@ const COPY = {
     "journey.metaphor": "규모 비유",
     "journey.insightTitle": "빛의 시간 체험",
     "journey.aweTitle": "경이 포인트"
+    ,
+    "kepler.title": "케플러 법칙 학습 시뮬레이터",
+    "kepler.subtitle": "현상을 보고 법칙을 이해한 뒤, 뉴턴 연결과 실제 행성 데이터로 검증합니다.",
+    "kepler.p2l": "1) 현상 -> 법칙",
+    "kepler.step1": "근일점에서 더 빨라지고 원일점에서 느려집니다.",
+    "kepler.step2": "같은 시간 동안 쓸어가는 면적이 거의 같아집니다.",
+    "kepler.step3": "이 현상을 케플러 2법칙(면적 속도 일정)으로 설명합니다.",
+    "kepler.k3": "2) 케플러 3법칙",
+    "kepler.a": "반장축 a (AU)",
+    "kepler.period": "주기 T",
+    "kepler.newton": "5) 뉴턴 연결",
+    "kepler.newtonDesc": "현재 거리 r에서 중력은 F = GMm/r²로 계산되며, r이 작을수록 힘이 커집니다.",
+    "kepler.currentR": "현재 r",
+    "kepler.force": "지구 대비 힘",
+    "kepler.data": "6) 실제 데이터 비교",
+    "kepler.selectPlanet": "행성 선택",
+    "kepler.realT": "실측 T",
+    "kepler.theoryT": "이론 T(3법칙)",
+    "kepler.error": "오차"
   },
   en: {
     "settings.language": "Language",
@@ -60,6 +80,7 @@ const COPY = {
     "tab.planner": "Planner",
     "tab.simulator": "3D Sky",
     "tab.journey": "Cosmic Journey",
+    "tab.kepler": "Kepler Lab",
     "planner.conditions": "Observation Conditions",
     "planner.latitude": "Latitude",
     "planner.longitude": "Longitude",
@@ -105,7 +126,25 @@ const COPY = {
     "journey.lightTime": "Light Travel Time",
     "journey.metaphor": "Scale Metaphor",
     "journey.insightTitle": "Light-Time Insight",
-    "journey.aweTitle": "Awe Notes"
+    "journey.aweTitle": "Awe Notes",
+    "kepler.title": "Kepler Law Learning Simulator",
+    "kepler.subtitle": "Observe a phenomenon first, derive the law, connect with Newton, then validate with real data.",
+    "kepler.p2l": "1) Phenomenon -> Law",
+    "kepler.step1": "Orbital speed increases near perihelion and decreases near aphelion.",
+    "kepler.step2": "Equal times sweep nearly equal areas.",
+    "kepler.step3": "This is Kepler's 2nd law (constant areal velocity).",
+    "kepler.k3": "2) Kepler 3rd Law",
+    "kepler.a": "Semi-major axis a (AU)",
+    "kepler.period": "Period T",
+    "kepler.newton": "5) Newton Link",
+    "kepler.newtonDesc": "At distance r, gravity follows F = GMm/r², so smaller r means stronger force.",
+    "kepler.currentR": "Current r",
+    "kepler.force": "Force vs Earth",
+    "kepler.data": "6) Real Data Comparison",
+    "kepler.selectPlanet": "Planet",
+    "kepler.realT": "Observed T",
+    "kepler.theoryT": "Theoretical T (3rd law)",
+    "kepler.error": "Error"
   }
 };
 
@@ -122,6 +161,7 @@ const cardTemplate = document.querySelector("#card-template");
 const plannerView = document.querySelector("#planner-view");
 const simulatorView = document.querySelector("#simulator-view");
 const journeyView = document.querySelector("#journey-view");
+const keplerView = document.querySelector("#kepler-view");
 const modeTabs = document.querySelectorAll(".mode-tab");
 
 let lastRecommendations = [];
@@ -170,14 +210,16 @@ function initializeDefaults() {
 }
 
 function initializeModeTabs() {
-  const modeFromHash = location.hash === "#simulator" ? "simulator" : location.hash === "#journey" ? "journey" : "planner";
+  const modeFromHash =
+    location.hash === "#simulator" ? "simulator" : location.hash === "#journey" ? "journey" : location.hash === "#kepler" ? "kepler" : "planner";
   setMode(modeFromHash);
 
   modeTabs.forEach((tab) => {
     tab.addEventListener("click", () => {
-      const mode = tab.dataset.tab === "simulator" ? "simulator" : tab.dataset.tab === "journey" ? "journey" : "planner";
+      const mode =
+        tab.dataset.tab === "simulator" ? "simulator" : tab.dataset.tab === "journey" ? "journey" : tab.dataset.tab === "kepler" ? "kepler" : "planner";
       setMode(mode);
-      const hash = mode === "simulator" ? "#simulator" : mode === "journey" ? "#journey" : "#planner";
+      const hash = mode === "simulator" ? "#simulator" : mode === "journey" ? "#journey" : mode === "kepler" ? "#kepler" : "#planner";
       history.replaceState(null, "", hash);
     });
   });
@@ -186,14 +228,17 @@ function initializeModeTabs() {
 function setMode(mode) {
   const simulatorMode = mode === "simulator";
   const journeyMode = mode === "journey";
-  const plannerMode = !simulatorMode && !journeyMode;
+  const keplerMode = mode === "kepler";
+  const plannerMode = !simulatorMode && !journeyMode && !keplerMode;
 
   document.body.classList.toggle("planner-mode", plannerMode);
   document.body.classList.toggle("simulator-mode", simulatorMode);
   document.body.classList.toggle("journey-mode", journeyMode);
+  document.body.classList.toggle("kepler-mode", keplerMode);
   plannerView.hidden = !plannerMode;
   simulatorView.hidden = !simulatorMode;
   journeyView.hidden = !journeyMode;
+  keplerView.hidden = !keplerMode;
 
   modeTabs.forEach((tab) => {
     const active = tab.dataset.tab === mode;
@@ -206,6 +251,9 @@ function setMode(mode) {
   }
   if (journeyMode) {
     window.dispatchEvent(new CustomEvent("journey:activate"));
+  }
+  if (keplerMode) {
+    window.dispatchEvent(new CustomEvent("kepler:activate"));
   }
 }
 

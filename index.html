@@ -50,6 +50,9 @@
         <button type="button" class="mode-tab" data-tab="journey" role="tab" aria-selected="false" data-i18n="tab.journey">
           코스믹 저니
         </button>
+        <button type="button" class="mode-tab" data-tab="kepler" role="tab" aria-selected="false" data-i18n="tab.kepler">
+          Kepler Lab
+        </button>
       </div>
     </header>
 
@@ -203,6 +206,61 @@
       </section>
     </section>
 
+    <section id="kepler-view" class="kepler-view" hidden>
+      <div class="kepler-hero">
+        <h2 data-i18n="kepler.title">케플러 법칙 학습 시뮬레이터</h2>
+        <p data-i18n="kepler.subtitle">현상을 보고 법칙을 이해한 뒤, 뉴턴 연결과 실제 행성 데이터로 검증합니다.</p>
+      </div>
+
+      <section class="kepler-grid">
+        <article class="kepler-panel">
+          <h3 data-i18n="kepler.p2l">1) 현상 -> 법칙</h3>
+          <ol class="kepler-steps">
+            <li data-i18n="kepler.step1">근일점에서 더 빨라지고 원일점에서 느려집니다.</li>
+            <li data-i18n="kepler.step2">같은 시간 동안 쓸어가는 면적이 거의 같아집니다.</li>
+            <li data-i18n="kepler.step3">이 현상을 케플러 2법칙(면적 속도 일정)으로 설명합니다.</li>
+          </ol>
+        </article>
+
+        <article class="kepler-panel">
+          <h3 data-i18n="kepler.k3">2) 케플러 3법칙</h3>
+          <label for="kepler-a" data-i18n="kepler.a">반장축 a (AU)</label>
+          <input id="kepler-a" type="range" min="0.4" max="30" step="0.1" value="1" />
+          <div class="kepler-metrics">
+            <p><span data-i18n="kepler.period">주기 T</span> <strong id="kepler-period"></strong></p>
+            <p><span>T²</span> <strong id="kepler-t2"></strong></p>
+            <p><span>a³</span> <strong id="kepler-a3"></strong></p>
+          </div>
+          <p id="kepler-law-check" class="kepler-note"></p>
+        </article>
+
+        <article class="kepler-panel kepler-visual">
+          <canvas id="kepler-canvas" width="820" height="420"></canvas>
+        </article>
+
+        <article class="kepler-panel">
+          <h3 data-i18n="kepler.newton">5) 뉴턴 연결</h3>
+          <p data-i18n="kepler.newtonDesc">현재 거리 r에서 중력은 F = GMm/r²로 계산되며, r이 작을수록 힘이 커집니다.</p>
+          <p><span data-i18n="kepler.currentR">현재 r</span> <strong id="kepler-r"></strong></p>
+          <p><span data-i18n="kepler.force">지구 대비 힘</span> <strong id="kepler-force"></strong></p>
+        </article>
+
+        <article class="kepler-panel">
+          <h3 data-i18n="kepler.data">6) 실제 데이터 비교</h3>
+          <label for="kepler-planet" data-i18n="kepler.selectPlanet">행성 선택</label>
+          <select id="kepler-planet"></select>
+          <table class="kepler-table">
+            <tbody>
+              <tr><th>a (AU)</th><td id="planet-a"></td></tr>
+              <tr><th data-i18n="kepler.realT">실측 T</th><td id="planet-real-t"></td></tr>
+              <tr><th data-i18n="kepler.theoryT">이론 T(3법칙)</th><td id="planet-theory-t"></td></tr>
+              <tr><th data-i18n="kepler.error">오차</th><td id="planet-error"></td></tr>
+            </tbody>
+          </table>
+        </article>
+      </section>
+    </section>
+
     <footer class="site-footer">
       <p>COSMOS ATLAS | Observe. Understand. Feel The Scale.</p>
     </footer>
@@ -210,5 +268,6 @@
     <script type="module" src="app.js"></script>
     <script type="module" src="sky3d.js"></script>
     <script type="module" src="cosmic-journey.js"></script>
+    <script type="module" src="kepler-lab.js"></script>
   </body>
 </html>
