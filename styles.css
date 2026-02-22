@@ -382,6 +382,33 @@ button:hover {
   padding: 8px 12px;
 }
 
+.sky-search-results {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-height: 30px;
+}
+
+.sky-search-results .empty {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.search-result-item {
+  border-radius: 999px;
+  border: 1px solid rgba(141, 188, 255, 0.34);
+  background: rgba(10, 22, 38, 0.62);
+  color: #dcedff;
+  padding: 5px 9px;
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.search-result-item:hover {
+  border-color: rgba(207, 227, 255, 0.62);
+}
+
 #sync-sky-now {
   border-color: rgba(255, 211, 123, 0.48);
   color: var(--warm);

@@ -16,6 +16,7 @@ const liveTimeInput = document.querySelector("#sky-live-time");
 const skySearchInput = document.querySelector("#sky-search");
 const skySearchBtn = document.querySelector("#sky-search-btn");
 const skySearchList = document.querySelector("#sky-search-list");
+const skySearchResults = document.querySelector("#sky-search-results");
 const syncSkyNowBtn = document.querySelector("#sync-sky-now");
 const skyStatus = document.querySelector("#sky-status");
 const scaleAweEl = document.querySelector("#scale-awe");
@@ -415,6 +416,11 @@ let scaleTransitionDuration = 1450;
 let scaleOrbitYaw = 0;
 let scaleOrbitPitch = 0.35;
 let scaleOrbitRadius = 120;
+let skyTrackActive = false;
+let targetYaw = yaw;
+let targetPitch = pitch;
+let scaleFollowTargetKey = "";
+const scaleLookCenter = new THREE.Vector3(0, 0, 0);
 
 const scaleScene = createScaleScenes();
 setScaleMode("sky", false);
@@ -429,6 +435,7 @@ initializeSkyTime();
 timeSpeed = Number(skySpeedInput?.value || "1");
 buildLabels();
 initializeSearchOptions();
+renderSearchResults([]);
 updateSearchPlaceholder();
 wireControls();
 window.addEventListener("simulator:activate", ensureStarted);
@@ -438,6 +445,7 @@ window.addEventListener("cosmos:settings-changed", () => {
   refreshLabelTexts();
   updateScaleAweText();
   updateScaleAccuracyBadge();
+  renderSearchResults(getSearchMatches(skySearchInput?.value || ""));
   updateStatus();
 });
 
@@ -597,11 +605,18 @@ function wireControls() {
       focusSearchTarget();
     }
   });
+  skySearchInput?.addEventListener("input", () => {
+    renderSearchResults(getSearchMatches(skySearchInput.value || ""));
+  });
 
   renderer.domElement.addEventListener("pointerdown", (event) => {
     isDragging = true;
     lastX = event.clientX;
     lastY = event.clientY;
+    skyTrackActive = false;
+    if (scaleMode !== "sky") {
+      scaleFollowTargetKey = "";
+    }
     renderer.domElement.setPointerCapture(event.pointerId);
   });
 
@@ -733,10 +748,21 @@ function moveViewToFocus(mode) {
   moveViewToHorizontal(altDeg, azDeg);
 }
 
-function moveViewToHorizontal(altDeg, azDeg) {
+function moveViewToHorizontal(altDeg, azDeg, smooth = true) {
   const v = horizontalToVector(altDeg, azDeg, 1).normalize();
-  pitch = Math.asin(v.y);
-  yaw = Math.atan2(v.x, -v.z);
+  const nextPitch = Math.asin(v.y);
+  const nextYaw = Math.atan2(v.x, -v.z);
+  if (smooth) {
+    targetPitch = nextPitch;
+    targetYaw = nextYaw;
+    skyTrackActive = true;
+    return;
+  }
+  pitch = nextPitch;
+  yaw = nextYaw;
+  targetPitch = nextPitch;
+  targetYaw = nextYaw;
+  skyTrackActive = false;
 }
 
 function initializeSearchOptions() {
@@ -753,21 +779,121 @@ function updateSearchPlaceholder() {
 function focusSearchTarget() {
   const raw = skySearchInput?.value?.trim();
   if (!raw) return;
-  if (scaleMode !== "sky") {
-    setScaleMode("sky", false);
-  }
-
-  const target = findSearchTarget(raw);
+  const matches = getSearchMatches(raw, 8);
+  renderSearchResults(matches);
+  const target = findSearchTarget(raw, matches);
   if (!target) {
     setStatusHint(getLanguage() === "en" ? `No match for "${raw}"` : `"${raw}"에 해당하는 천체를 찾지 못했습니다.`);
     searchHitKey = "";
     return;
   }
 
-  const equatorial =
-    target.type === "planet"
-      ? getPlanetRaDec(target.key.replace("planet:", ""), currentContext.date)
-      : { raHours: target.raHours, decDeg: target.decDeg };
+  applyTargetFocus(target, true);
+}
+
+function findSearchTarget(query, precomputedMatches = null) {
+  const q = normalizeSearch(query);
+  if (!q) return null;
+
+  if (precomputedMatches && precomputedMatches.length > 0) {
+    return precomputedMatches[0];
+  }
+  const exact = searchableTargets.find((target) => normalizeSearch(target.name) === q);
+  if (exact) return exact;
+
+  return searchableTargets.find((target) => normalizeSearch(target.name).includes(q)) || null;
+}
+
+function getSearchMatches(query, limit = 8) {
+  const q = normalizeSearch(query || "");
+  if (!q) return [];
+
+  const ranked = searchableTargets
+    .map((target) => {
+      const n = normalizeSearch(target.name);
+      const index = n.indexOf(q);
+      if (index < 0) return null;
+      const exact = n === q ? 0 : 1;
+      const startsWith = index === 0 ? 0 : 1;
+      return { ...target, score: exact * 100 + startsWith * 10 + index };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.score - b.score);
+
+  const unique = new Map();
+  ranked.forEach((target) => {
+    if (!unique.has(target.key)) {
+      unique.set(target.key, target);
+    }
+  });
+
+  return Array.from(unique.values()).slice(0, limit);
+}
+
+function renderSearchResults(matches) {
+  if (!skySearchResults) return;
+  if (!matches || matches.length === 0) {
+    skySearchResults.innerHTML = `<span class="empty">${getLanguage() === "en" ? "Type to see matching objects" : "입력하면 일치하는 천체가 표시됩니다"}</span>`;
+    return;
+  }
+
+  skySearchResults.innerHTML = "";
+  matches.forEach((target) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "search-result-item";
+    button.textContent = getTargetDisplayName(target);
+    button.addEventListener("click", () => {
+      if (skySearchInput) {
+        skySearchInput.value = getTargetDisplayName(target);
+      }
+      renderSearchResults(getSearchMatches(skySearchInput?.value || ""));
+      applyTargetFocus(target, true);
+    });
+    skySearchResults.appendChild(button);
+  });
+}
+
+function getTargetDisplayName(target) {
+  const lang = getLanguage();
+  if (target.type === "planet") {
+    const key = target.key.replace("planet:", "");
+    return lang === "en" ? key : PLANET_NAME_KO[key] || key;
+  }
+  if (target.type === "star") {
+    const key = target.key.replace("star:", "");
+    const star = brightStars[key];
+    if (!star) return target.name;
+    return lang === "en" ? star.name : star.koName || star.name;
+  }
+  if (target.type === "nebula") {
+    const id = target.key.replace("nebula:", "");
+    const nebula = nebulaTargets.find((item) => item.id === id);
+    if (!nebula) return target.name;
+    return lang === "en" ? TARGET_NAME_EN_BY_ID[id] || nebula.name : nebula.name;
+  }
+  return target.name;
+}
+
+function applyTargetFocus(target, smooth) {
+  if (!target) return;
+
+  searchHitKey = target.key;
+  const display = getTargetDisplayName(target);
+  if (target.type === "planet") {
+    scaleFollowTargetKey = target.key;
+    if (scaleMode !== "solar") {
+      setScaleMode("solar", true);
+    }
+    setStatusHint(getLanguage() === "en" ? `Following: ${display}` : `추적 중: ${display}`, 2600);
+    return;
+  }
+
+  scaleFollowTargetKey = "";
+  if (scaleMode !== "sky") {
+    setScaleMode("sky", false);
+  }
+  const equatorial = { raHours: target.raHours, decDeg: target.decDeg };
   const { altDeg, azDeg } = raDecToHorizontal(
     equatorial.raHours,
     equatorial.decDeg,
@@ -775,19 +901,8 @@ function focusSearchTarget() {
     currentContext.lat,
     currentContext.lon
   );
-  moveViewToHorizontal(altDeg, azDeg);
-  searchHitKey = target.key;
-  setStatusHint(getLanguage() === "en" ? `Focused: ${target.name}` : `포커스: ${target.name}`, 2200);
-}
-
-function findSearchTarget(query) {
-  const q = normalizeSearch(query);
-  if (!q) return null;
-
-  const exact = searchableTargets.find((target) => normalizeSearch(target.name) === q);
-  if (exact) return exact;
-
-  return searchableTargets.find((target) => normalizeSearch(target.name).includes(q)) || null;
+  moveViewToHorizontal(altDeg, azDeg, smooth);
+  setStatusHint(getLanguage() === "en" ? `Focused: ${display}` : `포커스: ${display}`, 2200);
 }
 
 function normalizeSearch(value) {
@@ -929,6 +1044,7 @@ function setScaleMode(mode, animated = true) {
   updateScaleButtons();
   updateScaleAweText();
   updateScaleAccuracyBadge();
+  scaleLookCenter.copy(getScaleCenter(scaleMode));
 
   const skyVisible = scaleMode === "sky";
   dome.visible = skyVisible;
@@ -944,6 +1060,9 @@ function setScaleMode(mode, animated = true) {
   solarScaleGroup.visible = scaleMode === "solar";
   galaxyScaleGroup.visible = scaleMode === "galaxy";
   localScaleGroup.visible = scaleMode === "local";
+  if (scaleMode !== "solar") {
+    scaleFollowTargetKey = "";
+  }
 
   if (scaleMode === "sky") {
     updateContextFromInputs();
@@ -1086,6 +1205,17 @@ function getScaleCenter(mode) {
   return new THREE.Vector3(0, 0, 0);
 }
 
+function getScaleFollowCenter(mode) {
+  if (mode === "solar" && scaleFollowTargetKey.startsWith("planet:")) {
+    const planetKey = scaleFollowTargetKey.replace("planet:", "");
+    const node = scaleScene.solar.planetMeshes.get(planetKey);
+    if (node) {
+      return node.position.clone();
+    }
+  }
+  return getScaleCenter(mode);
+}
+
 function updateScaleTransition(ts) {
   if (scaleTransition >= 1 || !scaleTransitionFrom || !scaleTransitionTo) return;
   const t = clamp((ts - scaleTransitionStart) / scaleTransitionDuration, 0, 1);
@@ -1115,14 +1245,15 @@ function applyCameraForScale() {
     return;
   }
 
-  const center = getScaleCenter(scaleMode);
+  const center = getScaleFollowCenter(scaleMode);
+  scaleLookCenter.lerp(center, 0.18);
   const orbitalPos = new THREE.Vector3(
-    center.x + scaleOrbitRadius * Math.cos(scaleOrbitPitch) * Math.sin(scaleOrbitYaw),
-    center.y + scaleOrbitRadius * Math.sin(scaleOrbitPitch),
-    center.z + scaleOrbitRadius * Math.cos(scaleOrbitPitch) * Math.cos(scaleOrbitYaw)
+    scaleLookCenter.x + scaleOrbitRadius * Math.cos(scaleOrbitPitch) * Math.sin(scaleOrbitYaw),
+    scaleLookCenter.y + scaleOrbitRadius * Math.sin(scaleOrbitPitch),
+    scaleLookCenter.z + scaleOrbitRadius * Math.cos(scaleOrbitPitch) * Math.cos(scaleOrbitYaw)
   );
   camera.position.copy(orbitalPos);
-  camera.lookAt(center);
+  camera.lookAt(scaleLookCenter);
 }
 
 function applyCameraState(state) {
@@ -1381,6 +1512,17 @@ function animate(ts) {
     updateScaleScene(ts);
     updateStatus();
     lastStatusUpdate = ts;
+  }
+
+  if (scaleMode === "sky" && skyTrackActive) {
+    const yawDelta = shortestAngleDelta(yaw, targetYaw);
+    yaw += yawDelta * 0.12;
+    pitch += (targetPitch - pitch) * 0.12;
+    if (Math.abs(yawDelta) < 0.0009 && Math.abs(targetPitch - pitch) < 0.0009) {
+      yaw = targetYaw;
+      pitch = targetPitch;
+      skyTrackActive = false;
+    }
   }
 
   updateScaleTransition(ts);
@@ -1840,6 +1982,10 @@ function toDeg(rad) {
 
 function normalizeDeg(deg) {
   return ((deg % 360) + 360) % 360;
+}
+
+function shortestAngleDelta(from, to) {
+  return Math.atan2(Math.sin(to - from), Math.cos(to - from));
 }
 
 function clamp(value, min, max) {
