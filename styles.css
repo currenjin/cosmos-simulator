@@ -115,12 +115,12 @@ main {
   grid-column: span 6;
 }
 
-.checklist {
-  grid-column: span 3;
+.viewer3d {
+  grid-column: span 6;
 }
 
 .results {
-  grid-column: span 9;
+  grid-column: span 12;
 }
 
 form {
@@ -186,18 +186,88 @@ button:hover {
   color: var(--warm);
 }
 
-#checklist-items {
-  margin: 14px 0 0;
-  padding-left: 18px;
-  color: var(--muted);
-  display: grid;
-  gap: 8px;
-}
-
 .results-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.viewer-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.viewer-head p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.viewer-quick {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.viewer-quick button {
+  padding: 8px 10px;
+}
+
+.viewer-controls {
+  margin-top: 12px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: #8ed8ff;
+}
+
+#sky-viewer {
+  margin-top: 12px;
+  border: 1px solid rgba(126, 160, 221, 0.24);
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 430px;
+  background: radial-gradient(circle at 20% 20%, #0c1f39, #030a13 58%);
+  position: relative;
+}
+
+#sky-viewer canvas {
+  display: block;
+}
+
+.viewer-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.viewer-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  color: #dceaff;
+  font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+  font-size: 0.72rem;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  transition: opacity 0.12s linear;
+}
+
+.viewer-label.nebula {
+  color: #ffd9a0;
 }
 
 #result-count {
@@ -274,32 +344,6 @@ canvas {
   display: block;
 }
 
-.card-actions {
-  margin-top: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-
-.check-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--muted);
-}
-
-.check-item input {
-  width: 16px;
-  height: 16px;
-  accent-color: #8ed8ff;
-}
-
-.log-btn {
-  border-color: rgba(255, 211, 123, 0.5);
-  color: var(--warm);
-}
-
 @keyframes drift {
   from {
     transform: translate3d(0, 0, 0);
@@ -323,7 +367,7 @@ canvas {
 @media (max-width: 960px) {
   .controls,
   .summary,
-  .checklist,
+  .viewer3d,
   .results {
     grid-column: 1 / -1;
   }
@@ -343,8 +387,8 @@ canvas {
     flex-direction: column;
   }
 
-  .card-actions {
+  .viewer-head {
     flex-direction: column;
-    align-items: stretch;
   }
+
 }

@@ -59,9 +59,33 @@
 
       <section class="panel summary" id="summary"></section>
 
-      <section class="panel checklist">
-        <h2>오늘 체크리스트</h2>
-        <ul id="checklist-items"></ul>
+      <section class="panel viewer3d">
+        <div class="viewer-head">
+          <div>
+            <h2>3D 하늘 시뮬레이터</h2>
+            <p>드래그로 회전, 휠로 확대/축소. 별자리와 성운 레이어를 켜고 끌 수 있습니다.</p>
+          </div>
+          <div class="viewer-quick">
+            <button type="button" data-focus="orion">오리온</button>
+            <button type="button" data-focus="ursa-major">북두칠성</button>
+            <button type="button" data-focus="summer">여름 삼각형</button>
+          </div>
+        </div>
+        <div class="viewer-controls">
+          <label class="toggle">
+            <input type="checkbox" id="toggle-constellations" checked />
+            별자리 선
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-nebulae" checked />
+            성운/성단
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-labels" checked />
+            이름 라벨
+          </label>
+        </div>
+        <div id="sky-viewer"></div>
       </section>
 
       <section class="panel results">
@@ -86,16 +110,10 @@
         <div class="chart-wrap">
           <canvas width="320" height="120"></canvas>
         </div>
-        <div class="card-actions">
-          <label class="check-item">
-            <input type="checkbox" class="check-target" />
-            오늘 관측 예정
-          </label>
-          <button type="button" class="log-btn">관측 기록</button>
-        </div>
       </article>
     </template>
 
     <script type="module" src="app.js"></script>
+    <script type="module" src="sky3d.js"></script>
   </body>
 </html>

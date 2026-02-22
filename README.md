@@ -7,8 +7,8 @@
 - 위치/날짜/장비 입력
 - 야간 구간(태양 고도 -12° 이하) 자동 계산
 - 천체별 고도/가시 시간 기반 점수화 추천
-- 오늘 체크리스트 저장 (localStorage)
-- 관측 성공/실패 로그 저장 (localStorage)
+- 3D 하늘 시뮬레이터 (별/별자리 선/성운 라벨)
+- 오리온/북두칠성/여름 삼각형 빠른 포커스 버튼
 
 ## 로컬 실행
 
@@ -25,8 +25,8 @@ python3 -m http.server 4173
 
 1. 이 폴더를 독립 레포지토리로 push
 2. GitHub 저장소 설정에서 `Settings > Pages`
-3. Source를 `Deploy from a branch`로 선택
-4. Branch를 `main` / `/ (root)`로 선택
+3. Source를 `GitHub Actions`로 선택
+4. `main` 브랜치에 push 하면 `.github/workflows/deploy.yml`로 자동 배포
 5. 배포 완료 후 제공 URL 접속
 
 ### 커스텀 도메인 없이 빠르게 쓰기
@@ -39,3 +39,4 @@ python3 -m http.server 4173
 - `styles.css`: 화면 스타일
 - `app.js`: 관측 계산 로직 + 렌더링
 - `targets.js`: 기본 천체 데이터
+- `sky3d.js`: Three.js 기반 3D 하늘 시뮬레이터

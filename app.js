@@ -9,14 +9,9 @@ const useLocationBtn = document.querySelector("#use-location");
 const summaryEl = document.querySelector("#summary");
 const resultCards = document.querySelector("#result-cards");
 const resultCount = document.querySelector("#result-count");
-const checklistItems = document.querySelector("#checklist-items");
 const cardTemplate = document.querySelector("#card-template");
 
-const STORAGE_KEY = "sky_planner_logs_v1";
-const CHECK_KEY = "sky_planner_checklist_v1";
-
 initializeDefaults();
-renderChecklist();
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -222,8 +217,6 @@ function renderCards(recommendations, lat, lon, nightTimes) {
   resultCards.innerHTML = "";
   resultCount.textContent = `${recommendations.length}개`;
 
-  const checkedMap = getCheckedMap();
-
   recommendations.forEach((item) => {
     const node = cardTemplate.content.firstElementChild.cloneNode(true);
     node.querySelector(".target-name").textContent = item.name;
@@ -238,18 +231,6 @@ function renderCards(recommendations, lat, lon, nightTimes) {
       <span>최적 시각 <strong>${item.bestTime ? formatTime(item.bestTime) : "-"}</strong></span>
       <span>필요 장비 <strong>${toEquipmentLabel(item.minEquipment)}</strong></span>
     `;
-
-    const checkbox = node.querySelector(".check-target");
-    checkbox.checked = Boolean(checkedMap[item.id]);
-    checkbox.addEventListener("change", () => {
-      toggleChecklist(item.id, item.name, checkbox.checked);
-      renderChecklist();
-    });
-
-    const logBtn = node.querySelector(".log-btn");
-    logBtn.addEventListener("click", () => {
-      saveObservationLog(item);
-    });
 
     drawAltitudeChart(node.querySelector("canvas"), item.trace, lat, lon, nightTimes);
     resultCards.appendChild(node);
@@ -318,76 +299,6 @@ function drawAltitudeChart(canvas, trace, lat, lon, nightTimes) {
   ctx.fillStyle = "#dce6ff";
   ctx.font = "11px IBM Plex Sans KR";
   ctx.fillText(`${formatLatLon(lat, lon)} 기준`, 10, height - 8);
-}
-
-function saveObservationLog(item) {
-  const seen = confirm(`${item.name} 관측에 성공했나요?\n확인: 성공 / 취소: 미성공`);
-  const note = prompt("짧은 메모를 남겨주세요 (선택)", "");
-
-  const logs = loadLogs();
-  logs.push({
-    timestamp: new Date().toISOString(),
-    targetId: item.id,
-    targetName: item.name,
-    seen,
-    note: note || ""
-  });
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-  alert("관측 기록이 저장되었습니다.");
-}
-
-function loadLogs() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function toggleChecklist(targetId, targetName, checked) {
-  const key = dateInput.value;
-  const data = getCheckedMapAllDays();
-  const dayMap = data[key] || {};
-
-  if (checked) {
-    dayMap[targetId] = targetName;
-  } else {
-    delete dayMap[targetId];
-  }
-
-  data[key] = dayMap;
-  localStorage.setItem(CHECK_KEY, JSON.stringify(data));
-}
-
-function getCheckedMapAllDays() {
-  try {
-    return JSON.parse(localStorage.getItem(CHECK_KEY) || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function getCheckedMap() {
-  const all = getCheckedMapAllDays();
-  return all[dateInput.value] || {};
-}
-
-function renderChecklist() {
-  const entries = Object.entries(getCheckedMap());
-  checklistItems.innerHTML = "";
-
-  if (!entries.length) {
-    checklistItems.innerHTML = "<li>아직 추가한 대상이 없습니다.</li>";
-    return;
-  }
-
-  entries.forEach(([id, name]) => {
-    const li = document.createElement("li");
-    li.textContent = name;
-    li.dataset.targetId = id;
-    checklistItems.appendChild(li);
-  });
 }
 
 function toEquipmentLabel(equipment) {
