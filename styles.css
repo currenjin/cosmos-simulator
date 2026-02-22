@@ -578,6 +578,12 @@ button:hover {
   font-weight: 600;
 }
 
+.viewer-label.constellation {
+  color: #9fc9ff;
+  font-size: 0.68rem;
+  opacity: 0.88;
+}
+
 .viewer-label.cardinal {
   color: #9fd8ff;
   font-weight: 700;

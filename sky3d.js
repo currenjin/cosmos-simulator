@@ -692,6 +692,10 @@ function buildLabels() {
     addLabel(`planet:${planet.key}`, "planet");
   });
 
+  CONSTELLATION_CATALOG.forEach((item) => {
+    addLabel(`constellation:${item.id}`, "constellation");
+  });
+
   [
     ["N", 0],
     ["E", 90],
@@ -743,6 +747,12 @@ function getLabelText(labelKey, type) {
     const ko = target.name.replace("M", " M");
     const en = (TARGET_NAME_EN_BY_ID[id] || target.name).replace("M", " M");
     return lang === "en" ? en : ko;
+  }
+  if (type === "constellation") {
+    const id = labelKey.replace("constellation:", "");
+    const item = CONSTELLATION_CATALOG.find((constellation) => constellation.id === id);
+    if (!item) return id;
+    return lang === "en" ? item.en : item.ko;
   }
   if (type === "cardinal") {
     const axis = labelKey.replace("cardinal:", "");
@@ -1769,6 +1779,12 @@ function updateCelestialPositions() {
     planetPositions[base + 2] = v.z;
   });
   planetGeometry.attributes.position.needsUpdate = true;
+
+  CONSTELLATION_CATALOG.forEach((item) => {
+    const { altDeg, azDeg } = raDecToHorizontal(item.raHours, item.decDeg, date, lat, lon);
+    const v = horizontalToVector(altDeg, azDeg, SKY_RADIUS - 2.8);
+    vectorCache.set(`constellation:${item.id}`, v);
+  });
 }
 
 function resizeRenderer() {
