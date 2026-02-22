@@ -299,10 +299,26 @@ button:hover {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .viewer-quick button {
   padding: 8px 10px;
+}
+
+.constellation-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.constellation-select-wrap select {
+  min-width: 180px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(11, 23, 40, 0.7);
 }
 
 .viewer-controls {

@@ -31,6 +31,7 @@ const toggleNebulae = document.querySelector("#toggle-nebulae");
 const togglePlanets = document.querySelector("#toggle-planets");
 const toggleLabels = document.querySelector("#toggle-labels");
 const focusButtons = document.querySelectorAll("[data-focus]");
+const constellationSelect = document.querySelector("#constellation-select");
 
 const SKY_RADIUS = 92;
 const HORIZON_RADIUS = 86;
@@ -187,6 +188,173 @@ const constellationLines = [
   ["altair", "vega"]
 ];
 
+const CONSTELLATION_CATALOG = [
+  { id: "andromeda", en: "Andromeda", ko: "안드로메다자리", raHours: 1.45, decDeg: 37.8 },
+  { id: "aquarius", en: "Aquarius", ko: "물병자리", raHours: 22.2, decDeg: -8.5 },
+  { id: "aquila", en: "Aquila", ko: "독수리자리", raHours: 19.87, decDeg: 8.9 },
+  { id: "aries", en: "Aries", ko: "양자리", raHours: 2.65, decDeg: 20.2 },
+  { id: "auriga", en: "Auriga", ko: "마차부자리", raHours: 5.55, decDeg: 44.8 },
+  { id: "bootes", en: "Bootes", ko: "목동자리", raHours: 14.7, decDeg: 30.9 },
+  { id: "canis-major", en: "Canis Major", ko: "큰개자리", raHours: 6.82, decDeg: -23.5 },
+  { id: "canis-minor", en: "Canis Minor", ko: "작은개자리", raHours: 7.55, decDeg: 1.5 },
+  { id: "capricornus", en: "Capricornus", ko: "염소자리", raHours: 21.0, decDeg: -18.0 },
+  { id: "cassiopeia", en: "Cassiopeia", ko: "카시오페이아자리", raHours: 1.1, decDeg: 60.1 },
+  { id: "cygnus", en: "Cygnus", ko: "백조자리", raHours: 20.37, decDeg: 40.3 },
+  { id: "gemini", en: "Gemini", ko: "쌍둥이자리", raHours: 7.25, decDeg: 24.5 },
+  { id: "hercules", en: "Hercules", ko: "헤르쿨레스자리", raHours: 17.2, decDeg: 28.3 },
+  { id: "leo", en: "Leo", ko: "사자자리", raHours: 10.65, decDeg: 17.3 },
+  { id: "libra", en: "Libra", ko: "천칭자리", raHours: 15.2, decDeg: -15.0 },
+  { id: "lyra", en: "Lyra", ko: "거문고자리", raHours: 18.8, decDeg: 36.2 },
+  { id: "orion", en: "Orion", ko: "오리온자리", raHours: 5.6, decDeg: -1.4 },
+  { id: "pegasus", en: "Pegasus", ko: "페가수스자리", raHours: 23.5, decDeg: 22.0 },
+  { id: "perseus", en: "Perseus", ko: "페르세우스자리", raHours: 3.35, decDeg: 45.2 },
+  { id: "pisces", en: "Pisces", ko: "물고기자리", raHours: 1.0, decDeg: 11.0 },
+  { id: "sagittarius", en: "Sagittarius", ko: "궁수자리", raHours: 18.6, decDeg: -29.4 },
+  { id: "scorpius", en: "Scorpius", ko: "전갈자리", raHours: 16.8, decDeg: -31.1 },
+  { id: "taurus", en: "Taurus", ko: "황소자리", raHours: 4.7, decDeg: 18.5 },
+  { id: "ursa-major", en: "Ursa Major", ko: "큰곰자리", raHours: 12.4, decDeg: 55.7 },
+  { id: "ursa-minor", en: "Ursa Minor", ko: "작은곰자리", raHours: 15.0, decDeg: 77.0 },
+  { id: "virgo", en: "Virgo", ko: "처녀자리", raHours: 13.1, decDeg: -2.0 }
+];
+
+const CONSTELLATION_SKETCHES = [
+  {
+    id: "taurus",
+    segments: [
+      [4.5987, 16.5093, 5.4382, 28.6074],
+      [4.5987, 16.5093, 4.4769, 19.1804],
+      [4.4769, 19.1804, 3.7914, 24.1051]
+    ]
+  },
+  {
+    id: "gemini",
+    segments: [
+      [7.5767, 31.8883, 7.7553, 28.0262],
+      [7.5767, 31.8883, 6.7322, 25.1311],
+      [7.7553, 28.0262, 6.6285, 16.3993]
+    ]
+  },
+  {
+    id: "leo",
+    segments: [
+      [10.3329, 19.8415, 10.1395, 11.9672],
+      [10.1395, 11.9672, 11.2373, 15.4296],
+      [11.2373, 15.4296, 11.2351, 20.5237],
+      [11.2351, 20.5237, 11.8177, 14.5721]
+    ]
+  },
+  {
+    id: "virgo",
+    segments: [
+      [13.0363, 10.9591, 12.6943, -1.4494],
+      [12.6943, -1.4494, 13.4199, -11.1614]
+    ]
+  },
+  {
+    id: "sagittarius",
+    segments: [
+      [18.0968, -30.4241, 18.3499, -29.8281],
+      [18.3499, -29.8281, 18.9211, -26.2967],
+      [18.3499, -29.8281, 18.4029, -34.3846],
+      [18.9211, -26.2967, 19.0435, -29.8801]
+    ]
+  },
+  {
+    id: "pegasus",
+    segments: [
+      [23.0793, 15.2053, 23.0629, 28.0828],
+      [23.0629, 28.0828, 0.1398, 29.0904],
+      [0.1398, 29.0904, 0.2206, 15.1836],
+      [0.2206, 15.1836, 23.0793, 15.2053]
+    ]
+  },
+  {
+    id: "andromeda",
+    segments: [
+      [0.1398, 29.0904, 1.1622, 35.6206],
+      [1.1622, 35.6206, 2.0649, 42.3297]
+    ]
+  },
+  {
+    id: "perseus",
+    segments: [
+      [3.4054, 49.8612, 3.1361, 40.9556],
+      [3.4054, 49.8612, 4.1444, 47.7125]
+    ]
+  },
+  {
+    id: "auriga",
+    segments: [
+      [5.2782, 45.998, 5.9921, 44.9474],
+      [5.9921, 44.9474, 5.1086, 41.2345]
+    ]
+  },
+  {
+    id: "bootes",
+    segments: [
+      [14.261, 19.1825, 14.7498, 27.0742],
+      [14.7498, 27.0742, 14.5346, 38.3083],
+      [14.5346, 38.3083, 15.0324, 40.3906]
+    ]
+  },
+  {
+    id: "hercules",
+    segments: [
+      [16.5037, 21.4896, 16.6881, 31.6031],
+      [16.6881, 31.6031, 16.7149, 38.9223],
+      [16.7149, 38.9223, 17.2505, 36.8091],
+      [17.2505, 36.8091, 16.5037, 21.4896]
+    ]
+  },
+  {
+    id: "canis-major",
+    segments: [
+      [6.7525, -16.7161, 6.3783, -17.9559],
+      [6.7525, -16.7161, 7.1399, -26.3932],
+      [7.1399, -26.3932, 6.9771, -28.9721]
+    ]
+  },
+  {
+    id: "canis-minor",
+    segments: [[7.655, -5.225, 7.4525, 8.2893]]
+  },
+  {
+    id: "aries",
+    segments: [
+      [2.1196, 23.4624, 2.8331, 27.2605],
+      [2.8331, 27.2605, 3.1938, 19.7267]
+    ]
+  },
+  {
+    id: "capricornus",
+    segments: [
+      [20.3009, -12.5449, 20.7683, -25.2709],
+      [20.7683, -25.2709, 21.784, -16.1273]
+    ]
+  },
+  {
+    id: "aquarius",
+    segments: [
+      [22.2805, -0.0201, 22.8769, -7.5796],
+      [22.8769, -7.5796, 23.1574, -21.1725]
+    ]
+  },
+  {
+    id: "pisces",
+    segments: [
+      [0.3433, 8.1903, 1.5247, 15.3458],
+      [1.5247, 15.3458, 1.2292, 24.5837]
+    ]
+  },
+  {
+    id: "libra",
+    segments: [
+      [15.2834, -9.3829, 15.5921, -14.7895],
+      [15.5921, -14.7895, 14.8479, -16.0418]
+    ]
+  }
+];
+
 const planetTargets = [
   { key: "Mercury", name: "Mercury", color: 0xd7d4c5, size: 4.2 },
   { key: "Venus", name: "Venus", color: 0xffe5b8, size: 5.2 },
@@ -277,6 +445,24 @@ const lineSegments = new THREE.LineSegments(
   new THREE.LineBasicMaterial({ color: 0x77baff, transparent: true, opacity: 0.58 })
 );
 constellationGroup.add(lineSegments);
+
+const sketchSegments = CONSTELLATION_SKETCHES.flatMap((item) =>
+  item.segments.map((segment) => ({
+    id: item.id,
+    raA: segment[0],
+    decA: segment[1],
+    raB: segment[2],
+    decB: segment[3]
+  }))
+);
+const sketchLinePositions = new Float32Array(sketchSegments.length * 6);
+const sketchLineGeometry = new THREE.BufferGeometry();
+sketchLineGeometry.setAttribute("position", new THREE.BufferAttribute(sketchLinePositions, 3));
+const sketchLineSegments = new THREE.LineSegments(
+  sketchLineGeometry,
+  new THREE.LineBasicMaterial({ color: 0x87c7ff, transparent: true, opacity: 0.34 })
+);
+constellationGroup.add(sketchLineSegments);
 
 const nebulaTargets = TARGETS.filter((target) =>
   ["Nebula", "Planetary Nebula", "Galaxy", "Globular Cluster"].includes(target.type)
@@ -387,7 +573,21 @@ const searchableTargets = [
       type: "planet",
       name: PLANET_NAME_KO[planet.key]
     }
-  ])
+  ]),
+  ...CONSTELLATION_CATALOG.map((item) => ({
+    key: `constellation:${item.id}`,
+    type: "constellation",
+    name: item.en,
+    raHours: item.raHours,
+    decDeg: item.decDeg
+  })),
+  ...CONSTELLATION_CATALOG.map((item) => ({
+    key: `constellation:${item.id}`,
+    type: "constellation",
+    name: item.ko,
+    raHours: item.raHours,
+    decDeg: item.decDeg
+  }))
 ];
 
 let started = false;
@@ -440,6 +640,7 @@ initializeSkyTime();
 timeSpeed = Number(skySpeedInput?.value || "1");
 buildLabels();
 initializeSearchOptions();
+initializeConstellationSelect();
 renderSearchResults([]);
 updateSearchPlaceholder();
 wireControls();
@@ -447,6 +648,7 @@ window.addEventListener("simulator:activate", ensureStarted);
 window.addEventListener("resize", resizeRenderer);
 window.addEventListener("cosmos:settings-changed", () => {
   updateSearchPlaceholder();
+  refreshConstellationSelectOptions();
   refreshLabelTexts();
   updateScaleAweText();
   updateScaleAccuracyBadge();
@@ -609,6 +811,11 @@ function wireControls() {
   skySearchInput?.addEventListener("input", () => {
     renderSearchResults(getSearchMatches(skySearchInput.value || ""));
   });
+  constellationSelect?.addEventListener("change", () => {
+    const id = constellationSelect.value;
+    if (!id) return;
+    focusConstellationById(id, true);
+  });
 
   renderer.domElement.addEventListener("pointerdown", (event) => {
     isDragging = true;
@@ -730,9 +937,15 @@ function syncInputsFromContext() {
 }
 
 function moveViewToFocus(mode) {
+  if (mode === "orion" || mode === "ursa-major") {
+    focusConstellationById(mode, true);
+    if (constellationSelect) {
+      constellationSelect.value = mode;
+    }
+    return;
+  }
+
   const focus = {
-    orion: { raHours: 5.5, decDeg: -1.5 },
-    "ursa-major": { raHours: 12.3, decDeg: 56.0 },
     summer: { raHours: 19.7, decDeg: 30.0 }
   }[mode];
 
@@ -746,6 +959,9 @@ function moveViewToFocus(mode) {
     currentContext.lon
   );
 
+  if (constellationSelect) {
+    constellationSelect.value = "";
+  }
   moveViewToHorizontal(altDeg, azDeg);
 }
 
@@ -775,6 +991,43 @@ function initializeSearchOptions() {
 function updateSearchPlaceholder() {
   if (!skySearchInput) return;
   skySearchInput.placeholder = getLanguage() === "en" ? "Orion / M42 / Vega" : "오리온 / M42 / Vega";
+}
+
+function initializeConstellationSelect() {
+  if (!constellationSelect) return;
+  refreshConstellationSelectOptions();
+}
+
+function refreshConstellationSelectOptions() {
+  if (!constellationSelect) return;
+  const lang = getLanguage();
+  const current = constellationSelect.value;
+  const placeholder = lang === "en" ? "Select constellation" : "별자리를 선택하세요";
+  const options = [
+    `<option value="">${placeholder}</option>`,
+    ...CONSTELLATION_CATALOG.map(
+      (item) => `<option value="${item.id}">${lang === "en" ? item.en : item.ko}</option>`
+    )
+  ];
+  constellationSelect.innerHTML = options.join("");
+  if (current && CONSTELLATION_CATALOG.some((item) => item.id === current)) {
+    constellationSelect.value = current;
+  }
+}
+
+function focusConstellationById(id, smooth = true) {
+  const constellation = CONSTELLATION_CATALOG.find((item) => item.id === id);
+  if (!constellation) return;
+  applyTargetFocus(
+    {
+      key: `constellation:${constellation.id}`,
+      type: "constellation",
+      name: getLanguage() === "en" ? constellation.en : constellation.ko,
+      raHours: constellation.raHours,
+      decDeg: constellation.decDeg
+    },
+    smooth
+  );
 }
 
 function focusSearchTarget() {
@@ -873,6 +1126,12 @@ function getTargetDisplayName(target) {
     if (!nebula) return target.name;
     return lang === "en" ? TARGET_NAME_EN_BY_ID[id] || nebula.name : nebula.name;
   }
+  if (target.type === "constellation") {
+    const id = target.key.replace("constellation:", "");
+    const constellation = CONSTELLATION_CATALOG.find((item) => item.id === id);
+    if (!constellation) return target.name;
+    return lang === "en" ? constellation.en : constellation.ko;
+  }
   return target.name;
 }
 
@@ -891,6 +1150,9 @@ function applyTargetFocus(target, smooth) {
   }
 
   scaleFollowTargetKey = "";
+  if (target.type === "constellation" && constellationSelect) {
+    constellationSelect.value = target.key.replace("constellation:", "");
+  }
   if (scaleMode !== "sky") {
     setScaleMode("sky", false);
   }
@@ -1458,6 +1720,21 @@ function updateCelestialPositions() {
   });
 
   lineGeometry.attributes.position.needsUpdate = true;
+
+  sketchSegments.forEach((segment, index) => {
+    const a = raDecToHorizontal(segment.raA, segment.decA, date, lat, lon);
+    const b = raDecToHorizontal(segment.raB, segment.decB, date, lat, lon);
+    const va = horizontalToVector(a.altDeg, a.azDeg, SKY_RADIUS - 0.8);
+    const vb = horizontalToVector(b.altDeg, b.azDeg, SKY_RADIUS - 0.8);
+    const base = index * 6;
+    sketchLinePositions[base] = va.x;
+    sketchLinePositions[base + 1] = va.y;
+    sketchLinePositions[base + 2] = va.z;
+    sketchLinePositions[base + 3] = vb.x;
+    sketchLinePositions[base + 4] = vb.y;
+    sketchLinePositions[base + 5] = vb.z;
+  });
+  sketchLineGeometry.attributes.position.needsUpdate = true;
 
   nebulaTargets.forEach((target, index) => {
     const { altDeg, azDeg } = raDecToHorizontal(target.raHours, target.decDeg, date, lat, lon);
