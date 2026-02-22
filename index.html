@@ -21,9 +21,17 @@
       <p>
         위치와 날짜를 넣으면, 오늘 밤 실제로 보기 쉬운 천체를 우선순위로 추천합니다.
       </p>
+      <div class="mode-tabs" role="tablist" aria-label="앱 모드 선택">
+        <button type="button" class="mode-tab is-active" data-tab="planner" role="tab" aria-selected="true">
+          플래너
+        </button>
+        <button type="button" class="mode-tab" data-tab="simulator" role="tab" aria-selected="false">
+          3D 시뮬레이터
+        </button>
+      </div>
     </header>
 
-    <main>
+    <main id="planner-view">
       <section class="panel controls">
         <h2>관측 조건</h2>
         <form id="planner-form">
@@ -59,35 +67,6 @@
 
       <section class="panel summary" id="summary"></section>
 
-      <section class="panel viewer3d">
-        <div class="viewer-head">
-          <div>
-            <h2>3D 하늘 시뮬레이터</h2>
-            <p>드래그로 회전, 휠로 확대/축소. 별자리와 성운 레이어를 켜고 끌 수 있습니다.</p>
-          </div>
-          <div class="viewer-quick">
-            <button type="button" data-focus="orion">오리온</button>
-            <button type="button" data-focus="ursa-major">북두칠성</button>
-            <button type="button" data-focus="summer">여름 삼각형</button>
-          </div>
-        </div>
-        <div class="viewer-controls">
-          <label class="toggle">
-            <input type="checkbox" id="toggle-constellations" checked />
-            별자리 선
-          </label>
-          <label class="toggle">
-            <input type="checkbox" id="toggle-nebulae" checked />
-            성운/성단
-          </label>
-          <label class="toggle">
-            <input type="checkbox" id="toggle-labels" checked />
-            이름 라벨
-          </label>
-        </div>
-        <div id="sky-viewer"></div>
-      </section>
-
       <section class="panel results">
         <div class="results-head">
           <h2>추천 대상</h2>
@@ -112,6 +91,45 @@
         </div>
       </article>
     </template>
+
+    <section id="simulator-view" class="simulator-view" hidden>
+      <div class="sim-toolbar">
+        <div>
+          <h2>3D 하늘 시뮬레이터</h2>
+          <p>드래그로 회전, 휠로 확대/축소. 별자리와 천체 레이어를 제어하세요.</p>
+        </div>
+        <div class="viewer-quick">
+          <button type="button" data-focus="orion">오리온</button>
+          <button type="button" data-focus="ursa-major">북두칠성</button>
+          <button type="button" data-focus="summer">여름 삼각형</button>
+        </div>
+      </div>
+      <div class="sim-controls viewer-controls">
+        <label class="toggle">
+          <input type="checkbox" id="toggle-constellations" checked />
+          별자리 선
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-nebulae" checked />
+          천체(Messier)
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-labels" checked />
+          이름 라벨
+        </label>
+        <label class="sim-time">
+          시간
+          <input type="time" id="sky-time" step="60" />
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="sky-live-time" checked />
+          현재 시간 실시간
+        </label>
+        <button type="button" id="sync-sky-now">현재 위치/시간 맞추기</button>
+      </div>
+      <p id="sky-status" class="sky-status"></p>
+      <div id="sky-viewer"></div>
+    </section>
 
     <script type="module" src="app.js"></script>
     <script type="module" src="sky3d.js"></script>

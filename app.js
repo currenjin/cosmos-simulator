@@ -10,8 +10,12 @@ const summaryEl = document.querySelector("#summary");
 const resultCards = document.querySelector("#result-cards");
 const resultCount = document.querySelector("#result-count");
 const cardTemplate = document.querySelector("#card-template");
+const plannerView = document.querySelector("#planner-view");
+const simulatorView = document.querySelector("#simulator-view");
+const modeTabs = document.querySelectorAll(".mode-tab");
 
 initializeDefaults();
+initializeModeTabs();
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -44,6 +48,37 @@ function initializeDefaults() {
   latitudeInput.value = "37.5665";
   longitudeInput.value = "126.9780";
   calculateRecommendations();
+}
+
+function initializeModeTabs() {
+  const modeFromHash = location.hash === "#simulator" ? "simulator" : "planner";
+  setMode(modeFromHash);
+
+  modeTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const mode = tab.dataset.tab === "simulator" ? "simulator" : "planner";
+      setMode(mode);
+      history.replaceState(null, "", mode === "simulator" ? "#simulator" : "#planner");
+    });
+  });
+}
+
+function setMode(mode) {
+  const simulatorMode = mode === "simulator";
+
+  document.body.classList.toggle("simulator-mode", simulatorMode);
+  plannerView.hidden = simulatorMode;
+  simulatorView.hidden = !simulatorMode;
+
+  modeTabs.forEach((tab) => {
+    const active = tab.dataset.tab === mode;
+    tab.classList.toggle("is-active", active);
+    tab.setAttribute("aria-selected", active ? "true" : "false");
+  });
+
+  if (simulatorMode) {
+    window.dispatchEvent(new CustomEvent("simulator:activate"));
+  }
 }
 
 function calculateRecommendations() {

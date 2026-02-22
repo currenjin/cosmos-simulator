@@ -89,6 +89,30 @@ h1 {
   max-width: 720px;
 }
 
+.mode-tabs {
+  margin-top: 18px;
+  display: inline-flex;
+  background: rgba(7, 16, 28, 0.78);
+  border: 1px solid rgba(145, 185, 255, 0.28);
+  border-radius: 999px;
+  padding: 5px;
+  gap: 4px;
+}
+
+.mode-tab {
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 8px 14px;
+}
+
+.mode-tab.is-active {
+  background: linear-gradient(90deg, #6ecfff, #9fd8ff);
+  color: #061123;
+}
+
 main {
   max-width: 1080px;
   margin: 0 auto;
@@ -112,10 +136,6 @@ main {
 }
 
 .summary {
-  grid-column: span 6;
-}
-
-.viewer3d {
   grid-column: span 6;
 }
 
@@ -192,19 +212,6 @@ button:hover {
   align-items: center;
 }
 
-.viewer-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: start;
-}
-
-.viewer-head p {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-
 .viewer-quick {
   display: flex;
   gap: 8px;
@@ -220,6 +227,7 @@ button:hover {
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .toggle {
@@ -235,12 +243,36 @@ button:hover {
   accent-color: #8ed8ff;
 }
 
+.sim-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.sim-time input {
+  width: 110px;
+  padding: 8px 10px;
+}
+
+#sync-sky-now {
+  border-color: rgba(255, 211, 123, 0.48);
+  color: var(--warm);
+  padding: 8px 11px;
+}
+
+.sky-status {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 #sky-viewer {
-  margin-top: 12px;
+  margin-top: 10px;
   border: 1px solid rgba(126, 160, 221, 0.24);
   border-radius: 12px;
   overflow: hidden;
-  min-height: 430px;
+  min-height: calc(100vh - 220px);
   background: radial-gradient(circle at 20% 20%, #0c1f39, #030a13 58%);
   position: relative;
 }
@@ -268,6 +300,12 @@ button:hover {
 
 .viewer-label.nebula {
   color: #ffd9a0;
+}
+
+.viewer-label.cardinal {
+  color: #9fd8ff;
+  font-weight: 700;
+  font-size: 0.78rem;
 }
 
 #result-count {
@@ -344,6 +382,49 @@ canvas {
   display: block;
 }
 
+.simulator-view {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px 24px;
+}
+
+.sim-toolbar {
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.sim-toolbar p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.sim-controls {
+  margin-top: 12px;
+}
+
+body.simulator-mode #planner-view {
+  display: none;
+}
+
+body.simulator-mode .hero h1,
+body.simulator-mode .hero p.eyebrow {
+  display: none;
+}
+
+body.simulator-mode .hero {
+  padding-top: 18px;
+  padding-bottom: 14px;
+}
+
+body.simulator-mode .hero > p {
+  margin-top: 0;
+}
+
 @keyframes drift {
   from {
     transform: translate3d(0, 0, 0);
@@ -367,13 +448,20 @@ canvas {
 @media (max-width: 960px) {
   .controls,
   .summary,
-  .viewer3d,
   .results {
     grid-column: 1 / -1;
   }
 
   .cards {
     grid-template-columns: 1fr;
+  }
+
+  #sky-viewer {
+    min-height: calc(100vh - 250px);
+  }
+
+  .sim-toolbar {
+    flex-direction: column;
   }
 }
 
@@ -387,8 +475,12 @@ canvas {
     flex-direction: column;
   }
 
-  .viewer-head {
-    flex-direction: column;
+  .mode-tabs {
+    width: 100%;
+    justify-content: space-between;
   }
 
+  .mode-tab {
+    width: 100%;
+  }
 }
