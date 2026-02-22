@@ -24,6 +24,9 @@ const syncSkyNowBtn = document.querySelector("#sync-sky-now");
 const skyStatus = document.querySelector("#sky-status");
 const scaleAweEl = document.querySelector("#scale-awe");
 const scaleAccuracyEl = document.querySelector("#scale-accuracy");
+const scaleCinematicEl = document.querySelector("#scale-cinematic");
+const scaleStoryEl = document.querySelector("#scale-story");
+const scaleCounterEl = document.querySelector("#scale-counter");
 const scaleButtons = document.querySelectorAll(".scale-btn");
 
 const toggleConstellations = document.querySelector("#toggle-constellations");
@@ -98,9 +101,16 @@ scene.add(ground);
 const solarScaleGroup = new THREE.Group();
 const galaxyScaleGroup = new THREE.Group();
 const localScaleGroup = new THREE.Group();
+const scaleDepthGroup = new THREE.Group();
 scene.add(solarScaleGroup);
 scene.add(galaxyScaleGroup);
 scene.add(localScaleGroup);
+scene.add(scaleDepthGroup);
+
+const scaleDepthNear = createScaleDepthParticles(440, 180, 260, 1.35, 0x7cb9ff, 0.4);
+const scaleDepthMid = createScaleDepthParticles(360, 260, 360, 1.1, 0xc5dcff, 0.26);
+const scaleDepthFar = createScaleDepthParticles(280, 360, 520, 1.0, 0xf6d39e, 0.2);
+scaleDepthGroup.add(scaleDepthNear, scaleDepthMid, scaleDepthFar);
 
 const labelLayer = document.createElement("div");
 labelLayer.className = "viewer-layer";
@@ -626,6 +636,12 @@ let targetYaw = yaw;
 let targetPitch = pitch;
 let scaleFollowTargetKey = "";
 const scaleLookCenter = new THREE.Vector3(0, 0, 0);
+let cinematicUntil = 0;
+let cinematicMode = "sky";
+let scaleCounterFromLy = 1 / 63241;
+let scaleCounterToLy = 1 / 63241;
+let scaleCounterStart = performance.now();
+let scaleCounterDuration = 1500;
 
 const scaleScene = createScaleScenes();
 setScaleMode("sky", false);
@@ -651,6 +667,7 @@ window.addEventListener("cosmos:settings-changed", () => {
   refreshConstellationSelectOptions();
   refreshLabelTexts();
   updateScaleAweText();
+  updateScaleStoryText();
   updateScaleAccuracyBadge();
   renderSearchResults(getSearchMatches(skySearchInput?.value || ""));
   updateStatus();
@@ -1261,6 +1278,32 @@ function createSolarScaleScene() {
     })
   );
   solarScaleGroup.add(sun);
+  const sunGlow = createGlowSphere(6.4, 0xffc978, 0.24);
+  solarScaleGroup.add(sunGlow);
+
+  const earthOrbit = new THREE.Mesh(
+    new THREE.RingGeometry(scale * 0.98, scale * 1.02, 160),
+    new THREE.MeshBasicMaterial({
+      color: 0xffde9d,
+      transparent: true,
+      opacity: 0.32,
+      side: THREE.DoubleSide
+    })
+  );
+  earthOrbit.rotation.x = -Math.PI / 2;
+  solarScaleGroup.add(earthOrbit);
+
+  const outerReference = new THREE.Mesh(
+    new THREE.RingGeometry(scale * 29.8, scale * 30.2, 256),
+    new THREE.MeshBasicMaterial({
+      color: 0x8fb7ec,
+      transparent: true,
+      opacity: 0.15,
+      side: THREE.DoubleSide
+    })
+  );
+  outerReference.rotation.x = -Math.PI / 2;
+  solarScaleGroup.add(outerReference);
 
   planetTargets.forEach((planet) => {
     const orbit = new THREE.Mesh(
@@ -1287,7 +1330,11 @@ function createSolarScaleScene() {
     planetMeshes.set(planet.key, mesh);
   });
 
-  return { planetMeshes, scale };
+  return {
+    planetMeshes,
+    scale,
+    pulseMaterials: [sunGlow.material, earthOrbit.material, outerReference.material]
+  };
 }
 
 function createGalaxyScaleScene() {
@@ -1313,6 +1360,9 @@ function createGalaxyScaleScene() {
   );
   core.position.y = 0.6;
   galaxyScaleGroup.add(core);
+  const coreGlow = createGlowSphere(22, 0xffd5a3, 0.2);
+  coreGlow.position.y = 0.6;
+  galaxyScaleGroup.add(coreGlow);
 
   const sunMarker = new THREE.Mesh(
     new THREE.SphereGeometry(2.4, 14, 10),
@@ -1323,7 +1373,22 @@ function createGalaxyScaleScene() {
   sunMarker.position.set(68, 1, 18);
   galaxyScaleGroup.add(sunMarker);
 
-  return { disk, core, sunMarker };
+  const distanceLine = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.8, 0), sunMarker.position.clone()]),
+    new THREE.LineBasicMaterial({
+      color: 0xb8d9ff,
+      transparent: true,
+      opacity: 0.34
+    })
+  );
+  galaxyScaleGroup.add(distanceLine);
+
+  return {
+    disk,
+    core,
+    sunMarker,
+    pulseMaterials: [disk.material, coreGlow.material, distanceLine.material]
+  };
 }
 
 function createLocalGroupScaleScene() {
@@ -1338,6 +1403,9 @@ function createLocalGroupScaleScene() {
   mw.rotation.x = -Math.PI / 2;
   mw.position.set(-86, 0, 0);
   localScaleGroup.add(mw);
+  const mwGlow = createGlowSphere(44, 0xa8beff, 0.14);
+  mwGlow.position.copy(mw.position);
+  localScaleGroup.add(mwGlow);
 
   const andromeda = new THREE.Mesh(
     new THREE.CircleGeometry(38, 48),
@@ -1350,6 +1418,9 @@ function createLocalGroupScaleScene() {
   andromeda.rotation.x = -Math.PI / 2;
   andromeda.position.set(112, 0, -34);
   localScaleGroup.add(andromeda);
+  const andromedaGlow = createGlowSphere(54, 0xffd7b5, 0.12);
+  andromedaGlow.position.copy(andromeda.position);
+  localScaleGroup.add(andromedaGlow);
 
   const bridge = new THREE.Line(
     new THREE.BufferGeometry().setFromPoints([mw.position.clone(), andromeda.position.clone()]),
@@ -1361,17 +1432,32 @@ function createLocalGroupScaleScene() {
   );
   localScaleGroup.add(bridge);
 
-  return { mw, andromeda };
+  return {
+    mw,
+    andromeda,
+    pulseMaterials: [bridge.material, mwGlow.material, andromedaGlow.material]
+  };
 }
 
 function setScaleMode(mode, animated = true) {
   const validMode = ["sky", "solar", "galaxy", "local"].includes(mode) ? mode : "sky";
   const prevMode = scaleMode;
   scaleMode = validMode;
+  cinematicMode = scaleMode;
   updateScaleButtons();
   updateScaleAweText();
   updateScaleAccuracyBadge();
+  updateScaleStoryText();
   scaleLookCenter.copy(getScaleCenter(scaleMode));
+  scaleCounterFromLy = getScaleRepresentativeLy(prevMode);
+  scaleCounterToLy = getScaleRepresentativeLy(scaleMode);
+  scaleCounterStart = performance.now();
+  scaleCounterDuration = 1700;
+  if (scaleMode !== "sky") {
+    cinematicUntil = performance.now() + 1900;
+  } else {
+    cinematicUntil = 0;
+  }
 
   const skyVisible = scaleMode === "sky";
   dome.visible = skyVisible;
@@ -1383,6 +1469,7 @@ function setScaleMode(mode, animated = true) {
   horizonRing.visible = skyVisible;
   horizonAtmosphere.visible = skyVisible;
   ground.visible = skyVisible;
+  scaleDepthGroup.visible = !skyVisible;
 
   solarScaleGroup.visible = scaleMode === "solar";
   galaxyScaleGroup.visible = scaleMode === "galaxy";
@@ -1452,6 +1539,65 @@ function updateScaleAweText() {
     }
   };
   scaleAweEl.textContent = textByMode[scaleMode][lang];
+}
+
+function updateScaleStoryText() {
+  if (!scaleStoryEl) return;
+  const lang = getLanguage();
+  const storyByMode = {
+    sky: {
+      ko: "지금 보는 하늘은 지금 여기의 시간과 공간을 그대로 비춘다.",
+      en: "This sky reflects your exact place and time, right now."
+    },
+    solar: {
+      ko: "태양계의 점 하나가 곧 지구 궤도다. 같은 별 아래 속도만 다를 뿐이다.",
+      en: "A tiny point here is an Earth orbit; under one star, only speed differs."
+    },
+    galaxy: {
+      ko: "우리 태양은 은하 외곽의 작은 점이다. 중심빛은 약 2만6천 년을 건너온다.",
+      en: "Our Sun is a tiny outer-disk point; core light takes about 26,000 years to reach us."
+    },
+    local: {
+      ko: "안드로메다의 빛은 약 250만 년 전 출발했다. 우리는 과거를 보고 있다.",
+      en: "Andromeda’s light left about 2.5 million years ago; you are seeing the past."
+    }
+  };
+  scaleStoryEl.textContent = storyByMode[scaleMode][lang];
+}
+
+function getScaleRepresentativeLy(mode) {
+  if (mode === "solar") return 30 / 63241;
+  if (mode === "galaxy") return 26000;
+  if (mode === "local") return 2_500_000;
+  return 1 / 63241;
+}
+
+function formatLyValue(ly, lang) {
+  const abs = Math.max(ly, 1e-9);
+  if (abs < 0.01) {
+    const au = abs * 63241;
+    return `${au.toFixed(1)} AU`;
+  }
+  if (abs < 1000) {
+    return `${abs.toFixed(abs < 10 ? 2 : 1)} ${lang === "en" ? "ly" : "광년"}`;
+  }
+  if (abs < 1_000_000) {
+    return `${(abs / 1000).toFixed(1)} ${lang === "en" ? "kly" : "천 광년"}`;
+  }
+  return `${(abs / 1_000_000).toFixed(2)} ${lang === "en" ? "Mly" : "백만 광년"}`;
+}
+
+function updateCinematicOverlay(ts) {
+  const inCinematic = ts < cinematicUntil && scaleMode !== "sky";
+  simulatorView?.classList.toggle("cinematic-active", inCinematic);
+  scaleCinematicEl?.classList.toggle("is-visible", scaleMode !== "sky");
+  if (!scaleCounterEl) return;
+  const t = clamp((ts - scaleCounterStart) / scaleCounterDuration, 0, 1);
+  const eased = easeInOutCubic(t);
+  const ly = scaleCounterFromLy + (scaleCounterToLy - scaleCounterFromLy) * eased;
+  const lang = getLanguage();
+  const prefix = lang === "en" ? "Scale Distance" : "스케일 거리";
+  scaleCounterEl.textContent = `${prefix}: ${formatLyValue(ly, lang)}`;
 }
 
 function updateScaleAccuracyBadge() {
@@ -1574,10 +1720,12 @@ function applyCameraForScale() {
 
   const center = getScaleFollowCenter(scaleMode);
   scaleLookCenter.lerp(center, 0.18);
+  const breath = !isDragging ? 1 + Math.sin(lastFrameTs * 0.00024) * 0.016 : 1;
+  const radius = scaleOrbitRadius * breath;
   const orbitalPos = new THREE.Vector3(
-    scaleLookCenter.x + scaleOrbitRadius * Math.cos(scaleOrbitPitch) * Math.sin(scaleOrbitYaw),
-    scaleLookCenter.y + scaleOrbitRadius * Math.sin(scaleOrbitPitch),
-    scaleLookCenter.z + scaleOrbitRadius * Math.cos(scaleOrbitPitch) * Math.cos(scaleOrbitYaw)
+    scaleLookCenter.x + radius * Math.cos(scaleOrbitPitch) * Math.sin(scaleOrbitYaw),
+    scaleLookCenter.y + radius * Math.sin(scaleOrbitPitch),
+    scaleLookCenter.z + radius * Math.cos(scaleOrbitPitch) * Math.cos(scaleOrbitYaw)
   );
   camera.position.copy(orbitalPos);
   camera.lookAt(scaleLookCenter);
@@ -1591,13 +1739,55 @@ function applyCameraState(state) {
 }
 
 function updateScaleScene(ts) {
+  const pulse = 0.5 + 0.5 * Math.sin(ts * 0.0018);
+
   if (scaleMode === "solar") {
     updateSolarScalePositions();
     solarScaleGroup.rotation.y += 0.00045;
+    scaleScene.solar.pulseMaterials?.forEach((material, index) => {
+      material.opacity = 0.12 + pulse * (0.18 + index * 0.05);
+    });
   } else if (scaleMode === "galaxy") {
     galaxyScaleGroup.rotation.y += 0.00016;
+    scaleScene.galaxy.pulseMaterials?.forEach((material, index) => {
+      material.opacity = 0.14 + (0.5 + 0.5 * Math.sin(ts * 0.0012 + index)) * 0.2;
+    });
   } else if (scaleMode === "local") {
     localScaleGroup.rotation.y += 0.00008;
+    scaleScene.local.pulseMaterials?.forEach((material, index) => {
+      material.opacity = 0.12 + (0.5 + 0.5 * Math.sin(ts * 0.00075 + index)) * 0.18;
+    });
+  }
+
+  if (scaleMode !== "sky") {
+    scaleDepthNear.rotation.y += 0.00011;
+    scaleDepthMid.rotation.y -= 0.00007;
+    scaleDepthFar.rotation.y += 0.00004;
+    applyScaleAtmosphere(ts);
+  }
+}
+
+function applyScaleAtmosphere(ts) {
+  const pulse = 0.5 + 0.5 * Math.sin(ts * 0.0009);
+  if (scaleMode === "solar") {
+    scene.fog.color.setRGB(0.08 + pulse * 0.03, 0.06 + pulse * 0.02, 0.05);
+    ambient.color.setRGB(1.0, 0.8, 0.62);
+    fill.color.setRGB(1.0, 0.88, 0.72);
+    renderer.toneMappingExposure = 1.05;
+    return;
+  }
+  if (scaleMode === "galaxy") {
+    scene.fog.color.setRGB(0.03, 0.05 + pulse * 0.03, 0.09 + pulse * 0.04);
+    ambient.color.setRGB(0.62, 0.74, 0.96);
+    fill.color.setRGB(0.7, 0.86, 1.0);
+    renderer.toneMappingExposure = 0.92;
+    return;
+  }
+  if (scaleMode === "local") {
+    scene.fog.color.setRGB(0.03, 0.035 + pulse * 0.015, 0.065 + pulse * 0.025);
+    ambient.color.setRGB(0.56, 0.66, 0.9);
+    fill.color.setRGB(0.67, 0.77, 1.0);
+    renderer.toneMappingExposure = 0.88;
   }
 }
 
@@ -1683,6 +1873,45 @@ function createGround() {
   group.add(innerGround);
 
   return group;
+}
+
+function createGlowSphere(radius, color, opacity) {
+  return new THREE.Mesh(
+    new THREE.SphereGeometry(radius, 28, 20),
+    new THREE.MeshBasicMaterial({
+      color,
+      transparent: true,
+      opacity,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+}
+
+function createScaleDepthParticles(count, minRadius, maxRadius, size, color, opacity) {
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i += 1) {
+    const radius = minRadius + Math.random() * (maxRadius - minRadius);
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const base = i * 3;
+    positions[base] = radius * Math.sin(phi) * Math.cos(theta);
+    positions[base + 1] = radius * Math.cos(phi);
+    positions[base + 2] = radius * Math.sin(phi) * Math.sin(theta);
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const material = new THREE.PointsMaterial({
+    color,
+    size,
+    transparent: true,
+    opacity,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    sizeAttenuation: true
+  });
+  return new THREE.Points(geometry, material);
 }
 
 function updateCelestialPositions() {
@@ -1897,8 +2126,14 @@ function animate(ts) {
   horizonAtmosphere.children[1].material.opacity = 0.05 + twilightFactor * 0.2 + (1 - horizonLift) * 0.08;
   domeMaterial.opacity = 0.76 + darkness * 0.2 + (1 - horizonLift) * 0.05;
   domeMaterial.color.lerpColors(skyTwilightColor, skyNightColor, darkness);
-  scene.fog.color.lerpColors(fogTwilightColor, fogNightColor, darkness);
+  if (scaleMode === "sky") {
+    scene.fog.color.lerpColors(fogTwilightColor, fogNightColor, darkness);
+    ambient.color.set(0x8bb0ff);
+    fill.color.set(0xb2ceff);
+    renderer.toneMappingExposure = 0.95;
+  }
 
+  updateCinematicOverlay(ts);
   applyCameraForScale();
 
   updateLabels();

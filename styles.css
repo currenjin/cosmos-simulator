@@ -509,6 +509,40 @@ button:hover {
   background: rgba(20, 24, 58, 0.5);
 }
 
+.scale-cinematic {
+  position: absolute;
+  left: 38px;
+  top: 142px;
+  z-index: 12;
+  max-width: min(640px, calc(100% - 72px));
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 380ms ease, transform 380ms ease;
+}
+
+.scale-cinematic.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scale-story {
+  margin: 0;
+  color: #e8f3ff;
+  font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+  font-size: clamp(0.94rem, 1.5vw, 1.2rem);
+  letter-spacing: 0.01em;
+  text-shadow: 0 6px 20px rgba(0, 0, 0, 0.72);
+}
+
+.scale-counter {
+  margin: 8px 0 0;
+  color: #ffdca1;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+}
+
 #sky-viewer {
   margin-top: 10px;
   border: 1px solid rgba(126, 160, 221, 0.24);
@@ -676,6 +710,24 @@ canvas {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 20px 24px;
+}
+
+.simulator-view .sim-toolbar,
+.simulator-view .scale-jump,
+.simulator-view .viewer-controls,
+.simulator-view .sky-status,
+.simulator-view .scale-meta {
+  transition: opacity 340ms ease, transform 340ms ease;
+}
+
+.simulator-view.cinematic-active .sim-toolbar,
+.simulator-view.cinematic-active .scale-jump,
+.simulator-view.cinematic-active .viewer-controls,
+.simulator-view.cinematic-active .sky-status,
+.simulator-view.cinematic-active .scale-meta {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
 }
 
 .sim-toolbar h2 {
