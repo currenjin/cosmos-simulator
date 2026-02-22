@@ -128,13 +128,18 @@ const constellationLines = [
 const starEntries = Object.entries(brightStars);
 const starPositions = new Float32Array(starEntries.length * 3);
 const starColors = new Float32Array(starEntries.length * 3);
+const baseStarColors = new Float32Array(starEntries.length * 3);
 for (let i = 0; i < starEntries.length; i += 1) {
   const star = starEntries[i][1];
   const magBoost = 1.18 - clamp(star.mag ?? 2.5, -1, 4.2) * 0.13;
   const color = new THREE.Color(star.color ?? 0xd7e7ff).multiplyScalar(clamp(magBoost, 0.55, 1.22));
-  starColors[i * 3] = color.r;
-  starColors[i * 3 + 1] = color.g;
-  starColors[i * 3 + 2] = color.b;
+  const base = i * 3;
+  baseStarColors[base] = color.r;
+  baseStarColors[base + 1] = color.g;
+  baseStarColors[base + 2] = color.b;
+  starColors[base] = color.r;
+  starColors[base + 1] = color.g;
+  starColors[base + 2] = color.b;
 }
 
 const starGeometry = new THREE.BufferGeometry();
@@ -168,22 +173,27 @@ const nebulaTargets = TARGETS.filter((target) =>
 );
 const nebulaPositions = new Float32Array(nebulaTargets.length * 3);
 const nebulaColors = new Float32Array(nebulaTargets.length * 3);
+const baseNebulaColors = new Float32Array(nebulaTargets.length * 3);
 
 for (let i = 0; i < nebulaTargets.length; i += 1) {
   const target = nebulaTargets[i];
   if (target.type.includes("Galaxy")) {
-    nebulaColors[i * 3] = 1;
-    nebulaColors[i * 3 + 1] = 0.75;
-    nebulaColors[i * 3 + 2] = 0.68;
+    baseNebulaColors[i * 3] = 1;
+    baseNebulaColors[i * 3 + 1] = 0.75;
+    baseNebulaColors[i * 3 + 2] = 0.68;
   } else if (target.type.includes("Globular")) {
-    nebulaColors[i * 3] = 0.8;
-    nebulaColors[i * 3 + 1] = 1;
-    nebulaColors[i * 3 + 2] = 0.76;
+    baseNebulaColors[i * 3] = 0.8;
+    baseNebulaColors[i * 3 + 1] = 1;
+    baseNebulaColors[i * 3 + 2] = 0.76;
   } else {
-    nebulaColors[i * 3] = 0.72;
-    nebulaColors[i * 3 + 1] = 0.93;
-    nebulaColors[i * 3 + 2] = 1;
+    baseNebulaColors[i * 3] = 0.72;
+    baseNebulaColors[i * 3 + 1] = 0.93;
+    baseNebulaColors[i * 3 + 2] = 1;
   }
+
+  nebulaColors[i * 3] = baseNebulaColors[i * 3];
+  nebulaColors[i * 3 + 1] = baseNebulaColors[i * 3 + 1];
+  nebulaColors[i * 3 + 2] = baseNebulaColors[i * 3 + 2];
 }
 
 const nebulaGeometry = new THREE.BufferGeometry();
@@ -215,6 +225,15 @@ let currentContext = {
   lat: 37.5665,
   lon: 126.978
 };
+let currentSkyState = {
+  sunAltDeg: -24,
+  darkness: 1
+};
+
+const skyNightColor = new THREE.Color(0x071425);
+const skyTwilightColor = new THREE.Color(0x2c3d58);
+const fogNightColor = new THREE.Color(0x030914);
+const fogTwilightColor = new THREE.Color(0x2e4d72);
 
 initializeSkyTime();
 buildLabels();
@@ -468,6 +487,13 @@ function createGround() {
 
 function updateCelestialPositions() {
   const { date, lat, lon } = currentContext;
+  const sunEq = getSunRaDec(date);
+  const sunHorizontal = raDecToHorizontal(sunEq.raHours, sunEq.decDeg, date, lat, lon);
+  const darkness = computeSkyDarkness(sunHorizontal.altDeg);
+  currentSkyState = {
+    sunAltDeg: sunHorizontal.altDeg,
+    darkness
+  };
 
   starEntries.forEach(([key, star], index) => {
     const { altDeg, azDeg } = raDecToHorizontal(star.raHours, star.decDeg, date, lat, lon);
@@ -478,9 +504,17 @@ function updateCelestialPositions() {
     starPositions[base] = v.x;
     starPositions[base + 1] = v.y;
     starPositions[base + 2] = v.z;
+
+    const altitudeFade = clamp((altDeg + 6) / 34, 0, 1);
+    const visibility = darkness * Math.pow(altitudeFade, 1.3);
+    const brightness = 0.03 + visibility * 0.97;
+    starColors[base] = baseStarColors[base] * brightness;
+    starColors[base + 1] = baseStarColors[base + 1] * brightness;
+    starColors[base + 2] = baseStarColors[base + 2] * brightness;
   });
 
   starGeometry.attributes.position.needsUpdate = true;
+  starGeometry.attributes.color.needsUpdate = true;
 
   constellationLines.forEach(([a, b], index) => {
     const va = vectorCache.get(`star:${a}`) || new THREE.Vector3();
@@ -506,9 +540,17 @@ function updateCelestialPositions() {
     nebulaPositions[base] = v.x;
     nebulaPositions[base + 1] = v.y;
     nebulaPositions[base + 2] = v.z;
+
+    const altitudeFade = clamp((altDeg + 10) / 38, 0, 1);
+    const visibility = darkness * Math.pow(altitudeFade, 1.55);
+    const brightness = 0.02 + visibility * 0.98;
+    nebulaColors[base] = baseNebulaColors[base] * brightness;
+    nebulaColors[base + 1] = baseNebulaColors[base + 1] * brightness;
+    nebulaColors[base + 2] = baseNebulaColors[base + 2] * brightness;
   });
 
   nebulaGeometry.attributes.position.needsUpdate = true;
+  nebulaGeometry.attributes.color.needsUpdate = true;
 }
 
 function resizeRenderer() {
@@ -578,13 +620,21 @@ function animate(ts) {
   milkyWay.rotation.y += 0.00003;
 
   const twinkle = 0.85 + Math.sin(ts * 0.0013) * 0.05;
-  starPoints.material.opacity = 0.9 * twinkle;
-  nebulaPoints.material.opacity = 0.9 + Math.sin(ts * 0.0008) * 0.03;
+  const darkness = currentSkyState.darkness;
+  starPoints.material.opacity = (0.14 + darkness * 0.84) * twinkle;
+  nebulaPoints.material.opacity = 0.02 + darkness * 0.88 + Math.sin(ts * 0.0008) * 0.02;
+  starCloudNear.material.opacity = 0.06 + darkness * 0.76;
+  starCloudMid.material.opacity = 0.04 + darkness * 0.4;
+  starCloudFar.material.opacity = 0.03 + darkness * 0.25;
+  milkyWay.material.opacity = 0.02 + darkness * 0.36;
 
   const horizonLift = clamp((Math.sin(pitch) + 0.15) * 0.5, 0.05, 1);
-  horizonAtmosphere.children[0].material.opacity = 0.2 + (1 - horizonLift) * 0.28;
-  horizonAtmosphere.children[1].material.opacity = 0.1 + (1 - horizonLift) * 0.16;
-  domeMaterial.opacity = 0.84 + (1 - horizonLift) * 0.1;
+  const twilightFactor = 1 - darkness;
+  horizonAtmosphere.children[0].material.opacity = 0.1 + twilightFactor * 0.26 + (1 - horizonLift) * 0.12;
+  horizonAtmosphere.children[1].material.opacity = 0.05 + twilightFactor * 0.2 + (1 - horizonLift) * 0.08;
+  domeMaterial.opacity = 0.76 + darkness * 0.2 + (1 - horizonLift) * 0.05;
+  domeMaterial.color.lerpColors(skyTwilightColor, skyNightColor, darkness);
+  scene.fog.color.lerpColors(fogTwilightColor, fogNightColor, darkness);
 
   const lookDirection = new THREE.Vector3(
     Math.cos(pitch) * Math.sin(yaw),
@@ -606,11 +656,12 @@ function updateStatus() {
   const dd = String(d.getDate()).padStart(2, "0");
   const hh = String(d.getHours()).padStart(2, "0");
   const min = String(d.getMinutes()).padStart(2, "0");
+  const darknessLabel = getSkyConditionLabel(currentSkyState.sunAltDeg);
 
   if (getLanguage() === "en") {
-    skyStatus.textContent = `Observer ${formatLatLon(currentContext.lat, currentContext.lon)} | Time ${yyyy}-${mm}-${dd} ${hh}:${min}`;
+    skyStatus.textContent = `Observer ${formatLatLon(currentContext.lat, currentContext.lon)} | Time ${yyyy}-${mm}-${dd} ${hh}:${min} | ${darknessLabel}`;
   } else {
-    skyStatus.textContent = `관측 위치 ${formatLatLon(currentContext.lat, currentContext.lon)} | 기준 시각 ${yyyy}-${mm}-${dd} ${hh}:${min}`;
+    skyStatus.textContent = `관측 위치 ${formatLatLon(currentContext.lat, currentContext.lon)} | 기준 시각 ${yyyy}-${mm}-${dd} ${hh}:${min} | ${darknessLabel}`;
   }
 }
 
@@ -876,6 +927,37 @@ function getLocalSiderealTime(date, lonDeg) {
 
   gmst = normalizeDeg(gmst);
   return normalizeDeg(gmst + lonDeg) / 15;
+}
+
+function getSunRaDec(date) {
+  const jd = toJulianDay(date);
+  const d = jd - 2451545;
+  const g = toRad(normalizeDeg(357.529 + 0.98560028 * d));
+  const q = normalizeDeg(280.459 + 0.98564736 * d);
+  const L = toRad(normalizeDeg(q + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)));
+  const epsilon = toRad(23.439 - 0.00000036 * d);
+
+  const ra = Math.atan2(Math.cos(epsilon) * Math.sin(L), Math.cos(L));
+  const dec = Math.asin(Math.sin(epsilon) * Math.sin(L));
+  return {
+    raHours: normalizeDeg(toDeg(ra)) / 15,
+    decDeg: toDeg(dec)
+  };
+}
+
+function computeSkyDarkness(sunAltDeg) {
+  if (sunAltDeg <= -18) return 1;
+  if (sunAltDeg >= -4) return 0;
+  return clamp((-sunAltDeg - 4) / 14, 0, 1);
+}
+
+function getSkyConditionLabel(sunAltDeg) {
+  const isEn = getLanguage() === "en";
+  if (sunAltDeg <= -18) return isEn ? "Astronomical Night" : "천문박명 이후(암야)";
+  if (sunAltDeg <= -12) return isEn ? "Astronomical Twilight" : "천문박명";
+  if (sunAltDeg <= -6) return isEn ? "Nautical Twilight" : "항해박명";
+  if (sunAltDeg <= -0.833) return isEn ? "Civil Twilight" : "시민박명";
+  return isEn ? "Daylight" : "주간";
 }
 
 function toJulianDay(date) {
