@@ -21,6 +21,7 @@ const skyStatus = document.querySelector("#sky-status");
 
 const toggleConstellations = document.querySelector("#toggle-constellations");
 const toggleNebulae = document.querySelector("#toggle-nebulae");
+const togglePlanets = document.querySelector("#toggle-planets");
 const toggleLabels = document.querySelector("#toggle-labels");
 const focusButtons = document.querySelectorAll("[data-focus]");
 
@@ -72,8 +73,10 @@ scene.add(milkyWay);
 
 const constellationGroup = new THREE.Group();
 const nebulaGroup = new THREE.Group();
+const planetGroup = new THREE.Group();
 scene.add(constellationGroup);
 scene.add(nebulaGroup);
+scene.add(planetGroup);
 
 const horizonRing = createHorizonRing();
 scene.add(horizonRing);
@@ -128,6 +131,31 @@ const constellationLines = [
   ["deneb", "altair"],
   ["altair", "vega"]
 ];
+
+const planetTargets = [
+  { key: "Mercury", name: "Mercury", color: 0xd7d4c5, size: 4.2 },
+  { key: "Venus", name: "Venus", color: 0xffe5b8, size: 5.2 },
+  { key: "Mars", name: "Mars", color: 0xff9d7f, size: 4.6 },
+  { key: "Jupiter", name: "Jupiter", color: 0xffd8b0, size: 5.4 },
+  { key: "Saturn", name: "Saturn", color: 0xffe9be, size: 5.0 }
+];
+
+const PLANET_NAME_KO = {
+  Mercury: "수성",
+  Venus: "금성",
+  Mars: "화성",
+  Jupiter: "목성",
+  Saturn: "토성"
+};
+
+const PLANET_ELEMENTS = {
+  Mercury: { N0: 48.3313, Nd: 3.24587e-5, i0: 7.0047, id: 5e-8, w0: 29.1241, wd: 1.01444e-5, a: 0.387098, e0: 0.205635, ed: 5.59e-10, M0: 168.6562, Md: 4.0923344368 },
+  Venus: { N0: 76.6799, Nd: 2.4659e-5, i0: 3.3946, id: 2.75e-8, w0: 54.891, wd: 1.38374e-5, a: 0.72333, e0: 0.006773, ed: -1.302e-9, M0: 48.0052, Md: 1.6021302244 },
+  Earth: { N0: 0, Nd: 0, i0: 0, id: 0, w0: 282.9404, wd: 4.70935e-5, a: 1.0, e0: 0.016709, ed: -1.151e-9, M0: 356.047, Md: 0.9856002585 },
+  Mars: { N0: 49.5574, Nd: 2.11081e-5, i0: 1.8497, id: -1.78e-8, w0: 286.5016, wd: 2.92961e-5, a: 1.523688, e0: 0.093405, ed: 2.516e-9, M0: 18.6021, Md: 0.5240207766 },
+  Jupiter: { N0: 100.4542, Nd: 2.76854e-5, i0: 1.303, id: -1.557e-7, w0: 273.8777, wd: 1.64505e-5, a: 5.20256, e0: 0.048498, ed: 4.469e-9, M0: 19.895, Md: 0.0830853001 },
+  Saturn: { N0: 113.6634, Nd: 2.3898e-5, i0: 2.4886, id: -1.081e-7, w0: 339.3939, wd: 2.97661e-5, a: 9.55475, e0: 0.055546, ed: -9.499e-9, M0: 316.967, Md: 0.0334442282 }
+};
 
 const starEntries = Object.entries(brightStars);
 const starPositions = new Float32Array(starEntries.length * 3);
@@ -216,19 +244,58 @@ const nebulaPoints = new THREE.Points(
 );
 nebulaGroup.add(nebulaPoints);
 
+const planetPositions = new Float32Array(planetTargets.length * 3);
+const planetColors = new Float32Array(planetTargets.length * 3);
+for (let i = 0; i < planetTargets.length; i += 1) {
+  const color = new THREE.Color(planetTargets[i].color);
+  planetColors[i * 3] = color.r;
+  planetColors[i * 3 + 1] = color.g;
+  planetColors[i * 3 + 2] = color.b;
+}
+
+const planetGeometry = new THREE.BufferGeometry();
+planetGeometry.setAttribute("position", new THREE.BufferAttribute(planetPositions, 3));
+planetGeometry.setAttribute("color", new THREE.BufferAttribute(planetColors, 3));
+
+const planetPoints = new THREE.Points(
+  planetGeometry,
+  new THREE.PointsMaterial({
+    size: 5.2,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.95,
+    sizeAttenuation: true
+  })
+);
+planetGroup.add(planetPoints);
+
 const searchableTargets = [
   ...starEntries.map(([key, star]) => ({
     key: `star:${key}`,
+    type: "star",
     name: star.name,
     raHours: star.raHours,
     decDeg: star.decDeg
   })),
   ...nebulaTargets.map((target) => ({
     key: `nebula:${target.id}`,
+    type: "nebula",
     name: target.name,
     raHours: target.raHours,
     decDeg: target.decDeg
-  }))
+  })),
+  ...planetTargets.flatMap((planet) => [
+    {
+      key: `planet:${planet.key}`,
+      type: "planet",
+      name: planet.name
+    },
+    {
+      key: `planet:${planet.key}`,
+      type: "planet",
+      name: PLANET_NAME_KO[planet.key]
+    }
+  ])
 ];
 
 let started = false;
@@ -305,6 +372,10 @@ function buildLabels() {
     addLabel(target.name.replace("M", " M"), `nebula:${target.id}`, "nebula");
   });
 
+  planetTargets.forEach((planet) => {
+    addLabel(planet.name, `planet:${planet.key}`, "planet");
+  });
+
   [
     ["N", 0],
     ["E", 90],
@@ -338,9 +409,18 @@ function wireControls() {
     nebulaGroup.visible = toggleNebulae.checked;
   });
 
+  togglePlanets?.addEventListener("change", () => {
+    planetGroup.visible = togglePlanets.checked;
+  });
+
   toggleLabels?.addEventListener("change", () => {
     labelLayer.style.display = toggleLabels.checked ? "block" : "none";
   });
+
+  constellationGroup.visible = toggleConstellations?.checked ?? true;
+  nebulaGroup.visible = toggleNebulae?.checked ?? true;
+  planetGroup.visible = togglePlanets?.checked ?? true;
+  labelLayer.style.display = toggleLabels?.checked === false ? "none" : "block";
 
   focusButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -523,7 +603,17 @@ function focusSearchTarget() {
     return;
   }
 
-  const { altDeg, azDeg } = raDecToHorizontal(target.raHours, target.decDeg, currentContext.date, currentContext.lat, currentContext.lon);
+  const equatorial =
+    target.type === "planet"
+      ? getPlanetRaDec(target.key.replace("planet:", ""), currentContext.date)
+      : { raHours: target.raHours, decDeg: target.decDeg };
+  const { altDeg, azDeg } = raDecToHorizontal(
+    equatorial.raHours,
+    equatorial.decDeg,
+    currentContext.date,
+    currentContext.lat,
+    currentContext.lon
+  );
   moveViewToHorizontal(altDeg, azDeg);
   searchHitKey = target.key;
   setStatusHint(getLanguage() === "en" ? `Focused: ${target.name}` : `포커스: ${target.name}`, 2200);
@@ -671,6 +761,19 @@ function updateCelestialPositions() {
 
   nebulaGeometry.attributes.position.needsUpdate = true;
   nebulaGeometry.attributes.color.needsUpdate = true;
+
+  planetTargets.forEach((planet, index) => {
+    const { raHours, decDeg } = getPlanetRaDec(planet.key, date);
+    const { altDeg, azDeg } = raDecToHorizontal(raHours, decDeg, date, lat, lon);
+    const v = horizontalToVector(altDeg, azDeg, SKY_RADIUS - 1.1);
+    vectorCache.set(`planet:${planet.key}`, v);
+
+    const base = index * 3;
+    planetPositions[base] = v.x;
+    planetPositions[base + 1] = v.y;
+    planetPositions[base + 2] = v.z;
+  });
+  planetGeometry.attributes.position.needsUpdate = true;
 }
 
 function resizeRenderer() {
@@ -754,6 +857,7 @@ function animate(ts) {
   const darkness = currentSkyState.darkness;
   starPoints.material.opacity = (0.14 + darkness * 0.84) * twinkle;
   nebulaPoints.material.opacity = 0.02 + darkness * 0.88 + Math.sin(ts * 0.0008) * 0.02;
+  planetPoints.material.opacity = 0.22 + darkness * 0.76;
   starCloudNear.material.opacity = 0.06 + darkness * 0.76;
   starCloudMid.material.opacity = 0.04 + darkness * 0.4;
   starCloudFar.material.opacity = 0.03 + darkness * 0.25;
@@ -816,7 +920,15 @@ function updateLabels() {
 
     const visible = rayVector.z < 1 && rayVector.z > -1;
     const aboveHorizon = point.y > 0 || type === "cardinal";
-    if (!visible || !aboveHorizon) {
+    const typeVisible =
+      type === "star"
+        ? toggleConstellations?.checked !== false
+        : type === "nebula"
+          ? toggleNebulae?.checked !== false
+          : type === "planet"
+            ? togglePlanets?.checked !== false
+            : true;
+    if (!visible || !aboveHorizon || !typeVisible) {
       element.style.opacity = "0";
       element.classList.remove("search-hit");
       return;
@@ -1015,6 +1127,62 @@ function createGrassTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
+function getPlanetRaDec(planetKey, date) {
+  const d = daysSinceJ2000(date);
+  const earth = getHeliocentricEclipticXYZ("Earth", d);
+  const planet = getHeliocentricEclipticXYZ(planetKey, d);
+  const xg = planet.x - earth.x;
+  const yg = planet.y - earth.y;
+  const zg = planet.z - earth.z;
+
+  const epsilon = toRad(23.4393 - 3.563e-7 * d);
+  const xe = xg;
+  const ye = yg * Math.cos(epsilon) - zg * Math.sin(epsilon);
+  const ze = yg * Math.sin(epsilon) + zg * Math.cos(epsilon);
+
+  const ra = Math.atan2(ye, xe);
+  const dec = Math.atan2(ze, Math.hypot(xe, ye));
+  return {
+    raHours: normalizeDeg(toDeg(ra)) / 15,
+    decDeg: toDeg(dec)
+  };
+}
+
+function getHeliocentricEclipticXYZ(planetKey, d) {
+  const el = PLANET_ELEMENTS[planetKey];
+  if (!el) {
+    return { x: 0, y: 0, z: 0 };
+  }
+
+  const N = toRad(normalizeDeg(el.N0 + el.Nd * d));
+  const i = toRad(el.i0 + el.id * d);
+  const w = toRad(normalizeDeg(el.w0 + el.wd * d));
+  const a = el.a;
+  const e = el.e0 + el.ed * d;
+  const M = toRad(normalizeDeg(el.M0 + el.Md * d));
+  const E = solveEccentricAnomaly(M, e);
+
+  const xv = a * (Math.cos(E) - e);
+  const yv = a * (Math.sqrt(1 - e * e) * Math.sin(E));
+  const v = Math.atan2(yv, xv);
+  const r = Math.hypot(xv, yv);
+
+  const xh = r * (Math.cos(N) * Math.cos(v + w) - Math.sin(N) * Math.sin(v + w) * Math.cos(i));
+  const yh = r * (Math.sin(N) * Math.cos(v + w) + Math.cos(N) * Math.sin(v + w) * Math.cos(i));
+  const zh = r * (Math.sin(v + w) * Math.sin(i));
+  return { x: xh, y: yh, z: zh };
+}
+
+function solveEccentricAnomaly(M, e) {
+  let E = M + e * Math.sin(M) * (1 + e * Math.cos(M));
+  for (let j = 0; j < 7; j += 1) {
+    const dE = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+    E -= dE;
+    if (Math.abs(dE) < 1e-7) break;
+  }
+  return E;
+}
+
 function raDecToHorizontal(raHours, decDeg, date, latDeg, lonDeg) {
   const lstHours = getLocalSiderealTime(date, lonDeg);
   let hourAngleDeg = lstHours * 15 - raHours * 15;
@@ -1097,6 +1265,10 @@ function getSkyConditionLabel(sunAltDeg) {
 
 function toJulianDay(date) {
   return date.getTime() / 86400000 + 2440587.5;
+}
+
+function daysSinceJ2000(date) {
+  return toJulianDay(date) - 2451545.0;
 }
 
 function formatLatLon(lat, lon) {

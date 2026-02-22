@@ -459,6 +459,11 @@ button:hover {
   color: #ffd9a0;
 }
 
+.viewer-label.planet {
+  color: #ffe8bf;
+  font-weight: 600;
+}
+
 .viewer-label.cardinal {
   color: #9fd8ff;
   font-weight: 700;
