@@ -101,8 +101,15 @@
             <option value="1">x1</option>
             <option value="10">x10</option>
             <option value="60">x60</option>
+            <option value="0">x0</option>
           </select>
         </label>
+        <div class="sim-time-presets">
+          <span data-i18n="sim.presetTitle">시간 프리셋</span>
+          <button type="button" id="sky-preset-day" data-i18n="sim.presetDay">24시간 재생</button>
+          <button type="button" id="sky-preset-year" data-i18n="sim.presetYear">1년 재생</button>
+          <button type="button" id="sky-preset-stop" data-i18n="sim.presetStop">정지</button>
+        </div>
         <label class="sim-time">
           <span data-i18n="sim.date">날짜</span>
           <input id="date" type="date" required />

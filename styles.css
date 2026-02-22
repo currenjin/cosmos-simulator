@@ -364,6 +364,29 @@ button:hover {
   gap: 6px;
 }
 
+.sim-time-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sim-time-presets > span {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-right: 2px;
+}
+
+.sim-time-presets button {
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(141, 188, 255, 0.32);
+  background: rgba(9, 21, 36, 0.62);
+  color: #d5e8ff;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
 .sim-search label {
   display: inline;
   align-self: center;

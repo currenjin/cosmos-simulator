@@ -17,6 +17,9 @@ const skySearchInput = document.querySelector("#sky-search");
 const skySearchBtn = document.querySelector("#sky-search-btn");
 const skySearchList = document.querySelector("#sky-search-list");
 const skySearchResults = document.querySelector("#sky-search-results");
+const skyPresetDayBtn = document.querySelector("#sky-preset-day");
+const skyPresetYearBtn = document.querySelector("#sky-preset-year");
+const skyPresetStopBtn = document.querySelector("#sky-preset-stop");
 const syncSkyNowBtn = document.querySelector("#sync-sky-now");
 const skyStatus = document.querySelector("#sky-status");
 const scaleAweEl = document.querySelector("#scale-awe");
@@ -31,6 +34,8 @@ const focusButtons = document.querySelectorAll("[data-focus]");
 
 const SKY_RADIUS = 92;
 const HORIZON_RADIUS = 86;
+const DAY_CYCLE_SPEED = 1440;
+const YEAR_CYCLE_SPEED = 86400;
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x030914, 120, 320);
@@ -586,16 +591,12 @@ function wireControls() {
       setScaleMode(mode, true);
     });
   });
+  skyPresetDayBtn?.addEventListener("click", () => applyTimePreset("day"));
+  skyPresetYearBtn?.addEventListener("click", () => applyTimePreset("year"));
+  skyPresetStopBtn?.addEventListener("click", () => applyTimePreset("stop"));
   skySpeedInput?.addEventListener("change", () => {
     const next = Number(skySpeedInput.value);
-    timeSpeed = Number.isFinite(next) && next > 0 ? next : 1;
-    if (timeSpeed > 1 && liveTimeInput.checked) {
-      liveTimeInput.checked = false;
-      currentContext.date = new Date();
-      syncInputsFromContext();
-    }
-    updateCelestialPositions();
-    updateStatus();
+    setTimeSpeed(next);
   });
 
   skySearchBtn?.addEventListener("click", focusSearchTarget);
@@ -912,6 +913,60 @@ function normalizeSearch(value) {
 function setStatusHint(text, ttlMs = 2800) {
   statusHint = text;
   statusHintUntil = Date.now() + ttlMs;
+}
+
+function applyTimePreset(preset) {
+  if (preset === "day") {
+    setTimeSpeed(DAY_CYCLE_SPEED);
+    setStatusHint(
+      getLanguage() === "en"
+        ? "24-hour cycle playback enabled"
+        : "24시간 일주 운동 재생을 시작했습니다",
+      2200
+    );
+    return;
+  }
+  if (preset === "year") {
+    setTimeSpeed(YEAR_CYCLE_SPEED);
+    setStatusHint(
+      getLanguage() === "en"
+        ? "1-year seasonal playback enabled"
+        : "1년 계절 변화 재생을 시작했습니다",
+      2200
+    );
+    return;
+  }
+  setTimeSpeed(0);
+  setStatusHint(getLanguage() === "en" ? "Simulation paused" : "시뮬레이션 일시정지", 2200);
+}
+
+function setTimeSpeed(value) {
+  const next = Number(value);
+  timeSpeed = Number.isFinite(next) && next >= 0 ? next : 1;
+  ensureSpeedOption(timeSpeed);
+  if (skySpeedInput) {
+    skySpeedInput.value = String(timeSpeed);
+  }
+
+  if (timeSpeed !== 1 && liveTimeInput.checked) {
+    liveTimeInput.checked = false;
+    currentContext.date = new Date();
+    syncInputsFromContext();
+  }
+
+  updateCelestialPositions();
+  updateStatus();
+}
+
+function ensureSpeedOption(speed) {
+  if (!skySpeedInput) return;
+  const value = String(speed);
+  const exists = Array.from(skySpeedInput.options).some((opt) => opt.value === value);
+  if (exists) return;
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = `x${speed}`;
+  skySpeedInput.appendChild(option);
 }
 
 function createScaleScenes() {
