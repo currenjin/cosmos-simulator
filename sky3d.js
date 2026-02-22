@@ -119,6 +119,8 @@ labelLayer.className = "viewer-layer";
 const labels = [];
 const rayVector = new THREE.Vector3();
 const vectorCache = new Map();
+const scaleLabelAnchors = new Map();
+const scaleLabelPoint = new THREE.Vector3();
 
 const brightStars = {
   betelgeuse: { name: "Betelgeuse", koName: "베텔게우스", raHours: 5.9195, decDeg: 7.4071, mag: 0.45, color: 0xffb36d },
@@ -365,6 +367,18 @@ const CONSTELLATION_SKETCHES = [
     ]
   }
 ];
+
+const SCALE_OBJECT_LABELS = {
+  "scale:galaxy-core": { mode: "galaxy", ko: "은하 중심", en: "Galactic Core" },
+  "scale:galaxy-sun": { mode: "galaxy", ko: "태양 위치", en: "Sun Position" },
+  "scale:local-mw": { mode: "local", ko: "우리은하", en: "Milky Way" },
+  "scale:local-andromeda": { mode: "local", ko: "안드로메다은하 (M31)", en: "Andromeda (M31)" },
+  "scale:local-triangulum": { mode: "local", ko: "삼각형자리은하 (M33)", en: "Triangulum (M33)" },
+  "scale:local-lmc": { mode: "local", ko: "대마젤란운", en: "Large Magellanic Cloud" },
+  "scale:local-smc": { mode: "local", ko: "소마젤란운", en: "Small Magellanic Cloud" },
+  "scale:local-m32": { mode: "local", ko: "M32", en: "M32" },
+  "scale:local-m110": { mode: "local", ko: "M110", en: "M110" }
+};
 
 const planetTargets = [
   { key: "Mercury", name: "Mercury", color: 0xd7d4c5, size: 4.2 },
@@ -730,6 +744,10 @@ function buildLabels() {
     vectorCache.set(`cardinal:${name}`, horizontalToVector(2, az, HORIZON_RADIUS + 2));
   });
 
+  Object.keys(SCALE_OBJECT_LABELS).forEach((key) => {
+    addLabel(key, "scale-object");
+  });
+
   refreshLabelTexts();
 }
 
@@ -783,6 +801,11 @@ function getLabelText(labelKey, type) {
     if (lang === "en") return axis;
     const mapKo = { N: "북", E: "동", S: "남", W: "서" };
     return mapKo[axis] || axis;
+  }
+  if (type === "scale-object") {
+    const meta = SCALE_OBJECT_LABELS[labelKey];
+    if (!meta) return labelKey;
+    return lang === "en" ? meta.en : meta.ko;
   }
   return labelKey;
 }
@@ -1484,6 +1507,8 @@ function createGalaxyScaleScene() {
   );
   sunMarker.position.set(68, 1, 18);
   galaxyScaleGroup.add(sunMarker);
+  scaleLabelAnchors.set("scale:galaxy-core", core);
+  scaleLabelAnchors.set("scale:galaxy-sun", sunMarker);
 
   const sunOrbitPath = new THREE.Mesh(
     new THREE.RingGeometry(70, 72, 200),
@@ -1551,6 +1576,7 @@ function createLocalGroupScaleScene() {
   mw.rotation.x = -Math.PI / 2;
   mw.position.set(-86, 0, 0);
   localScaleGroup.add(mw);
+  scaleLabelAnchors.set("scale:local-mw", mw);
   const mwGlow = createGlowSphere(44, 0xa8beff, 0.14);
   mwGlow.position.copy(mw.position);
   localScaleGroup.add(mwGlow);
@@ -1566,6 +1592,7 @@ function createLocalGroupScaleScene() {
   andromeda.rotation.x = -Math.PI / 2;
   andromeda.position.set(112, 0, -34);
   localScaleGroup.add(andromeda);
+  scaleLabelAnchors.set("scale:local-andromeda", andromeda);
   const andromedaGlow = createGlowSphere(54, 0xffd7b5, 0.12);
   andromedaGlow.position.copy(andromeda.position);
   localScaleGroup.add(andromedaGlow);
@@ -1581,6 +1608,7 @@ function createLocalGroupScaleScene() {
   triangulum.rotation.x = -Math.PI / 2;
   triangulum.position.set(72, 0, 36);
   localScaleGroup.add(triangulum);
+  scaleLabelAnchors.set("scale:local-triangulum", triangulum);
 
   const lmc = new THREE.Mesh(
     new THREE.CircleGeometry(9, 24),
@@ -1593,6 +1621,7 @@ function createLocalGroupScaleScene() {
   lmc.rotation.x = -Math.PI / 2;
   lmc.position.set(-52, 0, -22);
   localScaleGroup.add(lmc);
+  scaleLabelAnchors.set("scale:local-lmc", lmc);
 
   const smc = new THREE.Mesh(
     new THREE.CircleGeometry(6, 20),
@@ -1605,6 +1634,7 @@ function createLocalGroupScaleScene() {
   smc.rotation.x = -Math.PI / 2;
   smc.position.set(-38, 0, -34);
   localScaleGroup.add(smc);
+  scaleLabelAnchors.set("scale:local-smc", smc);
 
   const m32 = new THREE.Mesh(
     new THREE.CircleGeometry(5, 18),
@@ -1617,6 +1647,7 @@ function createLocalGroupScaleScene() {
   m32.rotation.x = -Math.PI / 2;
   m32.position.set(98, 0, -20);
   localScaleGroup.add(m32);
+  scaleLabelAnchors.set("scale:local-m32", m32);
 
   const m110 = new THREE.Mesh(
     new THREE.CircleGeometry(6, 18),
@@ -1629,6 +1660,7 @@ function createLocalGroupScaleScene() {
   m110.rotation.x = -Math.PI / 2;
   m110.position.set(127, 0, -49);
   localScaleGroup.add(m110);
+  scaleLabelAnchors.set("scale:local-m110", m110);
 
   const bridge = new THREE.Line(
     new THREE.BufferGeometry().setFromPoints([mw.position.clone(), andromeda.position.clone()]),
@@ -2445,16 +2477,20 @@ function getScaleModeName() {
 function updateLabels() {
   const width = container.clientWidth;
   const height = container.clientHeight;
-
-  if (scaleMode !== "sky") {
-    labels.forEach(({ element }) => {
-      element.style.opacity = "0";
-    });
-    return;
-  }
-
   labels.forEach(({ element, key, type }) => {
-    const point = vectorCache.get(key);
+    let point = vectorCache.get(key);
+    if (type === "scale-object") {
+      const meta = SCALE_OBJECT_LABELS[key];
+      const anchor = scaleLabelAnchors.get(key);
+      const validMode = meta?.mode === scaleMode && scaleMode !== "sky";
+      if (!anchor || !validMode) {
+        element.style.opacity = "0";
+        return;
+      }
+      anchor.getWorldPosition(scaleLabelPoint);
+      point = scaleLabelPoint;
+    }
+
     if (!point) {
       element.style.opacity = "0";
       return;
@@ -2466,15 +2502,17 @@ function updateLabels() {
     const y = (-rayVector.y * 0.5 + 0.5) * height;
 
     const visible = rayVector.z < 1 && rayVector.z > -1;
-    const aboveHorizon = point.y > 0 || type === "cardinal";
+    const aboveHorizon = type === "scale-object" ? true : point.y > 0 || type === "cardinal";
     const typeVisible =
       type === "star"
-        ? toggleConstellations?.checked !== false
+        ? scaleMode === "sky" && toggleConstellations?.checked !== false
         : type === "nebula"
-          ? toggleNebulae?.checked !== false
+          ? scaleMode === "sky" && toggleNebulae?.checked !== false
           : type === "planet"
-            ? togglePlanets?.checked !== false
-            : true;
+            ? scaleMode === "sky" && togglePlanets?.checked !== false
+            : type === "constellation"
+              ? scaleMode === "sky"
+              : true;
     if (!visible || !aboveHorizon || !typeVisible) {
       element.style.opacity = "0";
       element.classList.remove("search-hit");
