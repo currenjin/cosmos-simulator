@@ -93,23 +93,23 @@ const rayVector = new THREE.Vector3();
 const vectorCache = new Map();
 
 const brightStars = {
-  betelgeuse: { name: "Betelgeuse", raHours: 5.9195, decDeg: 7.4071, mag: 0.45, color: 0xffb36d },
-  bellatrix: { name: "Bellatrix", raHours: 5.4189, decDeg: 6.3497, mag: 1.64, color: 0xbdd8ff },
-  rigel: { name: "Rigel", raHours: 5.2423, decDeg: -8.2016, mag: 0.13, color: 0xb9d6ff },
-  saiph: { name: "Saiph", raHours: 5.7959, decDeg: -9.6696, mag: 2.06, color: 0xb6d2ff },
-  alnitak: { name: "Alnitak", raHours: 5.6793, decDeg: -1.9426, mag: 1.77, color: 0xb7d5ff },
-  alnilam: { name: "Alnilam", raHours: 5.6036, decDeg: -1.2019, mag: 1.69, color: 0xb8d5ff },
-  mintaka: { name: "Mintaka", raHours: 5.5334, decDeg: -0.2991, mag: 2.23, color: 0xbbd7ff },
-  dubhe: { name: "Dubhe", raHours: 11.0621, decDeg: 61.7508, mag: 1.79, color: 0xffd4a1 },
-  merak: { name: "Merak", raHours: 11.0307, decDeg: 56.3824, mag: 2.37, color: 0xe2ecff },
-  phecda: { name: "Phecda", raHours: 11.8972, decDeg: 53.6948, mag: 2.43, color: 0xecf2ff },
-  megrez: { name: "Megrez", raHours: 12.257, decDeg: 57.0326, mag: 3.31, color: 0xeaf1ff },
-  alioth: { name: "Alioth", raHours: 12.9005, decDeg: 55.9598, mag: 1.76, color: 0xf3f7ff },
-  mizar: { name: "Mizar", raHours: 13.3987, decDeg: 54.9254, mag: 2.23, color: 0xf6f9ff },
-  alkaid: { name: "Alkaid", raHours: 13.7923, decDeg: 49.3133, mag: 1.85, color: 0xc9ddff },
-  vega: { name: "Vega", raHours: 18.6156, decDeg: 38.7837, mag: 0.03, color: 0xd2e4ff },
-  deneb: { name: "Deneb", raHours: 20.6905, decDeg: 45.2803, mag: 1.25, color: 0xe2ebff },
-  altair: { name: "Altair", raHours: 19.8464, decDeg: 8.8683, mag: 0.77, color: 0xf3f8ff }
+  betelgeuse: { name: "Betelgeuse", koName: "베텔게우스", raHours: 5.9195, decDeg: 7.4071, mag: 0.45, color: 0xffb36d },
+  bellatrix: { name: "Bellatrix", koName: "벨라트릭스", raHours: 5.4189, decDeg: 6.3497, mag: 1.64, color: 0xbdd8ff },
+  rigel: { name: "Rigel", koName: "리겔", raHours: 5.2423, decDeg: -8.2016, mag: 0.13, color: 0xb9d6ff },
+  saiph: { name: "Saiph", koName: "사이프", raHours: 5.7959, decDeg: -9.6696, mag: 2.06, color: 0xb6d2ff },
+  alnitak: { name: "Alnitak", koName: "알니타크", raHours: 5.6793, decDeg: -1.9426, mag: 1.77, color: 0xb7d5ff },
+  alnilam: { name: "Alnilam", koName: "알닐람", raHours: 5.6036, decDeg: -1.2019, mag: 1.69, color: 0xb8d5ff },
+  mintaka: { name: "Mintaka", koName: "민타카", raHours: 5.5334, decDeg: -0.2991, mag: 2.23, color: 0xbbd7ff },
+  dubhe: { name: "Dubhe", koName: "두베", raHours: 11.0621, decDeg: 61.7508, mag: 1.79, color: 0xffd4a1 },
+  merak: { name: "Merak", koName: "메라크", raHours: 11.0307, decDeg: 56.3824, mag: 2.37, color: 0xe2ecff },
+  phecda: { name: "Phecda", koName: "페크다", raHours: 11.8972, decDeg: 53.6948, mag: 2.43, color: 0xecf2ff },
+  megrez: { name: "Megrez", koName: "메그레즈", raHours: 12.257, decDeg: 57.0326, mag: 3.31, color: 0xeaf1ff },
+  alioth: { name: "Alioth", koName: "알리오트", raHours: 12.9005, decDeg: 55.9598, mag: 1.76, color: 0xf3f7ff },
+  mizar: { name: "Mizar", koName: "미자르", raHours: 13.3987, decDeg: 54.9254, mag: 2.23, color: 0xf6f9ff },
+  alkaid: { name: "Alkaid", koName: "알카이드", raHours: 13.7923, decDeg: 49.3133, mag: 1.85, color: 0xc9ddff },
+  vega: { name: "Vega", koName: "베가", raHours: 18.6156, decDeg: 38.7837, mag: 0.03, color: 0xd2e4ff },
+  deneb: { name: "Deneb", koName: "데네브", raHours: 20.6905, decDeg: 45.2803, mag: 1.25, color: 0xe2ebff },
+  altair: { name: "Altair", koName: "알타이르", raHours: 19.8464, decDeg: 8.8683, mag: 0.77, color: 0xf3f8ff }
 };
 
 const constellationLines = [
@@ -146,6 +146,29 @@ const PLANET_NAME_KO = {
   Mars: "화성",
   Jupiter: "목성",
   Saturn: "토성"
+};
+
+const TARGET_NAME_EN_BY_ID = {
+  m45: "M45 Pleiades",
+  m42: "M42 Orion Nebula",
+  m31: "M31 Andromeda Galaxy",
+  m13: "M13 Hercules Globular Cluster",
+  m44: "M44 Praesepe",
+  m35: "M35",
+  m41: "M41",
+  m47: "M47",
+  m46: "M46",
+  m48: "M48",
+  m3: "M3",
+  m5: "M5",
+  m8: "M8 Lagoon Nebula",
+  m20: "M20 Trifid Nebula",
+  m57: "M57 Ring Nebula",
+  m27: "M27 Dumbbell Nebula",
+  m11: "M11 Wild Duck Cluster",
+  m7: "M7",
+  m6: "M6",
+  m39: "M39"
 };
 
 const PLANET_ELEMENTS = {
@@ -277,10 +300,24 @@ const searchableTargets = [
     raHours: star.raHours,
     decDeg: star.decDeg
   })),
+  ...starEntries.map(([key, star]) => ({
+    key: `star:${key}`,
+    type: "star",
+    name: star.koName || star.name,
+    raHours: star.raHours,
+    decDeg: star.decDeg
+  })),
   ...nebulaTargets.map((target) => ({
     key: `nebula:${target.id}`,
     type: "nebula",
     name: target.name,
+    raHours: target.raHours,
+    decDeg: target.decDeg
+  })),
+  ...nebulaTargets.map((target) => ({
+    key: `nebula:${target.id}`,
+    type: "nebula",
+    name: TARGET_NAME_EN_BY_ID[target.id] || target.name,
     raHours: target.raHours,
     decDeg: target.decDeg
   })),
@@ -337,6 +374,7 @@ window.addEventListener("simulator:activate", ensureStarted);
 window.addEventListener("resize", resizeRenderer);
 window.addEventListener("cosmos:settings-changed", () => {
   updateSearchPlaceholder();
+  refreshLabelTexts();
   updateStatus();
 });
 
@@ -364,16 +402,16 @@ function initializeObserverInputs() {
 }
 
 function buildLabels() {
-  starEntries.forEach(([key, star]) => {
-    addLabel(star.name, `star:${key}`, "star");
+  starEntries.forEach(([key]) => {
+    addLabel(`star:${key}`, "star");
   });
 
   nebulaTargets.forEach((target) => {
-    addLabel(target.name.replace("M", " M"), `nebula:${target.id}`, "nebula");
+    addLabel(`nebula:${target.id}`, "nebula");
   });
 
   planetTargets.forEach((planet) => {
-    addLabel(planet.name, `planet:${planet.key}`, "planet");
+    addLabel(`planet:${planet.key}`, "planet");
   });
 
   [
@@ -382,22 +420,59 @@ function buildLabels() {
     ["S", 180],
     ["W", 270]
   ].forEach(([name, az]) => {
-    addLabel(name, `cardinal:${name}`, "cardinal");
+    addLabel(`cardinal:${name}`, "cardinal");
     vectorCache.set(`cardinal:${name}`, horizontalToVector(2, az, HORIZON_RADIUS + 2));
   });
+
+  refreshLabelTexts();
 }
 
-function addLabel(text, key, type) {
+function addLabel(key, type) {
   const el = document.createElement("span");
   el.className = `viewer-label ${type}`;
-  el.textContent = text;
   labelLayer.appendChild(el);
 
   labels.push({
     element: el,
     key,
-    type
+    type,
+    labelKey: key
   });
+}
+
+function refreshLabelTexts() {
+  labels.forEach((label) => {
+    label.element.textContent = getLabelText(label.labelKey, label.type);
+  });
+}
+
+function getLabelText(labelKey, type) {
+  const lang = getLanguage();
+  if (type === "star") {
+    const starId = labelKey.replace("star:", "");
+    const star = brightStars[starId];
+    if (!star) return labelKey;
+    return lang === "en" ? star.name : star.koName || star.name;
+  }
+  if (type === "planet") {
+    const planetId = labelKey.replace("planet:", "");
+    return lang === "en" ? planetId : PLANET_NAME_KO[planetId] || planetId;
+  }
+  if (type === "nebula") {
+    const id = labelKey.replace("nebula:", "");
+    const target = nebulaTargets.find((item) => item.id === id);
+    if (!target) return id.toUpperCase();
+    const ko = target.name.replace("M", " M");
+    const en = (TARGET_NAME_EN_BY_ID[id] || target.name).replace("M", " M");
+    return lang === "en" ? en : ko;
+  }
+  if (type === "cardinal") {
+    const axis = labelKey.replace("cardinal:", "");
+    if (lang === "en") return axis;
+    const mapKo = { N: "북", E: "동", S: "남", W: "서" };
+    return mapKo[axis] || axis;
+  }
+  return labelKey;
 }
 
 function wireControls() {
