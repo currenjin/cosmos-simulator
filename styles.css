@@ -425,6 +425,189 @@ body.simulator-mode .hero > p {
   margin-top: 0;
 }
 
+.journey-view {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 4px 20px 28px;
+}
+
+.journey-hero {
+  border: 1px solid rgba(133, 180, 255, 0.22);
+  border-radius: 16px;
+  padding: 18px;
+  background: linear-gradient(120deg, rgba(12, 27, 47, 0.9), rgba(22, 21, 44, 0.82));
+}
+
+.journey-kicker {
+  margin: 0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--warm);
+  font-size: 0.76rem;
+}
+
+.journey-hero h2 {
+  margin-top: 6px;
+  font-size: clamp(1.2rem, 2.4vw, 2rem);
+}
+
+.journey-hero p {
+  margin-top: 8px;
+  color: var(--muted);
+  max-width: 860px;
+}
+
+.journey-grid {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1.05fr 1.45fr;
+}
+
+.journey-panel {
+  border-radius: 16px;
+  border: 1px solid rgba(136, 180, 255, 0.22);
+  padding: 14px;
+  background: linear-gradient(150deg, rgba(8, 17, 31, 0.9), rgba(6, 13, 25, 0.8));
+}
+
+.stage-panel {
+  grid-column: 1;
+}
+
+.visual-panel {
+  grid-column: 2;
+  grid-row: span 2;
+  padding: 0;
+  overflow: hidden;
+}
+
+.insight-panel {
+  grid-column: 1;
+}
+
+.stage-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+#journey-autoplay {
+  border-color: rgba(255, 211, 123, 0.45);
+  color: var(--warm);
+  padding: 8px 10px;
+  font-size: 0.86rem;
+}
+
+.stage-slider-label {
+  margin-top: 10px;
+  color: var(--muted);
+}
+
+#journey-scale {
+  margin-top: 8px;
+  width: 100%;
+  accent-color: #8ed8ff;
+}
+
+.journey-stage-name {
+  margin-top: 12px;
+  font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+  font-size: 1.06rem;
+  color: #dce8ff;
+}
+
+.journey-stage-description {
+  margin-top: 6px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.stage-metrics {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.stage-metrics div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.stage-metrics strong {
+  color: #e6efff;
+}
+
+.journey-scale-bar {
+  margin-top: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(129, 167, 239, 0.16);
+  position: relative;
+  overflow: hidden;
+}
+
+.journey-scale-bar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: var(--scale-fill, 8%);
+  border-radius: 999px;
+  background: linear-gradient(90deg, #68cbff, #ffd47f);
+  transition: width 500ms ease;
+}
+
+#journey-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  display: block;
+}
+
+.insight-panel h3 {
+  font-size: 1rem;
+  margin-top: 0;
+}
+
+.insight-panel p {
+  margin-top: 8px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+#journey-awe-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: #c9dcff;
+  display: grid;
+  gap: 8px;
+}
+
+body.journey-mode #planner-view,
+body.journey-mode #simulator-view {
+  display: none;
+}
+
+body.journey-mode .hero h1,
+body.journey-mode .hero p.eyebrow {
+  display: none;
+}
+
+body.journey-mode .hero {
+  padding-top: 18px;
+  padding-bottom: 10px;
+}
+
+body.journey-mode .hero > p {
+  margin-top: 0;
+}
+
 @keyframes drift {
   from {
     transform: translate3d(0, 0, 0);
@@ -462,6 +645,21 @@ body.simulator-mode .hero > p {
 
   .sim-toolbar {
     flex-direction: column;
+  }
+
+  .journey-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .visual-panel,
+  .insight-panel,
+  .stage-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  #journey-canvas {
+    min-height: 360px;
   }
 }
 

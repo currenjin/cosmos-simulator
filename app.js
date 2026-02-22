@@ -12,6 +12,7 @@ const resultCount = document.querySelector("#result-count");
 const cardTemplate = document.querySelector("#card-template");
 const plannerView = document.querySelector("#planner-view");
 const simulatorView = document.querySelector("#simulator-view");
+const journeyView = document.querySelector("#journey-view");
 const modeTabs = document.querySelectorAll(".mode-tab");
 
 initializeDefaults();
@@ -51,24 +52,29 @@ function initializeDefaults() {
 }
 
 function initializeModeTabs() {
-  const modeFromHash = location.hash === "#simulator" ? "simulator" : "planner";
+  const modeFromHash = location.hash === "#simulator" ? "simulator" : location.hash === "#journey" ? "journey" : "planner";
   setMode(modeFromHash);
 
   modeTabs.forEach((tab) => {
     tab.addEventListener("click", () => {
-      const mode = tab.dataset.tab === "simulator" ? "simulator" : "planner";
+      const mode = tab.dataset.tab === "simulator" ? "simulator" : tab.dataset.tab === "journey" ? "journey" : "planner";
       setMode(mode);
-      history.replaceState(null, "", mode === "simulator" ? "#simulator" : "#planner");
+      const hash = mode === "simulator" ? "#simulator" : mode === "journey" ? "#journey" : "#planner";
+      history.replaceState(null, "", hash);
     });
   });
 }
 
 function setMode(mode) {
   const simulatorMode = mode === "simulator";
+  const journeyMode = mode === "journey";
+  const plannerMode = !simulatorMode && !journeyMode;
 
   document.body.classList.toggle("simulator-mode", simulatorMode);
-  plannerView.hidden = simulatorMode;
+  document.body.classList.toggle("journey-mode", journeyMode);
+  plannerView.hidden = !plannerMode;
   simulatorView.hidden = !simulatorMode;
+  journeyView.hidden = !journeyMode;
 
   modeTabs.forEach((tab) => {
     const active = tab.dataset.tab === mode;
@@ -78,6 +84,9 @@ function setMode(mode) {
 
   if (simulatorMode) {
     window.dispatchEvent(new CustomEvent("simulator:activate"));
+  }
+  if (journeyMode) {
+    window.dispatchEvent(new CustomEvent("journey:activate"));
   }
 }
 

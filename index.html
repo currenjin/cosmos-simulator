@@ -28,6 +28,9 @@
         <button type="button" class="mode-tab" data-tab="simulator" role="tab" aria-selected="false">
           3D 시뮬레이터
         </button>
+        <button type="button" class="mode-tab" data-tab="journey" role="tab" aria-selected="false">
+          코스믹 저니
+        </button>
       </div>
     </header>
 
@@ -131,7 +134,58 @@
       <div id="sky-viewer"></div>
     </section>
 
+    <section id="journey-view" class="journey-view" hidden>
+      <div class="journey-hero">
+        <p class="journey-kicker">Cosmic Perspective</p>
+        <h2>우주의 위대함을 체감하는 코스믹 저니</h2>
+        <p>
+          지구에서 출발해 관측 가능한 우주까지 스케일을 확장해보세요. 슬라이더를 움직이면 거리와 빛의 시간이
+          함께 변합니다.
+        </p>
+      </div>
+
+      <section class="journey-grid">
+        <article class="journey-panel stage-panel">
+          <div class="stage-header">
+            <h3>우주 스케일 시뮬레이터</h3>
+            <button type="button" id="journey-autoplay">자동 항해 시작</button>
+          </div>
+          <label class="stage-slider-label" for="journey-scale">스케일 단계</label>
+          <input id="journey-scale" type="range" min="0" max="8" step="1" value="0" />
+          <div id="journey-stage-name" class="journey-stage-name"></div>
+          <p id="journey-stage-description" class="journey-stage-description"></p>
+          <div class="stage-metrics">
+            <div>
+              <span>거리</span>
+              <strong id="journey-distance"></strong>
+            </div>
+            <div>
+              <span>빛의 시간</span>
+              <strong id="journey-light-time"></strong>
+            </div>
+            <div>
+              <span>규모 비유</span>
+              <strong id="journey-scale-metaphor"></strong>
+            </div>
+          </div>
+          <div id="journey-scale-bar" class="journey-scale-bar"></div>
+        </article>
+
+        <article class="journey-panel visual-panel">
+          <canvas id="journey-canvas" width="860" height="460"></canvas>
+        </article>
+
+        <article class="journey-panel insight-panel">
+          <h3>빛의 시간 체험</h3>
+          <p id="journey-insight"></p>
+          <h3>경이 포인트</h3>
+          <ul id="journey-awe-list"></ul>
+        </article>
+      </section>
+    </section>
+
     <script type="module" src="app.js"></script>
     <script type="module" src="sky3d.js"></script>
+    <script type="module" src="cosmic-journey.js"></script>
   </body>
 </html>
