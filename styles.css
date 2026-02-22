@@ -550,9 +550,14 @@ button:hover {
   overflow: hidden;
   min-height: calc(100vh - 220px);
   background:
+    linear-gradient(180deg, rgba(4, 10, 18, 0.7) 0%, rgba(3, 8, 15, 0.78) 100%),
     radial-gradient(circle at 22% 20%, rgba(33, 65, 106, 0.7), transparent 42%),
     radial-gradient(circle at 78% 30%, rgba(43, 31, 74, 0.45), transparent 38%),
-    linear-gradient(180deg, #070f1d 0%, #020811 66%, #02070d 100%);
+    url("assets/jwst-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: normal, screen, screen, normal;
   position: relative;
 }
 
