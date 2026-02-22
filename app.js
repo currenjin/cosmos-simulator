@@ -4,11 +4,12 @@ const COPY = {
   ko: {
     "settings.language": "언어",
     "settings.unit": "단위",
-    "tab.planner": "플래너",
     "tab.simulator": "3D 시뮬레이터",
-    "tab.journey": "코스믹 저니",
     "tab.kepler": "케플러 랩",
     "tab.dynamics": "동역학 랩",
+    "sim.latitude": "위도",
+    "sim.longitude": "경도",
+    "sim.date": "날짜",
     "planner.conditions": "관측 조건",
     "planner.latitude": "위도",
     "planner.longitude": "경도",
@@ -98,11 +99,12 @@ const COPY = {
   en: {
     "settings.language": "Language",
     "settings.unit": "Units",
-    "tab.planner": "Planner",
     "tab.simulator": "3D Sky",
-    "tab.journey": "Cosmic Journey",
     "tab.kepler": "Kepler Lab",
     "tab.dynamics": "Dynamics Lab",
+    "sim.latitude": "Latitude",
+    "sim.longitude": "Longitude",
+    "sim.date": "Date",
     "planner.conditions": "Observation Conditions",
     "planner.latitude": "Latitude",
     "planner.longitude": "Longitude",
@@ -205,42 +207,50 @@ const journeyView = document.querySelector("#journey-view");
 const keplerView = document.querySelector("#kepler-view");
 const dynamicsView = document.querySelector("#dynamics-view");
 const modeTabs = document.querySelectorAll(".mode-tab");
+const plannerEnabled = Boolean(form && equipmentInput && summaryEl && resultCards && resultCount && cardTemplate && useLocationBtn);
 
 let lastRecommendations = [];
 let lastContext = null;
 
-initializeDefaults();
 initializeModeTabs();
 applyI18n();
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  calculateRecommendations();
-});
+if (plannerEnabled) {
+  initializeDefaults();
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculateRecommendations();
+  });
+}
 
 window.addEventListener("cosmos:settings-changed", () => {
   applyI18n();
-  renderSummary(lastRecommendations, lastContext?.nightMinutes || 0, lastContext?.lat || 0, lastContext?.lon || 0);
-  renderCards(lastRecommendations, lastContext?.lat || 0, lastContext?.lon || 0, lastContext?.nightTimes || []);
-});
-
-useLocationBtn.addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    alert(getLanguage() === "en" ? "Geolocation is unavailable in this browser." : "이 브라우저에서는 위치 기능을 지원하지 않습니다.");
-    return;
+  if (plannerEnabled) {
+    renderSummary(lastRecommendations, lastContext?.nightMinutes || 0, lastContext?.lat || 0, lastContext?.lon || 0);
+    renderCards(lastRecommendations, lastContext?.lat || 0, lastContext?.lon || 0, lastContext?.nightTimes || []);
   }
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      latitudeInput.value = position.coords.latitude.toFixed(4);
-      longitudeInput.value = position.coords.longitude.toFixed(4);
-      calculateRecommendations();
-    },
-    () => {
-      alert(getLanguage() === "en" ? "Could not read location. Please enter manually." : "위치 정보를 가져오지 못했습니다. 직접 입력해주세요.");
-    }
-  );
 });
+
+if (plannerEnabled) {
+  useLocationBtn.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      alert(getLanguage() === "en" ? "Geolocation is unavailable in this browser." : "이 브라우저에서는 위치 기능을 지원하지 않습니다.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        latitudeInput.value = position.coords.latitude.toFixed(4);
+        longitudeInput.value = position.coords.longitude.toFixed(4);
+        calculateRecommendations();
+      },
+      () => {
+        alert(getLanguage() === "en" ? "Could not read location. Please enter manually." : "위치 정보를 가져오지 못했습니다. 직접 입력해주세요.");
+      }
+    );
+  });
+}
 
 function initializeDefaults() {
   const now = new Date();
@@ -255,13 +265,11 @@ function initializeModeTabs() {
   const modeFromHash =
     location.hash === "#simulator"
       ? "simulator"
-      : location.hash === "#journey"
-        ? "journey"
-        : location.hash === "#kepler"
+      : location.hash === "#kepler"
           ? "kepler"
           : location.hash === "#dynamics"
             ? "dynamics"
-            : "planner";
+            : "simulator";
   setMode(modeFromHash);
 
   modeTabs.forEach((tab) => {
@@ -269,24 +277,20 @@ function initializeModeTabs() {
       const mode =
         tab.dataset.tab === "simulator"
           ? "simulator"
-          : tab.dataset.tab === "journey"
-            ? "journey"
-            : tab.dataset.tab === "kepler"
+          : tab.dataset.tab === "kepler"
               ? "kepler"
               : tab.dataset.tab === "dynamics"
                 ? "dynamics"
-                : "planner";
+                : "simulator";
       setMode(mode);
       const hash =
         mode === "simulator"
           ? "#simulator"
-          : mode === "journey"
-            ? "#journey"
-            : mode === "kepler"
+          : mode === "kepler"
               ? "#kepler"
               : mode === "dynamics"
                 ? "#dynamics"
-                : "#planner";
+                : "#simulator";
       history.replaceState(null, "", hash);
     });
   });
@@ -294,19 +298,15 @@ function initializeModeTabs() {
 
 function setMode(mode) {
   const simulatorMode = mode === "simulator";
-  const journeyMode = mode === "journey";
   const keplerMode = mode === "kepler";
   const dynamicsMode = mode === "dynamics";
-  const plannerMode = !simulatorMode && !journeyMode && !keplerMode && !dynamicsMode;
 
-  document.body.classList.toggle("planner-mode", plannerMode);
   document.body.classList.toggle("simulator-mode", simulatorMode);
-  document.body.classList.toggle("journey-mode", journeyMode);
   document.body.classList.toggle("kepler-mode", keplerMode);
   document.body.classList.toggle("dynamics-mode", dynamicsMode);
-  plannerView.hidden = !plannerMode;
+  if (plannerView) plannerView.hidden = true;
   simulatorView.hidden = !simulatorMode;
-  journeyView.hidden = !journeyMode;
+  if (journeyView) journeyView.hidden = true;
   keplerView.hidden = !keplerMode;
   dynamicsView.hidden = !dynamicsMode;
 
@@ -318,9 +318,6 @@ function setMode(mode) {
 
   if (simulatorMode) {
     window.dispatchEvent(new CustomEvent("simulator:activate"));
-  }
-  if (journeyMode) {
-    window.dispatchEvent(new CustomEvent("journey:activate"));
   }
   if (keplerMode) {
     window.dispatchEvent(new CustomEvent("kepler:activate"));

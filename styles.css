@@ -308,6 +308,15 @@ button:hover {
   padding: 8px 10px;
 }
 
+#date {
+  width: 150px;
+}
+
+#latitude,
+#longitude {
+  width: 116px;
+}
+
 #sync-sky-now {
   border-color: rgba(255, 211, 123, 0.48);
   color: var(--warm);

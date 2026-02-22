@@ -26,7 +26,7 @@
         </div>
       </div>
       <p class="hero-copy">
-        관측 플래너, 3D 하늘 시점, 코스믹 저니를 하나의 브랜드 경험으로 연결합니다.
+        실제 하늘 시뮬레이터와 물리 법칙 랩으로 우주를 직접 체험하고 학습합니다.
       </p>
       <div class="brand-settings">
         <label for="language-select" data-i18n="settings.language">언어</label>
@@ -41,14 +41,8 @@
         </select>
       </div>
       <div class="mode-tabs" role="tablist" aria-label="앱 모드 선택">
-        <button type="button" class="mode-tab is-active" data-tab="planner" role="tab" aria-selected="true" data-i18n="tab.planner">
-          플래너
-        </button>
-        <button type="button" class="mode-tab" data-tab="simulator" role="tab" aria-selected="false" data-i18n="tab.simulator">
+        <button type="button" class="mode-tab is-active" data-tab="simulator" role="tab" aria-selected="true" data-i18n="tab.simulator">
           3D 시뮬레이터
-        </button>
-        <button type="button" class="mode-tab" data-tab="journey" role="tab" aria-selected="false" data-i18n="tab.journey">
-          코스믹 저니
         </button>
         <button type="button" class="mode-tab" data-tab="kepler" role="tab" aria-selected="false" data-i18n="tab.kepler">
           Kepler Lab
@@ -59,66 +53,7 @@
       </div>
     </header>
 
-    <main id="planner-view">
-      <section class="panel controls">
-        <h2 data-i18n="planner.conditions">관측 조건</h2>
-        <form id="planner-form">
-          <label>
-            <span data-i18n="planner.latitude">위도</span>
-            <input id="latitude" type="number" min="-90" max="90" step="0.0001" required />
-          </label>
-          <label>
-            <span data-i18n="planner.longitude">경도</span>
-            <input id="longitude" type="number" min="-180" max="180" step="0.0001" required />
-          </label>
-          <label>
-            <span data-i18n="planner.date">날짜</span>
-            <input id="date" type="date" required />
-          </label>
-          <label>
-            <span data-i18n="planner.equipment">장비</span>
-            <select id="equipment">
-              <option value="naked-eye" data-i18n="equipment.naked">맨눈</option>
-              <option value="binocular" selected data-i18n="equipment.binocular">쌍안경</option>
-              <option value="small-scope" data-i18n="equipment.scope">소형 망원경</option>
-            </select>
-          </label>
-          <div class="buttons">
-            <button type="button" id="use-location" data-i18n="planner.useLocation">내 위치 사용</button>
-            <button type="submit" class="primary" data-i18n="planner.calculate">추천 계산</button>
-          </div>
-        </form>
-        <p class="hint" data-i18n="planner.hint">
-          기준: 태양 고도 -12° 이하(어두운 하늘), 대상 고도 25° 이상일 때 관측 가능으로 판단.
-        </p>
-      </section>
-
-      <section class="panel summary" id="summary"></section>
-
-      <section class="panel results">
-        <div class="results-head">
-          <h2 data-i18n="planner.recommendations">추천 대상</h2>
-          <span id="result-count"></span>
-        </div>
-        <div id="result-cards" class="cards"></div>
-      </section>
-    </main>
-
-    <template id="card-template">
-      <article class="card">
-        <div class="card-head">
-          <div>
-            <h3 class="target-name"></h3>
-            <p class="target-meta"></p>
-          </div>
-          <div class="score-chip"></div>
-        </div>
-        <div class="stats"></div>
-        <div class="chart-wrap">
-          <canvas width="320" height="120"></canvas>
-        </div>
-      </article>
-    </template>
+    <main id="planner-view" hidden></main>
 
     <section id="simulator-view" class="simulator-view" hidden>
       <div class="sim-toolbar">
@@ -149,6 +84,18 @@
           <span data-i18n="sim.time">시간</span>
           <input type="time" id="sky-time" step="60" />
         </label>
+        <label class="sim-time">
+          <span data-i18n="sim.date">날짜</span>
+          <input id="date" type="date" required />
+        </label>
+        <label class="sim-time">
+          <span data-i18n="sim.latitude">위도</span>
+          <input id="latitude" type="number" min="-90" max="90" step="0.0001" required />
+        </label>
+        <label class="sim-time">
+          <span data-i18n="sim.longitude">경도</span>
+          <input id="longitude" type="number" min="-180" max="180" step="0.0001" required />
+        </label>
         <label class="toggle">
           <input type="checkbox" id="sky-live-time" checked />
           <span data-i18n="sim.live">현재 시간 실시간</span>
@@ -159,55 +106,7 @@
       <div id="sky-viewer"></div>
     </section>
 
-    <section id="journey-view" class="journey-view" hidden>
-      <div class="journey-hero">
-        <p class="journey-kicker" data-i18n="journey.kicker">Cosmic Perspective</p>
-        <h2 data-i18n="journey.title">우주의 위대함을 체감하는 코스믹 저니</h2>
-        <p data-i18n="journey.subtitle">
-          지구에서 출발해 관측 가능한 우주까지 스케일을 확장해보세요. 슬라이더를 움직이면 거리와 빛의 시간이
-          함께 변합니다.
-        </p>
-      </div>
-
-      <section class="journey-grid">
-        <article class="journey-panel stage-panel">
-          <div class="stage-header">
-            <h3 data-i18n="journey.scaleTitle">우주 스케일 시뮬레이터</h3>
-            <button type="button" id="journey-autoplay" data-i18n="journey.autoplayStart">자동 항해 시작</button>
-          </div>
-          <label class="stage-slider-label" for="journey-scale" data-i18n="journey.scaleLabel">스케일 단계</label>
-          <input id="journey-scale" type="range" min="0" max="8" step="1" value="0" />
-          <div id="journey-stage-name" class="journey-stage-name"></div>
-          <p id="journey-stage-description" class="journey-stage-description"></p>
-          <div class="stage-metrics">
-            <div>
-              <span data-i18n="journey.distance">거리</span>
-              <strong id="journey-distance"></strong>
-            </div>
-            <div>
-              <span data-i18n="journey.lightTime">빛의 시간</span>
-              <strong id="journey-light-time"></strong>
-            </div>
-            <div>
-              <span data-i18n="journey.metaphor">규모 비유</span>
-              <strong id="journey-scale-metaphor"></strong>
-            </div>
-          </div>
-          <div id="journey-scale-bar" class="journey-scale-bar"></div>
-        </article>
-
-        <article class="journey-panel visual-panel">
-          <canvas id="journey-canvas" width="860" height="460"></canvas>
-        </article>
-
-        <article class="journey-panel insight-panel">
-          <h3 data-i18n="journey.insightTitle">빛의 시간 체험</h3>
-          <p id="journey-insight"></p>
-          <h3 data-i18n="journey.aweTitle">경이 포인트</h3>
-          <ul id="journey-awe-list"></ul>
-        </article>
-      </section>
-    </section>
+    <section id="journey-view" class="journey-view" hidden></section>
 
     <section id="kepler-view" class="kepler-view" hidden>
       <div class="kepler-hero">
@@ -323,7 +222,6 @@
     <script type="module" src="settings.js"></script>
     <script type="module" src="app.js"></script>
     <script type="module" src="sky3d.js"></script>
-    <script type="module" src="cosmic-journey.js"></script>
     <script type="module" src="kepler-lab.js"></script>
     <script type="module" src="dynamics-lab.js"></script>
   </body>

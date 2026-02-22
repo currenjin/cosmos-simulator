@@ -235,6 +235,7 @@ const skyTwilightColor = new THREE.Color(0x2c3d58);
 const fogNightColor = new THREE.Color(0x030914);
 const fogTwilightColor = new THREE.Color(0x2e4d72);
 
+initializeObserverInputs();
 initializeSkyTime();
 buildLabels();
 wireControls();
@@ -250,6 +251,18 @@ function initializeSkyTime() {
   const hh = String(now.getHours()).padStart(2, "0");
   const mm = String(now.getMinutes()).padStart(2, "0");
   skyTimeInput.value = `${hh}:${mm}`;
+}
+
+function initializeObserverInputs() {
+  if (dateInput && !dateInput.value) {
+    dateInput.value = todayString();
+  }
+  if (latitudeInput && !latitudeInput.value) {
+    latitudeInput.value = currentContext.lat.toFixed(4);
+  }
+  if (longitudeInput && !longitudeInput.value) {
+    longitudeInput.value = currentContext.lon.toFixed(4);
+  }
 }
 
 function buildLabels() {
