@@ -24,12 +24,10 @@ body {
   margin: 0;
   font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at 12% 14%, #15355f, transparent 30%),
-    radial-gradient(circle at 92% 8%, #533418, transparent 34%),
-    linear-gradient(140deg, rgba(5, 9, 19, 0.82) 0%, rgba(9, 19, 39, 0.76) 44%, rgba(12, 18, 40, 0.8) 100%),
-    url("assets/jwst-bg.png");
-  background-size: auto, auto, auto, cover;
-  background-position: center, center, center, center;
+  background-color: #050913;
+  background-image: url("assets/jwst-bg.png");
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   min-height: 100vh;
   position: relative;
@@ -1222,32 +1220,26 @@ body.dynamics-mode .hero > p {
 }
 
 body.simulator-mode {
-  background: radial-gradient(circle at 13% 12%, #0e3255, transparent 32%),
-    radial-gradient(circle at 88% 18%, #204a34, transparent 40%),
-    linear-gradient(140deg, rgba(4, 9, 16, 0.8) 0%, rgba(8, 18, 34, 0.76) 42%, rgba(10, 28, 31, 0.78) 100%),
-    url("assets/jwst-bg.png");
-  background-size: auto, auto, auto, cover;
-  background-position: center, center, center, center;
+  background-color: #050913;
+  background-image: url("assets/jwst-bg.png");
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
 }
 
 body.kepler-mode {
-  background: radial-gradient(circle at 12% 16%, #2d355e, transparent 35%),
-    radial-gradient(circle at 88% 12%, #4f3048, transparent 38%),
-    linear-gradient(140deg, rgba(5, 8, 17, 0.8) 0%, rgba(11, 18, 37, 0.76) 43%, rgba(24, 16, 35, 0.78) 100%),
-    url("assets/jwst-bg.png");
-  background-size: auto, auto, auto, cover;
-  background-position: center, center, center, center;
+  background-color: #050913;
+  background-image: url("assets/jwst-bg.png");
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
 }
 
 body.dynamics-mode {
-  background: radial-gradient(circle at 12% 16%, #2b3f59, transparent 35%),
-    radial-gradient(circle at 88% 12%, #4b2d44, transparent 38%),
-    linear-gradient(140deg, rgba(5, 8, 17, 0.8) 0%, rgba(12, 20, 39, 0.76) 43%, rgba(24, 16, 35, 0.78) 100%),
-    url("assets/jwst-bg.png");
-  background-size: auto, auto, auto, cover;
-  background-position: center, center, center, center;
+  background-color: #050913;
+  background-image: url("assets/jwst-bg.png");
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
 }
 
