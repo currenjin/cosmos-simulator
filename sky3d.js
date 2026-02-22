@@ -19,6 +19,7 @@ const skySearchList = document.querySelector("#sky-search-list");
 const syncSkyNowBtn = document.querySelector("#sync-sky-now");
 const skyStatus = document.querySelector("#sky-status");
 const scaleAweEl = document.querySelector("#scale-awe");
+const scaleAccuracyEl = document.querySelector("#scale-accuracy");
 const scaleButtons = document.querySelectorAll(".scale-btn");
 
 const toggleConstellations = document.querySelector("#toggle-constellations");
@@ -397,6 +398,7 @@ window.addEventListener("cosmos:settings-changed", () => {
   updateSearchPlaceholder();
   refreshLabelTexts();
   updateScaleAweText();
+  updateScaleAccuracyBadge();
   updateStatus();
 });
 
@@ -887,6 +889,7 @@ function setScaleMode(mode, animated = true) {
   scaleMode = validMode;
   updateScaleButtons();
   updateScaleAweText();
+  updateScaleAccuracyBadge();
 
   const skyVisible = scaleMode === "sky";
   dome.visible = skyVisible;
@@ -964,6 +967,37 @@ function updateScaleAweText() {
     }
   };
   scaleAweEl.textContent = textByMode[scaleMode][lang];
+}
+
+function updateScaleAccuracyBadge() {
+  if (!scaleAccuracyEl) return;
+  const lang = getLanguage();
+  const metaByMode = {
+    sky: {
+      className: "is-observed",
+      ko: "정확도: 관측 기반",
+      en: "Accuracy: Observation-based"
+    },
+    solar: {
+      className: "is-approx",
+      ko: "정확도: 근사 모델",
+      en: "Accuracy: Approximate model"
+    },
+    galaxy: {
+      className: "is-concept",
+      ko: "정확도: 개념적 배치",
+      en: "Accuracy: Conceptual layout"
+    },
+    local: {
+      className: "is-concept",
+      ko: "정확도: 개념적 배치",
+      en: "Accuracy: Conceptual layout"
+    }
+  };
+
+  const meta = metaByMode[scaleMode] || metaByMode.sky;
+  scaleAccuracyEl.className = `scale-accuracy-badge ${meta.className}`;
+  scaleAccuracyEl.textContent = lang === "en" ? meta.en : meta.ko;
 }
 
 function captureCameraState(mode) {

@@ -402,6 +402,47 @@ button:hover {
   min-height: 1.2em;
 }
 
+.scale-meta {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.scale-accuracy-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(141, 188, 255, 0.36);
+  background: rgba(7, 18, 32, 0.62);
+  color: #d6e9ff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.scale-accuracy-badge.is-observed {
+  border-color: rgba(140, 232, 178, 0.5);
+  color: #c3f1da;
+  background: rgba(15, 52, 38, 0.5);
+}
+
+.scale-accuracy-badge.is-approx {
+  border-color: rgba(255, 208, 126, 0.5);
+  color: #ffe4b0;
+  background: rgba(56, 34, 9, 0.5);
+}
+
+.scale-accuracy-badge.is-concept {
+  border-color: rgba(170, 182, 255, 0.48);
+  color: #d8ddff;
+  background: rgba(20, 24, 58, 0.5);
+}
+
 #sky-viewer {
   margin-top: 10px;
   border: 1px solid rgba(126, 160, 221, 0.24);
