@@ -522,7 +522,7 @@ function wireControls() {
   focusButtons.forEach((button) => {
     button.addEventListener("click", () => {
       if (scaleMode !== "sky") {
-        setScaleMode("sky", true);
+        setScaleMode("sky", false);
       }
       const mode = button.getAttribute("data-focus");
       moveViewToFocus(mode);
@@ -713,7 +713,7 @@ function focusSearchTarget() {
   const raw = skySearchInput?.value?.trim();
   if (!raw) return;
   if (scaleMode !== "sky") {
-    setScaleMode("sky", true);
+    setScaleMode("sky", false);
   }
 
   const target = findSearchTarget(raw);
