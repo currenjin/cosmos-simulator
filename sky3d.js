@@ -32,6 +32,8 @@ camera.position.set(0, 2.2, 0);
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.95;
 renderer.setAnimationLoop(animate);
 
 const ambient = new THREE.AmbientLight(0x8bb0ff, 0.5);
@@ -41,19 +43,28 @@ const fill = new THREE.DirectionalLight(0xb2ceff, 0.42);
 fill.position.set(30, 35, -20);
 scene.add(fill);
 
+const domeMaterial = new THREE.MeshBasicMaterial({
+  color: 0x071425,
+  side: THREE.BackSide,
+  transparent: true,
+  opacity: 0.92
+});
+
 const dome = new THREE.Mesh(
   new THREE.SphereGeometry(SKY_RADIUS + 8, 48, 32),
-  new THREE.MeshBasicMaterial({
-    color: 0x071425,
-    side: THREE.BackSide,
-    transparent: true,
-    opacity: 0.92
-  })
+  domeMaterial
 );
 scene.add(dome);
 
-const starCloud = createBackgroundStars(2200);
-scene.add(starCloud);
+const backgroundStars = new THREE.Group();
+const starCloudNear = createBackgroundStars(1800, 116, 148, 1.05, 0.78);
+const starCloudMid = createBackgroundStars(1500, 148, 196, 0.95, 0.56);
+const starCloudFar = createBackgroundStars(1200, 196, 254, 0.9, 0.42);
+backgroundStars.add(starCloudNear, starCloudMid, starCloudFar);
+scene.add(backgroundStars);
+
+const milkyWay = createMilkyWayShell();
+scene.add(milkyWay);
 
 const constellationGroup = new THREE.Group();
 const nebulaGroup = new THREE.Group();
@@ -62,6 +73,8 @@ scene.add(nebulaGroup);
 
 const horizonRing = createHorizonRing();
 scene.add(horizonRing);
+const horizonAtmosphere = createHorizonAtmosphere();
+scene.add(horizonAtmosphere);
 const ground = createGround();
 scene.add(ground);
 
@@ -73,23 +86,23 @@ const rayVector = new THREE.Vector3();
 const vectorCache = new Map();
 
 const brightStars = {
-  betelgeuse: { name: "Betelgeuse", raHours: 5.9195, decDeg: 7.4071 },
-  bellatrix: { name: "Bellatrix", raHours: 5.4189, decDeg: 6.3497 },
-  rigel: { name: "Rigel", raHours: 5.2423, decDeg: -8.2016 },
-  saiph: { name: "Saiph", raHours: 5.7959, decDeg: -9.6696 },
-  alnitak: { name: "Alnitak", raHours: 5.6793, decDeg: -1.9426 },
-  alnilam: { name: "Alnilam", raHours: 5.6036, decDeg: -1.2019 },
-  mintaka: { name: "Mintaka", raHours: 5.5334, decDeg: -0.2991 },
-  dubhe: { name: "Dubhe", raHours: 11.0621, decDeg: 61.7508 },
-  merak: { name: "Merak", raHours: 11.0307, decDeg: 56.3824 },
-  phecda: { name: "Phecda", raHours: 11.8972, decDeg: 53.6948 },
-  megrez: { name: "Megrez", raHours: 12.257, decDeg: 57.0326 },
-  alioth: { name: "Alioth", raHours: 12.9005, decDeg: 55.9598 },
-  mizar: { name: "Mizar", raHours: 13.3987, decDeg: 54.9254 },
-  alkaid: { name: "Alkaid", raHours: 13.7923, decDeg: 49.3133 },
-  vega: { name: "Vega", raHours: 18.6156, decDeg: 38.7837 },
-  deneb: { name: "Deneb", raHours: 20.6905, decDeg: 45.2803 },
-  altair: { name: "Altair", raHours: 19.8464, decDeg: 8.8683 }
+  betelgeuse: { name: "Betelgeuse", raHours: 5.9195, decDeg: 7.4071, mag: 0.45, color: 0xffb36d },
+  bellatrix: { name: "Bellatrix", raHours: 5.4189, decDeg: 6.3497, mag: 1.64, color: 0xbdd8ff },
+  rigel: { name: "Rigel", raHours: 5.2423, decDeg: -8.2016, mag: 0.13, color: 0xb9d6ff },
+  saiph: { name: "Saiph", raHours: 5.7959, decDeg: -9.6696, mag: 2.06, color: 0xb6d2ff },
+  alnitak: { name: "Alnitak", raHours: 5.6793, decDeg: -1.9426, mag: 1.77, color: 0xb7d5ff },
+  alnilam: { name: "Alnilam", raHours: 5.6036, decDeg: -1.2019, mag: 1.69, color: 0xb8d5ff },
+  mintaka: { name: "Mintaka", raHours: 5.5334, decDeg: -0.2991, mag: 2.23, color: 0xbbd7ff },
+  dubhe: { name: "Dubhe", raHours: 11.0621, decDeg: 61.7508, mag: 1.79, color: 0xffd4a1 },
+  merak: { name: "Merak", raHours: 11.0307, decDeg: 56.3824, mag: 2.37, color: 0xe2ecff },
+  phecda: { name: "Phecda", raHours: 11.8972, decDeg: 53.6948, mag: 2.43, color: 0xecf2ff },
+  megrez: { name: "Megrez", raHours: 12.257, decDeg: 57.0326, mag: 3.31, color: 0xeaf1ff },
+  alioth: { name: "Alioth", raHours: 12.9005, decDeg: 55.9598, mag: 1.76, color: 0xf3f7ff },
+  mizar: { name: "Mizar", raHours: 13.3987, decDeg: 54.9254, mag: 2.23, color: 0xf6f9ff },
+  alkaid: { name: "Alkaid", raHours: 13.7923, decDeg: 49.3133, mag: 1.85, color: 0xc9ddff },
+  vega: { name: "Vega", raHours: 18.6156, decDeg: 38.7837, mag: 0.03, color: 0xd2e4ff },
+  deneb: { name: "Deneb", raHours: 20.6905, decDeg: 45.2803, mag: 1.25, color: 0xe2ebff },
+  altair: { name: "Altair", raHours: 19.8464, decDeg: 8.8683, mag: 0.77, color: 0xf3f8ff }
 };
 
 const constellationLines = [
@@ -116,9 +129,12 @@ const starEntries = Object.entries(brightStars);
 const starPositions = new Float32Array(starEntries.length * 3);
 const starColors = new Float32Array(starEntries.length * 3);
 for (let i = 0; i < starEntries.length; i += 1) {
-  starColors[i * 3] = 0.7;
-  starColors[i * 3 + 1] = 0.85;
-  starColors[i * 3 + 2] = 1;
+  const star = starEntries[i][1];
+  const magBoost = 1.18 - clamp(star.mag ?? 2.5, -1, 4.2) * 0.13;
+  const color = new THREE.Color(star.color ?? 0xd7e7ff).multiplyScalar(clamp(magBoost, 0.55, 1.22));
+  starColors[i * 3] = color.r;
+  starColors[i * 3 + 1] = color.g;
+  starColors[i * 3 + 2] = color.b;
 }
 
 const starGeometry = new THREE.BufferGeometry();
@@ -556,7 +572,19 @@ function animate(ts) {
     lastStatusUpdate = ts;
   }
 
-  starCloud.rotation.y += 0.00006;
+  backgroundStars.rotation.y += 0.000045;
+  starCloudNear.rotation.y -= 0.00002;
+  starCloudFar.rotation.y += 0.000028;
+  milkyWay.rotation.y += 0.00003;
+
+  const twinkle = 0.85 + Math.sin(ts * 0.0013) * 0.05;
+  starPoints.material.opacity = 0.9 * twinkle;
+  nebulaPoints.material.opacity = 0.9 + Math.sin(ts * 0.0008) * 0.03;
+
+  const horizonLift = clamp((Math.sin(pitch) + 0.15) * 0.5, 0.05, 1);
+  horizonAtmosphere.children[0].material.opacity = 0.2 + (1 - horizonLift) * 0.28;
+  horizonAtmosphere.children[1].material.opacity = 0.1 + (1 - horizonLift) * 0.16;
+  domeMaterial.opacity = 0.84 + (1 - horizonLift) * 0.1;
 
   const lookDirection = new THREE.Vector3(
     Math.cos(pitch) * Math.sin(yaw),
@@ -615,12 +643,12 @@ function updateLabels() {
   });
 }
 
-function createBackgroundStars(count) {
+function createBackgroundStars(count, minRadius = 130, maxRadius = 225, size = 0.95, opacity = 0.64) {
   const positions = [];
   const colors = [];
 
   for (let i = 0; i < count; i += 1) {
-    const radius = 130 + Math.random() * 95;
+    const radius = minRadius + Math.random() * (maxRadius - minRadius);
     const theta = Math.random() * Math.PI * 2;
     const phi = Math.acos(2 * Math.random() - 1);
 
@@ -630,8 +658,15 @@ function createBackgroundStars(count) {
 
     positions.push(x, y, z);
 
-    const tone = 0.58 + Math.random() * 0.4;
-    colors.push(tone * 0.83, tone * 0.9, tone);
+    const tone = 0.52 + Math.random() * 0.44;
+    const warmth = Math.random();
+    if (warmth < 0.16) {
+      colors.push(tone, tone * 0.84, tone * 0.72);
+    } else if (warmth < 0.32) {
+      colors.push(tone * 0.75, tone * 0.87, tone);
+    } else {
+      colors.push(tone * 0.89, tone * 0.92, tone);
+    }
   }
 
   const geometry = new THREE.BufferGeometry();
@@ -641,13 +676,126 @@ function createBackgroundStars(count) {
   return new THREE.Points(
     geometry,
     new THREE.PointsMaterial({
-      size: 0.95,
+      size,
       vertexColors: true,
       transparent: true,
-      opacity: 0.64,
+      opacity,
       depthWrite: false
     })
   );
+}
+
+function createMilkyWayShell() {
+  const texture = createMilkyWayTexture();
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.repeat.set(1.15, 1);
+  texture.offset.set(-0.08, 0);
+
+  const shell = new THREE.Mesh(
+    new THREE.SphereGeometry(SKY_RADIUS + 7.5, 56, 34),
+    new THREE.MeshBasicMaterial({
+      map: texture,
+      side: THREE.BackSide,
+      transparent: true,
+      opacity: 0.54,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    })
+  );
+  shell.rotation.z = toRad(56);
+  shell.rotation.x = toRad(-12);
+  return shell;
+}
+
+function createMilkyWayTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const centerY = canvas.height * 0.5;
+  const width = canvas.height * 0.24;
+
+  for (let y = 0; y < canvas.height; y += 1) {
+    const dy = (y - centerY) / width;
+    const gaussian = Math.exp(-dy * dy);
+    const bandAlpha = Math.pow(gaussian, 1.05) * 0.48;
+    if (bandAlpha < 0.015) continue;
+
+    const gradient = ctx.createLinearGradient(0, y, canvas.width, y);
+    gradient.addColorStop(0, `rgba(186, 207, 255, ${bandAlpha * 0.34})`);
+    gradient.addColorStop(0.45, `rgba(228, 205, 176, ${bandAlpha * 0.42})`);
+    gradient.addColorStop(1, `rgba(170, 199, 255, ${bandAlpha * 0.3})`);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, y, canvas.width, 1);
+  }
+
+  for (let i = 0; i < 15000; i += 1) {
+    const x = Math.random() * canvas.width;
+    const jitter = (Math.random() - 0.5) * width * 1.8;
+    const y = centerY + jitter;
+    const dy = (y - centerY) / width;
+    const density = Math.exp(-dy * dy);
+    if (Math.random() > density) continue;
+
+    const size = 0.4 + Math.random() * 1.8 * density;
+    const alpha = 0.05 + Math.random() * 0.36 * density;
+    ctx.fillStyle = `rgba(240, 245, 255, ${alpha})`;
+    ctx.fillRect(x, y, size, size);
+  }
+
+  for (let i = 0; i < 140; i += 1) {
+    const x = Math.random() * canvas.width;
+    const y = centerY + (Math.random() - 0.5) * width * 1.3;
+    const size = 20 + Math.random() * 58;
+    const alpha = 0.012 + Math.random() * 0.028;
+    const color = i % 3 === 0 ? "190, 170, 150" : "160, 178, 210";
+    const g = ctx.createRadialGradient(x, y, 0, x, y, size);
+    g.addColorStop(0, `rgba(${color}, ${alpha})`);
+    g.addColorStop(1, "rgba(0, 0, 0, 0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  return new THREE.CanvasTexture(canvas);
+}
+
+function createHorizonAtmosphere() {
+  const group = new THREE.Group();
+
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(HORIZON_RADIUS - 8, HORIZON_RADIUS + 34, 96),
+    new THREE.MeshBasicMaterial({
+      color: 0x5ea4ff,
+      transparent: true,
+      opacity: 0.28,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    })
+  );
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = -0.24;
+  group.add(ring);
+
+  const haze = new THREE.Mesh(
+    new THREE.CylinderGeometry(HORIZON_RADIUS + 18, HORIZON_RADIUS + 18, 11, 96, 1, true),
+    new THREE.MeshBasicMaterial({
+      color: 0x78aef4,
+      transparent: true,
+      opacity: 0.18,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    })
+  );
+  haze.position.y = 4.3;
+  group.add(haze);
+
+  return group;
 }
 
 function createGrassTexture() {
