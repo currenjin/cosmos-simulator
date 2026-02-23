@@ -135,11 +135,13 @@ aInput.addEventListener("input", () => {
   state.a = Number(aInput.value);
   resetAreaSampling();
   renderStaticInfo();
+  renderImmediateFrame();
 });
 eInput.addEventListener("input", () => {
   state.e = Number(eInput.value);
   resetAreaSampling();
   renderStaticInfo();
+  renderImmediateFrame();
 });
 
 planetSelect.addEventListener("change", renderPlanetData);
@@ -176,6 +178,7 @@ window.addEventListener("kepler:activate", () => {
   resetAreaSampling();
   renderStaticInfo();
   renderPlanetData();
+  renderImmediateFrame();
   if (!state.lastTs) requestAnimationFrame(loop);
 });
 
@@ -412,6 +415,13 @@ function loop(ts) {
   }
 
   requestAnimationFrame(loop);
+}
+
+function renderImmediateFrame() {
+  const E = solveKepler(state.M, state.e);
+  const pos = orbitalPosition(E, state.e);
+  drawScene(pos, state.sweepPrev || pos);
+  updateNewtonInfo(pos.r);
 }
 
 function drawScene(pos, prevPos) {
