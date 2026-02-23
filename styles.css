@@ -1191,6 +1191,28 @@ body.dynamics-mode .hero > p {
   font-size: 0.9rem;
 }
 
+.kepler-area-box {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(248, 202, 120, 0.28);
+  background: rgba(248, 202, 120, 0.08);
+  display: grid;
+  gap: 6px;
+}
+
+.kepler-area-box p {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.kepler-area-box strong {
+  color: #fff3d2;
+}
+
 .kepler-panel label,
 .dynamics-panel label {
   margin-top: 4px;

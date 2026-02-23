@@ -15,6 +15,11 @@ const apheEl = document.querySelector("#kepler-aphe");
 const l1CheckEl = document.querySelector("#kepler-l1-check");
 const rEl = document.querySelector("#kepler-r");
 const forceEl = document.querySelector("#kepler-force");
+const areaLatestEl = document.querySelector("#kepler-area-latest");
+const areaAvgEl = document.querySelector("#kepler-area-avg");
+const areaSpreadEl = document.querySelector("#kepler-area-spread");
+const areaCountEl = document.querySelector("#kepler-area-count");
+const areaCheckEl = document.querySelector("#kepler-area-check");
 
 const planetSelect = document.querySelector("#kepler-planet");
 const planetAEl = document.querySelector("#planet-a");
@@ -45,6 +50,8 @@ const state = {
   active: false,
   sweepPrev: null,
   sweepTimer: 0,
+  areaSamples: [],
+  sweepSampleInterval: 0.9,
   tutorialIndex: -1,
   tutorialReady: false
 };
@@ -120,10 +127,12 @@ const TUTORIAL_STEPS = [
 
 aInput.addEventListener("input", () => {
   state.a = Number(aInput.value);
+  resetAreaSampling();
   renderStaticInfo();
 });
 eInput.addEventListener("input", () => {
   state.e = Number(eInput.value);
+  resetAreaSampling();
   renderStaticInfo();
 });
 
@@ -135,6 +144,7 @@ tutorialOpenBtn?.addEventListener("click", () => {
 window.addEventListener("kepler:activate", () => {
   state.active = true;
   ensureCanvasSize();
+  resetAreaSampling();
   renderStaticInfo();
   renderPlanetData();
   if (!state.lastTs) requestAnimationFrame(loop);
@@ -144,6 +154,7 @@ window.addEventListener("cosmos:settings-changed", () => {
   populatePlanets();
   renderStaticInfo();
   renderPlanetData();
+  renderAreaStats();
   refreshTutorialText();
 });
 
@@ -156,6 +167,7 @@ function initialize() {
   ensureCanvasSize();
   renderStaticInfo();
   renderPlanetData();
+  renderAreaStats();
   ensureTutorial();
 
   if (location.hash === "#kepler") {
@@ -332,13 +344,20 @@ function loop(ts) {
   const E = solveKepler(state.M, state.e);
   const pos = orbitalPosition(E, state.e);
 
+  const sweepAnchor = state.sweepPrev || pos;
+  drawScene(pos, sweepAnchor);
+
   state.sweepTimer += dt;
-  if (state.sweepTimer > 0.9 || !state.sweepPrev) {
+  if (!state.sweepPrev) {
+    state.sweepPrev = { ...pos };
+    state.sweepTimer = 0;
+  } else if (state.sweepTimer >= state.sweepSampleInterval) {
+    const area = computeSweptArea(state.sweepPrev, pos, state.a);
+    pushAreaSample(area);
     state.sweepPrev = { ...pos };
     state.sweepTimer = 0;
   }
 
-  drawScene(pos, state.sweepPrev);
   updateNewtonInfo(pos.r);
 
   requestAnimationFrame(loop);
@@ -434,6 +453,71 @@ function orbitalPosition(E, e) {
   const y = Math.sqrt(1 - e * e) * Math.sin(E);
   const r = 1 - e * Math.cos(E);
   return { x, y, r, E };
+}
+
+function computeSweptArea(prev, curr, a) {
+  const cross = Math.abs(prev.x * curr.y - prev.y * curr.x);
+  return 0.5 * cross * a * a;
+}
+
+function pushAreaSample(area) {
+  state.areaSamples.push(area);
+  if (state.areaSamples.length > 8) {
+    state.areaSamples.shift();
+  }
+  renderAreaStats();
+}
+
+function resetAreaSampling() {
+  state.sweepPrev = null;
+  state.sweepTimer = 0;
+  state.areaSamples = [];
+  renderAreaStats();
+}
+
+function renderAreaStats() {
+  if (!areaLatestEl || !areaAvgEl || !areaSpreadEl || !areaCountEl || !areaCheckEl) return;
+
+  const lang = getLanguage();
+  const count = state.areaSamples.length;
+  areaCountEl.textContent = String(count);
+
+  if (!count) {
+    areaLatestEl.textContent = "-";
+    areaAvgEl.textContent = "-";
+    areaSpreadEl.textContent = "-";
+    areaCheckEl.textContent =
+      lang === "en"
+        ? "Collecting area samples... orbit is being measured."
+        : "면적 샘플 수집 중... 궤도를 측정하고 있음.";
+    return;
+  }
+
+  const latest = state.areaSamples[count - 1];
+  const avg = state.areaSamples.reduce((sum, value) => sum + value, 0) / count;
+  const variance = state.areaSamples.reduce((sum, value) => sum + (value - avg) ** 2, 0) / count;
+  const std = Math.sqrt(variance);
+  const cvPercent = avg > 0 ? (std / avg) * 100 : 0;
+
+  areaLatestEl.textContent = `${latest.toFixed(4)} AU²`;
+  areaAvgEl.textContent = `${avg.toFixed(4)} AU²`;
+  areaSpreadEl.textContent = `${cvPercent.toFixed(2)}%`;
+
+  if (lang === "en") {
+    areaCheckEl.textContent =
+      cvPercent < 3
+        ? "Second-law check: very stable equal-area sweep."
+        : cvPercent < 8
+          ? "Second-law check: mostly stable. Try more samples or slower speed."
+          : "Second-law check: spread is wide. Observe longer for convergence.";
+  } else {
+    areaCheckEl.textContent =
+      cvPercent < 3
+        ? "2법칙 점검: 같은 시간 면적이 매우 안정적으로 유지됨."
+        : cvPercent < 8
+          ? "2법칙 점검: 대체로 안정적임. 샘플을 더 모아보면 좋음."
+          : "2법칙 점검: 편차가 큰 편임. 더 오래 관찰해 수렴 확인 권장.";
+  }
 }
 
 function ensureCanvasSize() {
