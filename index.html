@@ -204,6 +204,19 @@
             <p><span>T²</span> <strong id="kepler-t2"></strong></p>
             <p><span>a³</span> <strong id="kepler-a3"></strong></p>
           </div>
+          <div class="kepler-time-controls" role="group" aria-label="Kepler time controls">
+            <span data-i18n="kepler.simSpeed">시뮬레이션 속도</span>
+            <div class="kepler-time-buttons">
+              <button type="button" class="kepler-speed-btn" data-kepler-speed="0.5">x0.5</button>
+              <button type="button" class="kepler-speed-btn is-active" data-kepler-speed="1">x1</button>
+              <button type="button" class="kepler-speed-btn" data-kepler-speed="2">x2</button>
+              <button type="button" class="kepler-speed-btn" data-kepler-speed="5">x5</button>
+            </div>
+            <div class="kepler-time-buttons">
+              <button type="button" id="kepler-pause-btn" data-i18n="kepler.pause">일시정지</button>
+              <button type="button" id="kepler-step-btn" data-i18n="kepler.step">한 스텝</button>
+            </div>
+          </div>
           <p id="kepler-law-check" class="kepler-note"></p>
         </article>
 

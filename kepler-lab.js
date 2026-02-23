@@ -20,6 +20,9 @@ const areaAvgEl = document.querySelector("#kepler-area-avg");
 const areaSpreadEl = document.querySelector("#kepler-area-spread");
 const areaCountEl = document.querySelector("#kepler-area-count");
 const areaCheckEl = document.querySelector("#kepler-area-check");
+const speedBtns = Array.from(document.querySelectorAll(".kepler-speed-btn"));
+const pauseBtn = document.querySelector("#kepler-pause-btn");
+const stepBtn = document.querySelector("#kepler-step-btn");
 
 const planetSelect = document.querySelector("#kepler-planet");
 const planetAEl = document.querySelector("#planet-a");
@@ -52,6 +55,9 @@ const state = {
   sweepTimer: 0,
   areaSamples: [],
   sweepSampleInterval: 0.9,
+  timeScale: 1,
+  paused: false,
+  stepRequested: false,
   tutorialIndex: -1,
   tutorialReady: false
 };
@@ -141,6 +147,29 @@ tutorialOpenBtn?.addEventListener("click", () => {
   openTutorial(0);
 });
 
+speedBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const nextScale = Number(btn.dataset.keplerSpeed || 1);
+    if (!Number.isFinite(nextScale) || nextScale <= 0) return;
+    state.timeScale = nextScale;
+    state.paused = false;
+    state.stepRequested = false;
+    refreshTimeControls();
+  });
+});
+
+pauseBtn?.addEventListener("click", () => {
+  state.paused = !state.paused;
+  if (!state.paused) state.stepRequested = false;
+  refreshTimeControls();
+});
+
+stepBtn?.addEventListener("click", () => {
+  state.paused = true;
+  state.stepRequested = true;
+  refreshTimeControls();
+});
+
 window.addEventListener("kepler:activate", () => {
   state.active = true;
   ensureCanvasSize();
@@ -155,6 +184,7 @@ window.addEventListener("cosmos:settings-changed", () => {
   renderStaticInfo();
   renderPlanetData();
   renderAreaStats();
+  refreshTimeControls();
   refreshTutorialText();
 });
 
@@ -168,11 +198,26 @@ function initialize() {
   renderStaticInfo();
   renderPlanetData();
   renderAreaStats();
+  refreshTimeControls();
   ensureTutorial();
 
   if (location.hash === "#kepler") {
     state.active = true;
     requestAnimationFrame(loop);
+  }
+}
+
+function refreshTimeControls() {
+  speedBtns.forEach((btn) => {
+    const speed = Number(btn.dataset.keplerSpeed || 1);
+    btn.classList.toggle("is-active", Math.abs(speed - state.timeScale) < 1e-9);
+  });
+
+  if (pauseBtn) {
+    pauseBtn.textContent = state.paused ? t("kepler.resume", "재생", "Resume") : t("kepler.pause", "일시정지", "Pause");
+  }
+  if (stepBtn) {
+    stepBtn.textContent = t("kepler.step", "한 스텝", "Step");
   }
 }
 
@@ -339,7 +384,8 @@ function loop(ts) {
 
   const T = Math.sqrt(state.a ** 3);
   const n = (Math.PI * 2) / T;
-  state.M = (state.M + n * dt * 2.4) % (Math.PI * 2);
+  const simDt = state.paused ? (state.stepRequested ? 1 / 60 : 0) : dt * state.timeScale;
+  state.M = (state.M + n * simDt * 2.4) % (Math.PI * 2);
 
   const E = solveKepler(state.M, state.e);
   const pos = orbitalPosition(E, state.e);
@@ -347,7 +393,7 @@ function loop(ts) {
   const sweepAnchor = state.sweepPrev || pos;
   drawScene(pos, sweepAnchor);
 
-  state.sweepTimer += dt;
+  state.sweepTimer += simDt;
   if (!state.sweepPrev) {
     state.sweepPrev = { ...pos };
     state.sweepTimer = 0;
@@ -359,6 +405,11 @@ function loop(ts) {
   }
 
   updateNewtonInfo(pos.r);
+
+  if (state.stepRequested) {
+    state.stepRequested = false;
+    refreshTimeControls();
+  }
 
   requestAnimationFrame(loop);
 }
@@ -557,6 +608,13 @@ function toKoreanPlanet(name) {
       Neptune: "해왕성"
     }[name] || name
   );
+}
+
+function t(key, ko, en) {
+  if (window.cosmosSettings?.t) {
+    return window.cosmosSettings.t(key);
+  }
+  return getLanguage() === "en" ? en : ko;
 }
 
 function getLanguage() {

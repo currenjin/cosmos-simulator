@@ -1213,6 +1213,29 @@ body.dynamics-mode .hero > p {
   color: #fff3d2;
 }
 
+.kepler-time-controls {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.kepler-time-controls > span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.kepler-time-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kepler-speed-btn.is-active {
+  border-color: rgba(115, 210, 255, 0.8);
+  background: rgba(115, 210, 255, 0.2);
+  color: #dff3ff;
+}
+
 .kepler-panel label,
 .dynamics-panel label {
   margin-top: 4px;
