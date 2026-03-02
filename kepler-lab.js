@@ -65,7 +65,8 @@ const state = {
   paused: false,
   stepRequested: false,
   tutorialIndex: -1,
-  tutorialReady: false
+  tutorialReady: false,
+  lastHudUpdateTs: 0
 };
 
 const tutorialState = {
@@ -576,6 +577,10 @@ function renderLearningFeedback(forceRatioInput) {
 }
 
 function updateNewtonInfo(rAu) {
+  const now = performance.now();
+  if (now - state.lastHudUpdateTs < 100) return;
+  state.lastHudUpdateTs = now;
+
   const forceRatio = 1 / (rAu * rAu);
   if (getUnit() === "imperial") {
     const miles = rAu * 92955807;

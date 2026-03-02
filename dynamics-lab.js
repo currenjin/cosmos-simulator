@@ -42,7 +42,8 @@ const orbitState = {
   vy: 0.95,
   mu: 1,
   e0: null,
-  l0: null
+  l0: null,
+  lastHudUpdateTs: 0
 };
 
 let running = false;
@@ -401,6 +402,10 @@ function orbitStats() {
 }
 
 function renderConservation(stats) {
+  const now = performance.now();
+  if (now - orbitState.lastHudUpdateTs < 120) return;
+  orbitState.lastHudUpdateTs = now;
+
   kEl.textContent = stats.K.toFixed(4);
   uEl.textContent = stats.U.toFixed(4);
   eEl.textContent = stats.E.toFixed(4);

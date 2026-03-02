@@ -68,6 +68,16 @@ bash scripts/console-checks.sh
 - `[TODO] screenshots/flow-kepler-lab.png`
 - `[TODO] screenshots/flow-dynamics-lab.png`
 
+## 실행/검증 체크리스트
+
+- [ ] `cd cosmos-atlas`
+- [ ] `python3 -m http.server 4173` 실행
+- [ ] 브라우저에서 `http://localhost:4173` 접속
+- [ ] 탭 이동 확인: `3D -> Kepler -> Dynamics`
+- [ ] Kepler: `e/a` 조절 시 수치/시각 피드백 갱신 확인
+- [ ] Dynamics: 추력 적용 후 `a, v, E/L drift` 텍스트 갱신 확인
+- [ ] `bash scripts/console-checks.sh` 실행 후 `[ok] console checks passed` 확인
+
 ## 로컬 실행
 
 아래처럼 정적 서버로 실행할 수 있습니다.
@@ -78,6 +88,18 @@ python3 -m http.server 4173
 ```
 
 브라우저에서 `http://localhost:4173` 접속.
+
+## 문제해결 (자주 막힘 3가지)
+
+1. **포트 4173이 이미 사용 중일 때**
+   - 증상: `OSError: [Errno 48] Address already in use`
+   - 해결: 다른 포트로 실행 (`python3 -m http.server 5173`) 후 해당 포트로 접속
+2. **콘솔 체크 실패 시**
+   - 증상: `scripts/console-checks.sh`가 `[ok]` 없이 종료
+   - 해결: 누락 DOM id/런타임 가드 경고를 먼저 수정하고 스크립트 재실행
+3. **탭 전환 후 화면이 비어 보일 때**
+   - 증상: 모바일 회전 직후 캔버스가 작게 보이거나 갱신 지연
+   - 해결: 탭을 한 번 다시 선택하거나 창 크기 변경(회전)으로 리사이즈 이벤트 재트리거
 
 ## GitHub Pages 배포
 

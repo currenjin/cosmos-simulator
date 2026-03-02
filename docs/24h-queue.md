@@ -26,13 +26,13 @@
 - [DONE] T12 모바일 세로/가로 전환 시 레이아웃 유지
 - [DONE] T13 접근성: 버튼 aria-label 누락 점검/보완
 - [DONE] T14 탭 전환 키보드 포커스 흐름 정리
-- [DOING] T15 README 실행/검증 절차를 체크리스트화
-- [TODO] T16 README 문제해결 섹션(자주 막힘 3개) 추가
-- [TODO] T17 docs/mvp-plan.md와 실제 구현 간 갭 반영
-- [TODO] T18 docs/release-note-v1-draft.md 리스크 상세화
-- [TODO] T19 성능 측정 기준(FPS/초기 로드) 문서 초안
-- [TODO] T20 성능 quick win 2개 반영
-- [TODO] T21 코드 주석 정리(핵심 계산부 위주)
+- [DONE] T15 README 실행/검증 절차를 체크리스트화
+- [DONE] T16 README 문제해결 섹션(자주 막힘 3개) 추가
+- [DONE] T17 docs/mvp-plan.md와 실제 구현 간 갭 반영
+- [DONE] T18 docs/release-note-v1-draft.md 리스크 상세화
+- [DONE] T19 성능 측정 기준(FPS/초기 로드) 문서 초안
+- [DONE] T20 성능 quick win 2개 반영
+- [DOING] T21 코드 주석 정리(핵심 계산부 위주)
 - [TODO] T22 중복 유틸 함수 정리(리팩터링 소규모)
 - [TODO] T23 최종 스모크 테스트(핵심 흐름 10분)
 - [TODO] T24 24h 결과 요약 리포트 생성
