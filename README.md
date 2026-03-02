@@ -62,6 +62,32 @@ bash scripts/console-checks.sh
 성공 기준: `[ok] console checks passed` 출력.
 수동 확인 + 실패 대응 가이드는 `docs/console-checks.md` 참고.
 
+## 자동 브라우저 스모크 체크 (Playwright)
+
+사전 1회 설치:
+
+```bash
+npm install
+npx playwright install chromium
+```
+
+실행:
+
+```bash
+npm run smoke:browser
+```
+
+또는 콘솔 체크 + 브라우저 스모크를 연속 실행:
+
+```bash
+npm test
+```
+
+판독 기준:
+- 성공: `[ok] playwright smoke passed`
+- 실패: `[fail] playwright smoke failed` + 상세 에러 목록 출력
+- 기본 대상 URL: `http://127.0.0.1:4173` (필요 시 `SMOKE_BASE_URL` 환경변수로 변경)
+
 ## 스크린샷 자리표시자 (업데이트 예정)
 
 - `[TODO] screenshots/flow-3d-simulator.png`

@@ -22,7 +22,17 @@ Core learning flow only:
    - Warning: 35 ~ 49 FPS
    - Fail: < 35 FPS
 
-## Measurement Procedure (Manual v0)
+## Measurement Procedure
+
+### A) Automated quick snapshot (v1)
+1. 로컬 서버 실행 (`python3 -m http.server 4173`)
+2. `npm run perf:snapshot`
+3. 출력값 기록:
+   - `domContentLoadedMs`
+   - `loadMs`
+   - `fcpMs`
+
+### B) Manual deep check (v0)
 1. Open Chrome latest, clear cache (or hard reload)
 2. Record Performance panel for each flow segment (10~15s)
 3. Capture:
@@ -38,5 +48,12 @@ Core learning flow only:
 - Verdict: pass|warning|fail
 - Notes: bottleneck suspicion
 
+## Latest Snapshot (2026-03-02, local headless chromium)
+- domContentLoadedMs: **1810ms**
+- loadMs: **1810ms**
+- fcpMs: **248ms**
+- quick verdict: **load target(<=2.5s) 만족**
+
 ## Next Step
-Automate part of this baseline with Playwright + trace collection once smoke E2E is available.
+- Playwright trace 수집을 붙여 탭 전환 구간(3D→Kepler→Dynamics) interaction latency를 반자동 측정
+- 모바일 viewport(390/430) 별도 baseline 추가

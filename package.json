@@ -1,0 +1,29 @@
+{
+  "name": "cosmos-atlas",
+  "version": "1.0.0",
+  "description": "실제 하늘 시뮬레이터와 우주 물리 학습 랩을 제공하는 정적 웹앱입니다.",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "smoke:browser": "node scripts/playwright-smoke.js",
+    "perf:snapshot": "node scripts/perf-snapshot.js",
+    "check:console": "bash scripts/console-checks.sh",
+    "test": "npm run check:console && npm run smoke:browser"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/currenjin/cosmos-atlas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/currenjin/cosmos-atlas/issues"
+  },
+  "homepage": "https://github.com/currenjin/cosmos-atlas#readme",
+  "devDependencies": {
+    "playwright": "^1.58.2"
+  }
+}
