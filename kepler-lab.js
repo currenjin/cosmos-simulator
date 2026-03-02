@@ -519,13 +519,14 @@ function renderLearningFeedback(forceRatioInput) {
   const law3Msg = Math.abs(ratio - 1) < 0.02
     ? (lang === "en" ? "3rd law stable" : "3법칙 안정")
     : (lang === "en" ? "3rd law needs tuning" : "3법칙 재확인 필요");
+  const sampleCount = state.areaSamples.length;
   const areaMsg = cv == null
-    ? (lang === "en" ? "Area samples collecting" : "면적 샘플 수집 중")
+    ? (lang === "en" ? "Area samples collecting (need 6+)" : "면적 샘플 수집 중(6개 이상 권장)")
     : cv < 3
-      ? (lang === "en" ? "2nd law very stable" : "2법칙 매우 안정")
+      ? (lang === "en" ? `2nd law very stable (CV ${cv.toFixed(2)}%, n=${sampleCount})` : `2법칙 매우 안정 (CV ${cv.toFixed(2)}%, n=${sampleCount})`)
       : cv < 8
-        ? (lang === "en" ? "2nd law mostly stable" : "2법칙 대체로 안정")
-        : (lang === "en" ? "2nd law spread high" : "2법칙 편차 큼");
+        ? (lang === "en" ? `2nd law mostly stable (CV ${cv.toFixed(2)}%, n=${sampleCount})` : `2법칙 대체로 안정 (CV ${cv.toFixed(2)}%, n=${sampleCount})`)
+        : (lang === "en" ? `2nd law spread high (CV ${cv.toFixed(2)}%, n=${sampleCount})` : `2법칙 편차 큼 (CV ${cv.toFixed(2)}%, n=${sampleCount})`);
   const newtonMsg = forceRatio > 1.5
     ? (lang === "en" ? "Near focus: gravity rises sharply" : "초점 근처: 중력이 급격히 증가")
     : (lang === "en" ? "Farther zone: gravity weakens" : "원거리 구간: 중력이 약해짐");
@@ -613,17 +614,17 @@ function renderAreaStats() {
   if (lang === "en") {
     areaCheckEl.textContent =
       cvPercent < 3
-        ? "Second-law check: very stable equal-area sweep."
+        ? `Second-law check: very stable equal-area sweep (CV ${cvPercent.toFixed(2)}%, n=${count}).`
         : cvPercent < 8
-          ? "Second-law check: mostly stable. Try more samples or slower speed."
-          : "Second-law check: spread is wide. Observe longer for convergence.";
+          ? `Second-law check: mostly stable (CV ${cvPercent.toFixed(2)}%, n=${count}). Gather a few more samples.`
+          : `Second-law check: spread is wide (CV ${cvPercent.toFixed(2)}%, n=${count}). Observe longer for convergence.`;
   } else {
     areaCheckEl.textContent =
       cvPercent < 3
-        ? "2법칙 점검: 같은 시간 면적이 매우 안정적으로 유지됨."
+        ? `2법칙 점검: 같은 시간 면적이 매우 안정적으로 유지됨 (CV ${cvPercent.toFixed(2)}%, n=${count}).`
         : cvPercent < 8
-          ? "2법칙 점검: 대체로 안정적임. 샘플을 더 모아보면 좋음."
-          : "2법칙 점검: 편차가 큰 편임. 더 오래 관찰해 수렴 확인 권장.";
+          ? `2법칙 점검: 대체로 안정적임 (CV ${cvPercent.toFixed(2)}%, n=${count}). 샘플 추가 권장.`
+          : `2법칙 점검: 편차가 큰 편임 (CV ${cvPercent.toFixed(2)}%, n=${count}). 더 오래 관찰해 수렴 확인 권장.`;
   }
 }
 
