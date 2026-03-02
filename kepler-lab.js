@@ -31,10 +31,14 @@ const planetTheoryTEl = document.querySelector("#planet-theory-t");
 const planetErrorEl = document.querySelector("#planet-error");
 
 const canvas = document.querySelector("#kepler-canvas");
-const ctx = canvas.getContext("2d");
 const tutorialOpenBtn = document.querySelector("#kepler-tutorial-open");
 const guidanceEl = document.querySelector("#kepler-guidance");
 const feedbackEl = document.querySelector("#kepler-feedback");
+
+if (!aInput || !eInput || !forceEl || !feedbackEl || !canvas) {
+  console.warn("[cosmos-atlas] Kepler runtime guard triggered: missing required controls (a,e,force,feedback,canvas).");
+} else {
+const ctx = canvas.getContext("2d");
 
 const PLANETS = [
   { key: "Mercury", a: 0.387, period: 0.241 },
@@ -677,5 +681,6 @@ function getUnit() {
   return window.cosmosSettings?.get()?.unit === "imperial" ? "imperial" : "astro";
 }
 
+}
 
 }

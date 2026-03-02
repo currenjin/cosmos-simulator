@@ -12,10 +12,7 @@ const velEl = document.querySelector("#dyn-vel");
 const reactionEl = document.querySelector("#dyn-reaction");
 
 const thrustCanvas = document.querySelector("#dyn-thrust-canvas");
-const thrustCtx = thrustCanvas.getContext("2d");
-
 const orbitCanvas = document.querySelector("#dyn-orbit-canvas");
-const orbitCtx = orbitCanvas.getContext("2d");
 const kEl = document.querySelector("#dyn-k");
 const uEl = document.querySelector("#dyn-u");
 const eEl = document.querySelector("#dyn-e");
@@ -25,6 +22,12 @@ const lDriftEl = document.querySelector("#dyn-l-drift");
 const tutorialOpenBtn = document.querySelector("#dyn-tutorial-open");
 const guidanceEl = document.querySelector("#dyn-guidance");
 const feedbackEl = document.querySelector("#dyn-feedback");
+
+if (!massInput || !forceInput || !thrustBtn || !resetBtn || !thrustCanvas || !orbitCanvas || !feedbackEl) {
+  console.warn("[cosmos-atlas] Dynamics runtime guard triggered: missing required controls (mass,force,buttons,canvases,feedback).");
+} else {
+const thrustCtx = thrustCanvas.getContext("2d");
+const orbitCtx = orbitCanvas.getContext("2d");
 
 const thrustState = {
   x: 80,
@@ -485,5 +488,6 @@ function clampIndex(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
+}
 
 }
