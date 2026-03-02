@@ -362,6 +362,8 @@ function renderStaticInfo() {
   const c = state.a * state.e;
   const q = state.a * (1 - state.e);
   const Q = state.a * (1 + state.e);
+  const aScale = state.a;
+  const tScale = T;
 
   periodEl.textContent = `${T.toFixed(3)} ${yearLabel()}`;
   t2El.textContent = t2.toFixed(3);
@@ -371,10 +373,10 @@ function renderStaticInfo() {
   apheEl.textContent = `${Q.toFixed(3)} AU`;
 
   if (getLanguage() === "en") {
-    lawCheckEl.textContent = `Check: T²/a³ = ${ratio.toFixed(3)} (close to 1)`;
+    lawCheckEl.textContent = `Check: T²/a³ = ${ratio.toFixed(3)} (~1), scale vs Earth: a×${aScale.toFixed(2)} → T×${tScale.toFixed(2)}`;
     l1CheckEl.textContent = `1st law check: e=c/a=${state.e.toFixed(2)} (0≤e<1 ellipse), Sun fixed at one focus.`;
   } else {
-    lawCheckEl.textContent = `검증: T²/a³ = ${ratio.toFixed(3)} (1에 가까움)`;
+    lawCheckEl.textContent = `검증: T²/a³ = ${ratio.toFixed(3)} (~1), 지구 대비 스케일: a×${aScale.toFixed(2)} → T×${tScale.toFixed(2)}`;
     l1CheckEl.textContent = `1법칙 검증: e=c/a=${state.e.toFixed(2)} (0≤e<1 타원), 태양은 한 초점에 고정.`;
   }
 }
@@ -494,8 +496,47 @@ function drawScene(pos, prevPos) {
   ctx.font = "12px Space Grotesk, sans-serif";
   ctx.fillText(getLanguage() === "en" ? "Sun (focus)" : "태양(초점)", focusX + 12, focusY - 10);
   ctx.fillText(getLanguage() === "en" ? "Planet" : "행성", px + 10, py - 8);
+
+  drawLaw3ScalePanel(w, h);
 }
 
+function drawLaw3ScalePanel(w, h) {
+  const lang = getLanguage();
+  const period = Math.sqrt(state.a ** 3);
+  const aScale = state.a;
+  const tScale = period;
+
+  const panelW = Math.min(250, w * 0.46);
+  const panelH = 64;
+  const x = w - panelW - 14;
+  const y = 14;
+
+  ctx.fillStyle = "rgba(7,16,31,0.78)";
+  ctx.fillRect(x, y, panelW, panelH);
+  ctx.strokeStyle = "rgba(126,182,255,0.55)";
+  ctx.strokeRect(x, y, panelW, panelH);
+
+  const maxScale = Math.max(1, aScale, tScale);
+  const barMax = panelW - 92;
+  const aBar = (aScale / maxScale) * barMax;
+  const tBar = (tScale / maxScale) * barMax;
+
+  ctx.font = "11px Space Grotesk, sans-serif";
+  ctx.fillStyle = "#cde4ff";
+  ctx.fillText(lang === "en" ? "Law3 scale" : "3법칙 스케일", x + 8, y + 14);
+
+  ctx.fillStyle = "rgba(111,197,255,0.82)";
+  ctx.fillRect(x + 54, y + 24, aBar, 10);
+  ctx.fillStyle = "#9dd8ff";
+  ctx.fillText("a", x + 10, y + 33);
+  ctx.fillText(`${aScale.toFixed(2)}x`, x + panelW - 34, y + 33);
+
+  ctx.fillStyle = "rgba(246,201,125,0.88)";
+  ctx.fillRect(x + 54, y + 42, tBar, 10);
+  ctx.fillStyle = "#f6c97d";
+  ctx.fillText("T", x + 10, y + 51);
+  ctx.fillText(`${tScale.toFixed(2)}x`, x + panelW - 34, y + 51);
+}
 
 function renderLearningFeedback(forceRatioInput) {
   if (!guidanceEl || !feedbackEl) return;

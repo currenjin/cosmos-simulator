@@ -17,8 +17,8 @@
 - [DONE] T03 콘솔 체크 스크립트 실행 가이드 보강
 - [DONE] T04 Kepler Law 1 피드백 문구 정확도 보정
 - [DONE] T05 Kepler Law 2 면적속도 설명+수치 보조
-- [DOING] T06 Kepler Law 3 주기-반장축 상관 시각 강조
-- [TODO] T07 Dynamics 힘/가속도 방향 피드백 강화
+- [DONE] T06 Kepler Law 3 주기-반장축 상관 시각 강조
+- [DOING] T07 Dynamics 힘/가속도 방향 피드백 강화
 - [TODO] T08 Dynamics 에너지 드리프트 경고 기준 정리
 - [TODO] T09 Dynamics 각운동량 안정도 표현 개선
 - [TODO] T10 모바일 390px 패널 오버플로우 제거

@@ -477,7 +477,16 @@ function renderDynamicsFeedback(statsInput) {
       ? (lang === "en" ? "Conservation acceptable" : "보존량 허용 범위")
       : (lang === "en" ? "Conservation drift increasing" : "보존량 drift 증가");
 
-  feedbackEl.textContent = `${accelMsg} | ${conserveMsg} | v=${thrustState.v.toFixed(2)}`;
+  const velocityDir = thrustState.v > 0.08
+    ? (lang === "en" ? "+x (right)" : "+x(오른쪽)")
+    : thrustState.v < -0.08
+      ? (lang === "en" ? "-x (left)" : "-x(왼쪽)")
+      : (lang === "en" ? "near 0" : "거의 0");
+  const directionMsg = lang === "en"
+    ? `Dir: a=+x, action/reaction=+x/-x, v=${velocityDir}`
+    : `방향: a=+x, 작용/반작용=+x/-x, v=${velocityDir}`;
+
+  feedbackEl.textContent = `${accelMsg} | ${conserveMsg} | ${directionMsg}`;
 }
 
 function getLanguage() {
