@@ -59,7 +59,8 @@
 bash scripts/console-checks.sh
 ```
 
-수동 확인 가이드는 `docs/console-checks.md` 참고.
+성공 기준: `[ok] console checks passed` 출력.
+수동 확인 + 실패 대응 가이드는 `docs/console-checks.md` 참고.
 
 ## 스크린샷 자리표시자 (업데이트 예정)
 
