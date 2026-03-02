@@ -594,6 +594,8 @@ function updateNewtonInfo(rAu) {
   renderLearningFeedback(forceRatio);
 }
 
+// Newton-Raphson solver for Kepler equation: M = E - e*sin(E)
+// 6~8 iterations are sufficient for our eccentricity range (0 <= e < 1).
 function solveKepler(M, e) {
   let E = M;
   for (let i = 0; i < 7; i += 1) {
@@ -602,6 +604,7 @@ function solveKepler(M, e) {
   return E;
 }
 
+// Convert eccentric anomaly(E) to normalized orbital-plane coordinates.
 function orbitalPosition(E, e) {
   const x = Math.cos(E) - e;
   const y = Math.sqrt(1 - e * e) * Math.sin(E);

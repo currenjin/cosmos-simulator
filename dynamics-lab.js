@@ -377,6 +377,8 @@ function initOrbitBaseline() {
   orbitState.l0 = stats.L;
 }
 
+// Semi-implicit Euler integration for 2-body motion in normalized units.
+// a = -mu * r_vec / |r|^3
 function stepOrbit(dt) {
   const r = Math.hypot(orbitState.x, orbitState.y);
   const ax = (-orbitState.mu * orbitState.x) / (r * r * r);
