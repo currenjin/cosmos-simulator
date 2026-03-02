@@ -377,6 +377,7 @@ function setMode(mode) {
   if (dynamicsMode) {
     window.dispatchEvent(new CustomEvent("dynamics:activate"));
   }
+
 }
 
 function calculateRecommendations() {

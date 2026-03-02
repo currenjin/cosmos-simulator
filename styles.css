@@ -968,6 +968,20 @@ body.dynamics-mode .hero > p {
   color: var(--muted);
 }
 
+
+.lab-guidance {
+  margin: 10px 0 0;
+  color: #d5e8ff;
+  font-size: 0.9rem;
+}
+
+.lab-feedback {
+  margin: 8px 0 0;
+  color: #ffe5b2;
+  font-size: 0.9rem;
+  min-height: 1.2em;
+}
+
 .lab-hero-actions {
   margin-top: 12px;
 }

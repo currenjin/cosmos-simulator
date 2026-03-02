@@ -1,7 +1,7 @@
 const view = document.querySelector("#kepler-view");
 if (!view) {
-  throw new Error("#kepler-view element not found");
-}
+  console.warn("[cosmos-atlas] #kepler-view element not found; module init skipped.");
+} else {
 
 const aInput = document.querySelector("#kepler-a");
 const eInput = document.querySelector("#kepler-e");
@@ -633,4 +633,7 @@ function getLanguage() {
 
 function getUnit() {
   return window.cosmosSettings?.get()?.unit === "imperial" ? "imperial" : "astro";
+}
+
+
 }

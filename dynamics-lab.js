@@ -1,7 +1,7 @@
 const view = document.querySelector("#dynamics-view");
 if (!view) {
-  throw new Error("#dynamics-view element not found");
-}
+  console.warn("[cosmos-atlas] #dynamics-view element not found; module init skipped.");
+} else {
 
 const massInput = document.querySelector("#dyn-mass");
 const forceInput = document.querySelector("#dyn-force");
@@ -445,4 +445,7 @@ function getLanguage() {
 
 function clampIndex(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+
 }
