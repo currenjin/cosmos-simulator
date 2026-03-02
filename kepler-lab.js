@@ -372,10 +372,10 @@ function renderStaticInfo() {
 
   if (getLanguage() === "en") {
     lawCheckEl.textContent = `Check: T²/a³ = ${ratio.toFixed(3)} (close to 1)`;
-    l1CheckEl.textContent = `Ellipse check: c/a = ${state.e.toFixed(2)} and Sun stays at one focus.`;
+    l1CheckEl.textContent = `1st law check: e=c/a=${state.e.toFixed(2)} (0≤e<1 ellipse), Sun fixed at one focus.`;
   } else {
     lawCheckEl.textContent = `검증: T²/a³ = ${ratio.toFixed(3)} (1에 가까움)`;
-    l1CheckEl.textContent = `타원 검증: c/a = ${state.e.toFixed(2)} 이고 태양은 한 초점에 위치합니다.`;
+    l1CheckEl.textContent = `1법칙 검증: e=c/a=${state.e.toFixed(2)} (0≤e<1 타원), 태양은 한 초점에 고정.`;
   }
 }
 
