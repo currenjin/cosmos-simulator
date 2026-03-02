@@ -23,6 +23,8 @@ const lEl = document.querySelector("#dyn-l");
 const eDriftEl = document.querySelector("#dyn-e-drift");
 const lDriftEl = document.querySelector("#dyn-l-drift");
 const tutorialOpenBtn = document.querySelector("#dyn-tutorial-open");
+const guidanceEl = document.querySelector("#dyn-guidance");
+const feedbackEl = document.querySelector("#dyn-feedback");
 
 const thrustState = {
   x: 80,
@@ -130,6 +132,7 @@ window.addEventListener("dynamics:activate", () => {
 
 window.addEventListener("cosmos:settings-changed", () => {
   updateNewtonPanel();
+  renderDynamicsFeedback();
   refreshTutorialText();
 });
 
@@ -141,6 +144,7 @@ function initialize() {
   ensureCanvasSizes();
   updateNewtonPanel();
   initOrbitBaseline();
+  renderDynamicsFeedback();
   ensureTutorial();
 
   if (location.hash === "#dynamics") {
@@ -253,6 +257,7 @@ function applyThrust() {
   thrustState.v += a;
   thrustState.flash = 1;
   updateNewtonPanel();
+  renderDynamicsFeedback();
 }
 
 function resetThrust() {
@@ -261,6 +266,7 @@ function resetThrust() {
   thrustState.flash = 0;
   initOrbitBaseline();
   updateNewtonPanel();
+  renderDynamicsFeedback();
 }
 
 function updateNewtonPanel() {
@@ -273,6 +279,7 @@ function updateNewtonPanel() {
 
   const reactionText = getLanguage() === "en" ? `${F.toFixed(1)} N and opposite` : `${F.toFixed(1)} N, 같은 크기 반대 방향`;
   reactionEl.textContent = reactionText;
+  renderDynamicsFeedback();
 }
 
 function ensureCanvasSizes() {
@@ -401,6 +408,7 @@ function renderConservation(stats) {
 
   eDriftEl.textContent = `${eDrift.toFixed(3)}%`;
   lDriftEl.textContent = `${lDrift.toFixed(3)}%`;
+  renderDynamicsFeedback(stats);
 }
 
 function drawOrbitScene() {
@@ -437,6 +445,36 @@ function drawOrbitScene() {
   orbitCtx.beginPath();
   orbitCtx.arc(cx, cy, scale, 0, Math.PI * 2);
   orbitCtx.stroke();
+}
+
+
+function renderDynamicsFeedback(statsInput) {
+  if (!guidanceEl || !feedbackEl) return;
+  const lang = getLanguage();
+  const m = Number(massInput.value);
+  const F = Number(forceInput.value);
+  const a = F / m;
+  const stats = statsInput || orbitStats();
+  const eDrift = orbitState.e0 ? Math.abs((stats.E - orbitState.e0) / orbitState.e0) * 100 : 0;
+  const lDrift = orbitState.l0 ? Math.abs((stats.L - orbitState.l0) / orbitState.l0) * 100 : 0;
+
+  guidanceEl.textContent =
+    lang === "en"
+      ? "Tip: compare low/high mass with same thrust, then monitor E/L drift while orbit evolves."
+      : "팁: 같은 추력에서 저/고질량을 비교하고, 궤도 진행 중 E/L drift를 함께 관찰하세요.";
+
+  const accelMsg = a > 6
+    ? (lang === "en" ? "High acceleration regime" : "고가속 구간")
+    : a > 2
+      ? (lang === "en" ? "Moderate acceleration regime" : "중간 가속 구간")
+      : (lang === "en" ? "Low acceleration regime" : "저가속 구간");
+  const conserveMsg = (eDrift < 0.5 && lDrift < 0.5)
+    ? (lang === "en" ? "Conservation stable" : "보존량 안정")
+    : (eDrift < 2 && lDrift < 2)
+      ? (lang === "en" ? "Conservation acceptable" : "보존량 허용 범위")
+      : (lang === "en" ? "Conservation drift increasing" : "보존량 drift 증가");
+
+  feedbackEl.textContent = `${accelMsg} | ${conserveMsg} | v=${thrustState.v.toFixed(2)}`;
 }
 
 function getLanguage() {

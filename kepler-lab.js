@@ -33,6 +33,8 @@ const planetErrorEl = document.querySelector("#planet-error");
 const canvas = document.querySelector("#kepler-canvas");
 const ctx = canvas.getContext("2d");
 const tutorialOpenBtn = document.querySelector("#kepler-tutorial-open");
+const guidanceEl = document.querySelector("#kepler-guidance");
+const feedbackEl = document.querySelector("#kepler-feedback");
 
 const PLANETS = [
   { key: "Mercury", a: 0.387, period: 0.241 },
@@ -187,6 +189,7 @@ window.addEventListener("cosmos:settings-changed", () => {
   renderStaticInfo();
   renderPlanetData();
   renderAreaStats();
+  renderLearningFeedback();
   refreshTimeControls();
   refreshTutorialText();
 });
@@ -201,6 +204,7 @@ function initialize() {
   renderStaticInfo();
   renderPlanetData();
   renderAreaStats();
+  renderLearningFeedback();
   refreshTimeControls();
   ensureTutorial();
 
@@ -488,6 +492,43 @@ function drawScene(pos, prevPos) {
   ctx.fillText(getLanguage() === "en" ? "Planet" : "행성", px + 10, py - 8);
 }
 
+
+function renderLearningFeedback(forceRatioInput) {
+  if (!guidanceEl || !feedbackEl) return;
+  const lang = getLanguage();
+  const ratio = (Math.sqrt(state.a ** 3) ** 2) / (state.a ** 3);
+  const cv = (() => {
+    const count = state.areaSamples.length;
+    if (!count) return null;
+    const avg = state.areaSamples.reduce((sum, v) => sum + v, 0) / count;
+    if (!avg) return null;
+    const variance = state.areaSamples.reduce((sum, v) => sum + (v - avg) ** 2, 0) / count;
+    return (Math.sqrt(variance) / avg) * 100;
+  })();
+  const forceRatio = Number.isFinite(forceRatioInput) ? forceRatioInput : 1 / ((1 - state.e * Math.cos(solveKepler(state.M, state.e))) ** 2);
+
+  guidanceEl.textContent =
+    lang === "en"
+      ? "Tip: tune e/a, gather 6+ area samples, then compare T²/a³ and force ratio together."
+      : "팁: e/a 조절 후 면적 샘플 6개 이상을 모으고, T²/a³와 힘 비율을 함께 비교하세요.";
+
+  const law3Msg = Math.abs(ratio - 1) < 0.02
+    ? (lang === "en" ? "3rd law stable" : "3법칙 안정")
+    : (lang === "en" ? "3rd law needs tuning" : "3법칙 재확인 필요");
+  const areaMsg = cv == null
+    ? (lang === "en" ? "Area samples collecting" : "면적 샘플 수집 중")
+    : cv < 3
+      ? (lang === "en" ? "2nd law very stable" : "2법칙 매우 안정")
+      : cv < 8
+        ? (lang === "en" ? "2nd law mostly stable" : "2법칙 대체로 안정")
+        : (lang === "en" ? "2nd law spread high" : "2법칙 편차 큼");
+  const newtonMsg = forceRatio > 1.5
+    ? (lang === "en" ? "Near focus: gravity rises sharply" : "초점 근처: 중력이 급격히 증가")
+    : (lang === "en" ? "Farther zone: gravity weakens" : "원거리 구간: 중력이 약해짐");
+
+  feedbackEl.textContent = `${law3Msg} | ${areaMsg} | ${newtonMsg}`;
+}
+
 function updateNewtonInfo(rAu) {
   const forceRatio = 1 / (rAu * rAu);
   if (getUnit() === "imperial") {
@@ -499,6 +540,7 @@ function updateNewtonInfo(rAu) {
   }
 
   forceEl.textContent = `${forceRatio.toFixed(3)}x`;
+  renderLearningFeedback(forceRatio);
 }
 
 function solveKepler(M, e) {

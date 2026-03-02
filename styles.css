@@ -1425,6 +1425,19 @@ body.dynamics-mode {
 }
 
 @media (max-width: 560px) {
+  .hero {
+    padding: 20px 14px 12px;
+  }
+
+  .brand-settings {
+    width: 100%;
+  }
+
+  .brand-settings select {
+    flex: 1;
+    min-width: 0;
+  }
+
   .mode-tabs {
     width: 100%;
     justify-content: stretch;
@@ -1496,5 +1509,47 @@ body.dynamics-mode {
 
   .lab-tutorial-actions button {
     flex: 1;
+  }
+
+  .simulator-view,
+  .kepler-view,
+  .dynamics-view,
+  .site-footer {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .kepler-grid,
+  .dynamics-grid {
+    gap: 10px;
+  }
+
+  .kepler-panel,
+  .dynamics-panel {
+    padding: 12px;
+  }
+
+  #kepler-canvas {
+    min-height: 260px;
+  }
+
+  #dyn-thrust-canvas {
+    min-height: 180px;
+  }
+
+  #dyn-orbit-canvas {
+    min-height: 240px;
+  }
+
+  .lab-hero-actions .ghost-button,
+  .dynamics-actions button,
+  .kepler-time-buttons button {
+    width: 100%;
+  }
+
+  .dynamics-actions,
+  .kepler-time-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 }

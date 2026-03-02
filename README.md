@@ -47,6 +47,26 @@
 3. 모바일 반응형 UX 개선
 4. 성능 최적화(FPS/렌더링 비용)
 
+## 최신 사용자 플로우
+
+1. **3D 시뮬레이터**: 하늘 탐색, 천체 찾기, 스케일 점프
+2. **Kepler Lab**: e/a 조절, 면적(CV) 확인, T²/a³ 검증, 뉴턴 연결 확인
+3. **Dynamics Lab**: 추력/질량 조절, 에너지/각운동량 drift 확인
+
+## 품질 체크 (콘솔/안정성)
+
+```bash
+bash scripts/console-checks.sh
+```
+
+수동 확인 가이드는 `docs/console-checks.md` 참고.
+
+## 스크린샷 자리표시자 (업데이트 예정)
+
+- `[TODO] screenshots/flow-3d-simulator.png`
+- `[TODO] screenshots/flow-kepler-lab.png`
+- `[TODO] screenshots/flow-dynamics-lab.png`
+
 ## 로컬 실행
 
 아래처럼 정적 서버로 실행할 수 있습니다.
