@@ -463,8 +463,8 @@ function renderDynamicsFeedback(statsInput) {
 
   guidanceEl.textContent =
     lang === "en"
-      ? "Tip: compare low/high mass with same thrust, then monitor E/L drift while orbit evolves."
-      : "팁: 같은 추력에서 저/고질량을 비교하고, 궤도 진행 중 E/L drift를 함께 관찰하세요.";
+      ? "Tip: compare low/high mass with same thrust, then read drift bands (<0.5% stable, 0.5~2% watch, >2% warning)."
+      : "팁: 같은 추력에서 저/고질량을 비교하고, drift 기준(<0.5% 안정, 0.5~2% 주의, >2% 경고)으로 상태를 읽으세요.";
 
   const accelMsg = a > 6
     ? (lang === "en" ? "High acceleration regime" : "고가속 구간")
@@ -474,8 +474,14 @@ function renderDynamicsFeedback(statsInput) {
   const conserveMsg = (eDrift < 0.5 && lDrift < 0.5)
     ? (lang === "en" ? "Conservation stable" : "보존량 안정")
     : (eDrift < 2 && lDrift < 2)
-      ? (lang === "en" ? "Conservation acceptable" : "보존량 허용 범위")
-      : (lang === "en" ? "Conservation drift increasing" : "보존량 drift 증가");
+      ? (lang === "en" ? "Conservation watch" : "보존량 주의")
+      : (lang === "en" ? "Conservation warning" : "보존량 경고");
+  const driftMax = Math.max(eDrift, lDrift);
+  const driftBand = driftMax < 0.5
+    ? (lang === "en" ? "drift<0.5%" : "drift<0.5%")
+    : driftMax < 2
+      ? (lang === "en" ? "0.5~2% watch" : "0.5~2% 주의")
+      : (lang === "en" ? ">2% warning" : ">2% 경고");
 
   const velocityDir = thrustState.v > 0.08
     ? (lang === "en" ? "+x (right)" : "+x(오른쪽)")
@@ -486,7 +492,7 @@ function renderDynamicsFeedback(statsInput) {
     ? `Dir: a=+x, action/reaction=+x/-x, v=${velocityDir}`
     : `방향: a=+x, 작용/반작용=+x/-x, v=${velocityDir}`;
 
-  feedbackEl.textContent = `${accelMsg} | ${conserveMsg} | ${directionMsg}`;
+  feedbackEl.textContent = `${accelMsg} | ${conserveMsg}(${driftBand}) | ${directionMsg}`;
 }
 
 function getLanguage() {

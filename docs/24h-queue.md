@@ -18,9 +18,9 @@
 - [DONE] T04 Kepler Law 1 피드백 문구 정확도 보정
 - [DONE] T05 Kepler Law 2 면적속도 설명+수치 보조
 - [DONE] T06 Kepler Law 3 주기-반장축 상관 시각 강조
-- [DOING] T07 Dynamics 힘/가속도 방향 피드백 강화
-- [TODO] T08 Dynamics 에너지 드리프트 경고 기준 정리
-- [TODO] T09 Dynamics 각운동량 안정도 표현 개선
+- [DONE] T07 Dynamics 힘/가속도 방향 피드백 강화
+- [DONE] T08 Dynamics 에너지 드리프트 경고 기준 정리
+- [DOING] T09 Dynamics 각운동량 안정도 표현 개선
 - [TODO] T10 모바일 390px 패널 오버플로우 제거
 - [TODO] T11 모바일 430px 버튼 탭 영역(>=44px) 보정
 - [TODO] T12 모바일 세로/가로 전환 시 레이아웃 유지
