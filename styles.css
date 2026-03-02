@@ -1554,6 +1554,16 @@ body.dynamics-mode {
   }
 }
 
+@media (max-width: 430px) {
+  .mode-tab,
+  .ghost-button,
+  .dynamics-actions button,
+  .kepler-time-buttons button,
+  .lab-tutorial-actions button {
+    min-height: 44px;
+  }
+}
+
 @media (max-width: 390px) {
   .kepler-panel,
   .dynamics-panel {
