@@ -23,10 +23,10 @@
 - [DONE] T09 Dynamics 각운동량 안정도 표현 개선
 - [DONE] T10 모바일 390px 패널 오버플로우 제거
 - [DONE] T11 모바일 430px 버튼 탭 영역(>=44px) 보정
-- [DOING] T12 모바일 세로/가로 전환 시 레이아웃 유지
-- [TODO] T13 접근성: 버튼 aria-label 누락 점검/보완
-- [TODO] T14 탭 전환 키보드 포커스 흐름 정리
-- [TODO] T15 README 실행/검증 절차를 체크리스트화
+- [DONE] T12 모바일 세로/가로 전환 시 레이아웃 유지
+- [DONE] T13 접근성: 버튼 aria-label 누락 점검/보완
+- [DONE] T14 탭 전환 키보드 포커스 흐름 정리
+- [DOING] T15 README 실행/검증 절차를 체크리스트화
 - [TODO] T16 README 문제해결 섹션(자주 막힘 3개) 추가
 - [TODO] T17 docs/mvp-plan.md와 실제 구현 간 갭 반영
 - [TODO] T18 docs/release-note-v1-draft.md 리스크 상세화

@@ -1564,6 +1564,30 @@ body.dynamics-mode {
   }
 }
 
+@media (max-width: 960px) and (orientation: landscape) {
+  #sky-viewer {
+    min-height: min(62vh, 420px);
+  }
+
+  #kepler-canvas {
+    min-height: 220px;
+  }
+
+  #dyn-thrust-canvas {
+    min-height: 170px;
+  }
+
+  #dyn-orbit-canvas {
+    min-height: 210px;
+  }
+
+  .lab-tutorial-overlay {
+    width: min(360px, calc(100vw - 20px));
+    bottom: 8px;
+    right: 8px;
+  }
+}
+
 @media (max-width: 390px) {
   .kepler-panel,
   .dynamics-panel {

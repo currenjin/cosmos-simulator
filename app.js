@@ -324,7 +324,9 @@ function initializeModeTabs() {
             : "simulator";
   setMode(modeFromHash);
 
-  modeTabs.forEach((tab) => {
+  const tabs = Array.from(modeTabs);
+
+  modeTabs.forEach((tab, index) => {
     tab.addEventListener("click", () => {
       const mode =
         tab.dataset.tab === "simulator"
@@ -344,6 +346,27 @@ function initializeModeTabs() {
                 ? "#dynamics"
                 : "#simulator";
       history.replaceState(null, "", hash);
+    });
+
+    tab.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+        event.preventDefault();
+        const dir = event.key === "ArrowRight" ? 1 : -1;
+        const nextTab = tabs[(index + dir + tabs.length) % tabs.length];
+        nextTab?.focus();
+        return;
+      }
+
+      if (event.key === "Home") {
+        event.preventDefault();
+        tabs[0]?.focus();
+        return;
+      }
+
+      if (event.key === "End") {
+        event.preventDefault();
+        tabs[tabs.length - 1]?.focus();
+      }
     });
   });
 }
@@ -366,6 +389,7 @@ function setMode(mode) {
     const active = tab.dataset.tab === mode;
     tab.classList.toggle("is-active", active);
     tab.setAttribute("aria-selected", active ? "true" : "false");
+    tab.setAttribute("tabindex", active ? "0" : "-1");
   });
 
   if (simulatorMode) {
