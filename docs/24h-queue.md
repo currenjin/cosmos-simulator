@@ -20,8 +20,8 @@
 - [DONE] T06 Kepler Law 3 주기-반장축 상관 시각 강조
 - [DONE] T07 Dynamics 힘/가속도 방향 피드백 강화
 - [DONE] T08 Dynamics 에너지 드리프트 경고 기준 정리
-- [DOING] T09 Dynamics 각운동량 안정도 표현 개선
-- [TODO] T10 모바일 390px 패널 오버플로우 제거
+- [DONE] T09 Dynamics 각운동량 안정도 표현 개선
+- [DOING] T10 모바일 390px 패널 오버플로우 제거
 - [TODO] T11 모바일 430px 버튼 탭 영역(>=44px) 보정
 - [TODO] T12 모바일 세로/가로 전환 시 레이아웃 유지
 - [TODO] T13 접근성: 버튼 aria-label 누락 점검/보완

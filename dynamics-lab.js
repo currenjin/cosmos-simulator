@@ -409,9 +409,18 @@ function renderConservation(stats) {
   const eDrift = orbitState.e0 ? Math.abs((stats.E - orbitState.e0) / orbitState.e0) * 100 : 0;
   const lDrift = orbitState.l0 ? Math.abs((stats.L - orbitState.l0) / orbitState.l0) * 100 : 0;
 
-  eDriftEl.textContent = `${eDrift.toFixed(3)}%`;
-  lDriftEl.textContent = `${lDrift.toFixed(3)}%`;
+  const eLevel = driftLevelLabel(eDrift);
+  const lLevel = driftLevelLabel(lDrift);
+  eDriftEl.textContent = `${eDrift.toFixed(3)}% (${eLevel})`;
+  lDriftEl.textContent = `${lDrift.toFixed(3)}% (${lLevel})`;
   renderDynamicsFeedback(stats);
+}
+
+function driftLevelLabel(value) {
+  const lang = getLanguage();
+  if (value < 0.5) return lang === "en" ? "stable" : "안정";
+  if (value < 2) return lang === "en" ? "watch" : "주의";
+  return lang === "en" ? "warning" : "경고";
 }
 
 function drawOrbitScene() {
