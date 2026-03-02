@@ -1,8 +1,5 @@
 const journeyView = document.querySelector("#journey-view");
-if (!journeyView) {
-  throw new Error("#journey-view element not found");
-}
-
+if (journeyView) {
 const scaleInput = document.querySelector("#journey-scale");
 const autoplayButton = document.querySelector("#journey-autoplay");
 const stageNameEl = document.querySelector("#journey-stage-name");
@@ -476,4 +473,7 @@ function copy(key) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+} else {
+  console.warn("[cosmos-atlas] #journey-view element not found; module init skipped.");
 }
