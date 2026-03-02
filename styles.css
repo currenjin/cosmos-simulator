@@ -1553,3 +1553,29 @@ body.dynamics-mode {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 390px) {
+  .kepler-panel,
+  .dynamics-panel {
+    padding: 10px;
+  }
+
+  .kepler-metrics p,
+  .dynamics-metrics p,
+  .kepler-area-box p {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .kepler-metrics strong,
+  .dynamics-metrics strong,
+  .kepler-area-box strong {
+    width: 100%;
+    text-align: left;
+  }
+
+  .kepler-table th,
+  .kepler-table td {
+    font-size: 0.82rem;
+  }
+}
