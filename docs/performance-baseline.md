@@ -22,6 +22,11 @@ Core learning flow only:
    - Warning: 35 ~ 49 FPS
    - Fail: < 35 FPS
 
+4. **Main-thread Blocking (Long Task/TBT proxy)**
+   - Target: interaction sweep 기준 `tbtApproxMs <= 500ms`
+   - Warning: `501 ~ 1000ms`
+   - Fail: `> 1000ms`
+
 ## Measurement Procedure
 
 ### A) Automated quick snapshot (v1)
@@ -32,7 +37,16 @@ Core learning flow only:
    - `loadMs`
    - `fcpMs`
 
-### B) Manual deep check (v0)
+### B) Automated blocking-time snapshot (v1)
+1. 로컬 서버 실행 (`python3 -m http.server 4173`)
+2. `npm run perf:longtask`
+3. 출력값 기록:
+   - `longTaskCount`
+   - `totalLongTaskMs`
+   - `tbtApproxMs`
+   - `maxLongTaskMs`
+
+### C) Manual deep check (v0)
 1. Open Chrome latest, clear cache (or hard reload)
 2. Record Performance panel for each flow segment (10~15s)
 3. Capture:
@@ -53,6 +67,14 @@ Core learning flow only:
 - loadMs: **1810ms**
 - fcpMs: **248ms**
 - quick verdict: **load target(<=2.5s) 만족**
+
+## Latest LongTask/TBT Proxy (2026-03-03, local headless chromium)
+- loadMs: **1728ms**
+- longTaskCount: **3**
+- totalLongTaskMs: **1066ms**
+- tbtApproxMs: **916ms**
+- maxLongTaskMs: **800ms**
+- quick verdict: **Warning 구간(501~1000ms)** → 초기 진입/탭 전환 시 메인스레드 블로킹 최적화 필요
 
 ## Throttling Change Before/After (HUD update)
 

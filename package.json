@@ -11,6 +11,7 @@
     "test:ui-state": "node scripts/playwright-ui-state-regression.js",
     "test:calc-regression": "node scripts/playwright-calculation-regression.js",
     "perf:snapshot": "node scripts/perf-snapshot.js",
+    "perf:longtask": "node scripts/perf-longtask-snapshot.js",
     "perf:hud-throttle": "node scripts/hud-throttle-snapshot.js",
     "check:console": "bash scripts/console-checks.sh",
     "test": "npm run check:console && npm run smoke:browser && npm run test:ui-state && npm run test:calc-regression"

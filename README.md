@@ -92,6 +92,18 @@ npm test
 - 실패 시 각 스크립트에서 `[fail] ...`와 상세 에러 목록 출력
 - 기본 대상 URL: `http://127.0.0.1:4173` (필요 시 `SMOKE_BASE_URL` 환경변수로 변경)
 
+## 성능 스냅샷(경량)
+
+```bash
+npm run perf:snapshot
+npm run perf:longtask
+npm run perf:hud-throttle
+```
+
+- `perf:snapshot`: 초기 로드(`domContentLoaded/load/FCP`) 빠른 기준값
+- `perf:longtask`: 탭 전환+입력 상호작용 중 Long Task/TBT 근사치 수집 (기본 budget: `TBT<=1000ms`, `maxLongTask<=900ms`)
+- `perf:hud-throttle`: HUD 텍스트 갱신 빈도 제한 효과 측정
+
 ## 스크린샷 자리표시자 (업데이트 예정)
 
 - `[TODO] screenshots/flow-3d-simulator.png`

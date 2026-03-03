@@ -57,3 +57,6 @@
 - [DONE] T30 핵심 계산/피드백 문구 경량 회귀 체크 추가
 - [DONE] T31 성능 문서에 throttling 변경 전/후 비교 보강
 - [DONE] T32 릴리즈 산출물(README/release-note/QA matrix) 정합성 폴리싱
+- [BLOCKED] T33 CI 게이트 구축: PR/Push에서 콘솔+Playwright 회귀 자동 검증 (원격 push 권한 부족: PAT에 workflow scope 필요)
+- [DONE] T34 성능 계측 심화: Long Task/TBT 근사치 수집 스크립트 추가
+- [DOING] T35 T23 수동 스모크 핸드오프 양식 추가(기록 누락 방지)
