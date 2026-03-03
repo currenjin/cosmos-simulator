@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const { chromium } = require('playwright');
+const { waitForBaseUrl } = require('./wait-for-base-url');
 
 const BASE_URL = process.env.SMOKE_BASE_URL || 'http://127.0.0.1:4173';
 
@@ -27,6 +28,8 @@ async function sampleUpdates(page, selector, sampleMs = 3000) {
 }
 
 (async () => {
+  await waitForBaseUrl(BASE_URL);
+
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   try {

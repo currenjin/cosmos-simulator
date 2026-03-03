@@ -62,4 +62,6 @@
 - [BLOCKED] T33 CI 게이트 구축: PR/Push에서 콘솔+Playwright 회귀 자동 검증 (원격 push 권한 부족: PAT에 workflow scope 필요)
 - [DONE] T34 성능 계측 심화: Long Task/TBT 근사치 수집 스크립트 추가
 - [DONE] T35 T23 수동 스모크 핸드오프 양식 추가(기록 누락 방지)
-- [DOING] T36 테스트 신뢰성 강화: Playwright 스크립트 base URL 헬스체크 공통 유틸 도입
+- [DONE] T36 테스트 신뢰성 강화: Playwright 스크립트 base URL 헬스체크 공통 유틸 도입
+- [DONE] T37 릴리즈 준비: 권한 이슈(T33) 복구 가이드 문서화
+- [DOING] T38 테스트 실행 가이드 정합성 점검(README/QA/release-note 동기화)

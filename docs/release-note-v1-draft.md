@@ -25,8 +25,10 @@ This revision focuses on **technical quality and learning feedback depth** for t
   - `npm run test:calc-regression`
 - Performance trend checks (recommended):
   - `npm run perf:snapshot`
+  - `npm run perf:longtask`
   - `npm run perf:hud-throttle`
 - Manual browser verification remains required for visual/interaction quality.
+- CI workflow enable status: `docs/ci-workflow-enable.md` (PAT `workflow` scope 필요)
 
 ## Remaining Risks (Detailed)
 1. **Final manual release smoke not yet completed (T23 BLOCKED)**

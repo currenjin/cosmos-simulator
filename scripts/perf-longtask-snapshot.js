@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 const { chromium } = require('playwright');
+const { waitForBaseUrl } = require('./wait-for-base-url');
 
 const BASE_URL = process.env.SMOKE_BASE_URL || 'http://127.0.0.1:4173';
 const TBT_BUDGET_MS = Number(process.env.PERF_TBT_BUDGET_MS || 1000);
 const MAX_LONGTASK_BUDGET_MS = Number(process.env.PERF_MAX_LONGTASK_BUDGET_MS || 900);
 
 (async () => {
+  await waitForBaseUrl(BASE_URL);
+
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
