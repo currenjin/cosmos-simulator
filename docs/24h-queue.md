@@ -64,4 +64,5 @@
 - [DONE] T35 T23 수동 스모크 핸드오프 양식 추가(기록 누락 방지)
 - [DONE] T36 테스트 신뢰성 강화: Playwright 스크립트 base URL 헬스체크 공통 유틸 도입
 - [DONE] T37 릴리즈 준비: 권한 이슈(T33) 복구 가이드 문서화
-- [DOING] T38 테스트 실행 가이드 정합성 점검(README/QA/release-note 동기화)
+- [DONE] T38 테스트 실행 가이드 정합성 점검(README/QA/release-note 동기화)
+- [DOING] T39 UX 폴리싱: 390px 환경에서 성능/피드백 패널 가독성 미세 조정
