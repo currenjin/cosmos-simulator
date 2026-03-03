@@ -62,7 +62,7 @@ bash scripts/console-checks.sh
 성공 기준: `[ok] console checks passed` 출력.
 수동 확인 + 실패 대응 가이드는 `docs/console-checks.md` 참고.
 
-## 자동 브라우저 스모크 체크 (Playwright)
+## 자동 브라우저 체크 (Playwright)
 
 사전 1회 설치:
 
@@ -75,17 +75,21 @@ npx playwright install chromium
 
 ```bash
 npm run smoke:browser
+npm run test:ui-state
+npm run test:calc-regression
 ```
 
-또는 콘솔 체크 + 브라우저 스모크를 연속 실행:
+통합 실행(콘솔 체크 + 브라우저 스모크 + UI 상태 회귀 + 계산/피드백 회귀):
 
 ```bash
 npm test
 ```
 
 판독 기준:
-- 성공: `[ok] playwright smoke passed`
-- 실패: `[fail] playwright smoke failed` + 상세 에러 목록 출력
+- `smoke:browser` 성공: `[ok] playwright smoke passed`
+- `test:ui-state` 성공: `[ok] ui state regression checks passed`
+- `test:calc-regression` 성공: `[ok] calculation/feedback lightweight regression passed`
+- 실패 시 각 스크립트에서 `[fail] ...`와 상세 에러 목록 출력
 - 기본 대상 URL: `http://127.0.0.1:4173` (필요 시 `SMOKE_BASE_URL` 환경변수로 변경)
 
 ## 스크린샷 자리표시자 (업데이트 예정)
@@ -102,7 +106,9 @@ npm test
 - [ ] 탭 이동 확인: `3D -> Kepler -> Dynamics`
 - [ ] Kepler: `e/a` 조절 시 수치/시각 피드백 갱신 확인
 - [ ] Dynamics: 추력 적용 후 `a, v, E/L drift` 텍스트 갱신 확인
-- [ ] `bash scripts/console-checks.sh` 실행 후 `[ok] console checks passed` 확인
+- [ ] `npm run check:console` 실행 후 `[ok] console checks passed` 확인
+- [ ] `npm run test:ui-state` 실행 후 UI 상태 갱신 회귀 통과 확인
+- [ ] `npm run test:calc-regression` 실행 후 계산/피드백 회귀 통과 확인
 
 ## 로컬 실행
 

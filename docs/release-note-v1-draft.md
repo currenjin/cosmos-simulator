@@ -11,21 +11,30 @@ This revision focuses on **technical quality and learning feedback depth** for t
 - [x] Enhanced Kepler Lab guidance + real-time interpretation feedback
 - [x] Enhanced Dynamics Lab guidance + conservation/acceleration feedback
 - [x] Applied minimum mobile responsiveness improvements for core lab interactions
-- [x] Updated README with latest flow and screenshot placeholders
+- [x] Updated README with latest flow and verification commands
 - [x] Added revised MVP plan document (`docs/mvp-plan.md`)
+- [x] Added Playwright UI state regression (`scripts/playwright-ui-state-regression.js`)
+- [x] Added Playwright calculation/feedback regression (`scripts/playwright-calculation-regression.js`)
+- [x] Added HUD throttling snapshot script + docs (`scripts/hud-throttle-snapshot.js`, `docs/performance-baseline.md`)
 
 ## Quality Notes
-- Automated quick check:
-  - `bash scripts/console-checks.sh`
+- Automated checks:
+  - `npm run check:console`
+  - `npm run smoke:browser`
+  - `npm run test:ui-state`
+  - `npm run test:calc-regression`
+- Performance trend checks (recommended):
+  - `npm run perf:snapshot`
+  - `npm run perf:hud-throttle`
 - Manual browser verification remains required for visual/interaction quality.
 
 ## Remaining Risks (Detailed)
-1. **No automated browser E2E tests yet**
-   - Likelihood: High
-   - Impact: High (tab switching / interaction regressions can reach production unnoticed)
-   - Trigger: refactor around mode events, canvas lifecycle, or i18n update paths
-   - Mitigation: add smoke E2E for `3D -> Kepler -> Dynamics`, slider/button interactions, and no-console-error gate
-   - Owner/ETA: FE owner, next sprint first half
+1. **Final manual release smoke not yet completed (T23 BLOCKED)**
+   - Likelihood: Medium
+   - Impact: High (visual/layout edge regression may pass headless checks)
+   - Trigger: last-mile browser/device differences, especially mobile viewport
+   - Mitigation: complete 10-minute manual checklist (tab loop, sliders, thrust, console, 390/430)
+   - Owner/ETA: human manual smoke before release cut
 
 2. **Physics-learning copy still iterative**
    - Likelihood: Medium

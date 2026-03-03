@@ -8,9 +8,12 @@
   },
   "scripts": {
     "smoke:browser": "node scripts/playwright-smoke.js",
+    "test:ui-state": "node scripts/playwright-ui-state-regression.js",
+    "test:calc-regression": "node scripts/playwright-calculation-regression.js",
     "perf:snapshot": "node scripts/perf-snapshot.js",
+    "perf:hud-throttle": "node scripts/hud-throttle-snapshot.js",
     "check:console": "bash scripts/console-checks.sh",
-    "test": "npm run check:console && npm run smoke:browser"
+    "test": "npm run check:console && npm run smoke:browser && npm run test:ui-state && npm run test:calc-regression"
   },
   "repository": {
     "type": "git",

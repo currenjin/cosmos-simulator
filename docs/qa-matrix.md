@@ -10,9 +10,21 @@
   - 목적: 핵심 플로우(탭 전환, Kepler/Dynamics 제어, 피드백 갱신) 스모크
   - 통과 기준: `[ok] playwright smoke passed`
 
+- `npm run test:ui-state`
+  - 목적: Kepler/Dynamics 탭 상태(aria-selected/hidden) + 패널 값 갱신 회귀 방지
+  - 통과 기준: `[ok] ui state regression checks passed`
+
+- `npm run test:calc-regression`
+  - 목적: 핵심 계산(T²≈a³, a=F/m) + 피드백 문구 포맷(3-segment) 일관성 점검
+  - 통과 기준: `[ok] calculation/feedback lightweight regression passed`
+
 - `npm run perf:snapshot`
   - 목적: 초기 로드/FCP 경량 측정
   - 통과 기준: nav timing 값 출력 + load target(<=2.5s) 점검
+
+- `npm run perf:hud-throttle`
+  - 목적: HUD 업데이트 throttling 실측(Kepler/Dynamics 텍스트 업데이트 Hz)
+  - 통과 기준: `[ok] hud throttle snapshot` + JSON 결과 출력
 
 ## 2) Manual Checks (Release Gate)
 
@@ -26,6 +38,7 @@
 
 ## 3) Release Verdict Rule
 
-- **PASS**: Automated 3종 모두 통과 + Manual 5항목 PASS
+- **PASS**: Automated 핵심 4종(`check:console`, `smoke:browser`, `test:ui-state`, `test:calc-regression`) 통과 + Manual 5항목 PASS
 - **BLOCKED**: Automated 통과라도 Manual 미수행 또는 FAIL 존재
-- **FAIL**: Automated 실패(즉시 수정 후 재검증)
+- **FAIL**: Automated 핵심 항목 중 1개라도 실패(즉시 수정 후 재검증)
+- 참고: `perf:snapshot`, `perf:hud-throttle`는 성능 추세 관찰용(릴리즈 권장 실행)

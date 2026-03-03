@@ -53,3 +53,7 @@
 - [DONE] T26 README에 자동 스모크 실행/해석 가이드 추가
 - [DONE] T27 경량 성능 측정(초기 로드/FCP) 스크립트 초안 및 기준값 기록
 - [DONE] T28 QA 문서(수동+자동 체크 매트릭스) 작성
+- [DONE] T29 Kepler/Dynamics UI 상태 업데이트 자동 테스트 강화
+- [DONE] T30 핵심 계산/피드백 문구 경량 회귀 체크 추가
+- [DONE] T31 성능 문서에 throttling 변경 전/후 비교 보강
+- [DONE] T32 릴리즈 산출물(README/release-note/QA matrix) 정합성 폴리싱

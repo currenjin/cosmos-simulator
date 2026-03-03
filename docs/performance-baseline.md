@@ -54,6 +54,28 @@ Core learning flow only:
 - fcpMs: **248ms**
 - quick verdict: **load target(<=2.5s) 만족**
 
+## Throttling Change Before/After (HUD update)
+
+최근 변경에서 HUD 텍스트 갱신 빈도를 제한해(Kepler `updateNewtonInfo`, Dynamics `renderConservation`) 렌더 루프 부담을 낮췄다.
+
+### 기준
+- **Before(가정)**: 매 프레임 갱신 (약 60Hz, ~16.7ms 간격)
+- **After(코드 상한)**:
+  - Kepler HUD: `>=100ms` 간격 (이론 최대 10Hz)
+  - Dynamics HUD: `>=120ms` 간격 (이론 최대 8.33Hz)
+
+### 측정 (2026-03-03, headless chromium, 3s observer)
+- 실행: `node scripts/hud-throttle-snapshot.js`
+
+| Segment | Before (assumed) | After (measured) | Change |
+|---|---:|---:|---:|
+| Kepler `#kepler-r` text updates | ~60 Hz | **9.63 Hz** (~103.8ms) | 약 **-83.9%** 빈도 감소 |
+| Dynamics `#dyn-e` text updates | ~60 Hz | **7.32 Hz** (~136.7ms) | 약 **-87.8%** 빈도 감소 |
+
+해석:
+- HUD 텍스트/DOM 갱신 횟수 감소로 메인 스레드 작업량을 줄여, 캔버스 렌더링 우선순위를 유지하는 데 유리.
+- 값 표시 지연은 100~140ms 수준으로 학습용 피드백 체감 품질에 큰 영향 없이 동작.
+
 ## Next Step
 - Playwright trace 수집을 붙여 탭 전환 구간(3D→Kepler→Dynamics) interaction latency를 반자동 측정
 - 모바일 viewport(390/430) 별도 baseline 추가
