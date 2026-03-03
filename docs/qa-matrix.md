@@ -22,6 +22,10 @@
   - 목적: 초기 로드/FCP 경량 측정
   - 통과 기준: nav timing 값 출력 + load target(<=2.5s) 점검
 
+- `npm run perf:longtask`
+  - 목적: 상호작용 구간 Long Task/TBT 근사치 수집 + budget 점검
+  - 통과 기준: `[ok] longtask snapshot within budget`
+
 - `npm run perf:hud-throttle`
   - 목적: HUD 업데이트 throttling 실측(Kepler/Dynamics 텍스트 업데이트 Hz)
   - 통과 기준: `[ok] hud throttle snapshot` + JSON 결과 출력
@@ -41,4 +45,29 @@
 - **PASS**: Automated 핵심 4종(`check:console`, `smoke:browser`, `test:ui-state`, `test:calc-regression`) 통과 + Manual 5항목 PASS
 - **BLOCKED**: Automated 통과라도 Manual 미수행 또는 FAIL 존재
 - **FAIL**: Automated 핵심 항목 중 1개라도 실패(즉시 수정 후 재검증)
-- 참고: `perf:snapshot`, `perf:hud-throttle`는 성능 추세 관찰용(릴리즈 권장 실행)
+- 참고: `perf:snapshot`, `perf:longtask`, `perf:hud-throttle`는 성능 추세 관찰용(릴리즈 권장 실행)
+
+## 4) T23 수동 스모크 기록 양식 (복붙용)
+
+```text
+[T23 Manual Smoke Report]
+- 실행자:
+- 실행 시각(KST):
+- 브라우저/버전:
+- 디바이스/해상도:
+
+1) 탭 전환 안정성(3D→Kepler→Dynamics x2): PASS|FAIL
+   - 메모/증적:
+2) Kepler a/e 반응(2초 내): PASS|FAIL
+   - 메모/증적:
+3) Dynamics 힘/질량+추력 반응(1초 내): PASS|FAIL
+   - 메모/증적:
+4) 콘솔 red error 0건: PASS|FAIL
+   - warning 목록:
+5) 모바일 390/430 재발 여부: PASS|FAIL
+   - 메모/증적:
+
+총평: PASS|BLOCKED|FAIL
+후속 액션:
+```
+

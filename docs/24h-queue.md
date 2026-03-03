@@ -49,6 +49,8 @@
 
 자동 스모크(Playwright, headless) 결과: 탭 전환 + 핵심 입력/피드백 갱신 + 콘솔/페이지 에러 0건 통과.
 
+수동 보고 시 `docs/qa-matrix.md`의 **"T23 수동 스모크 기록 양식"** 사용 필수.
+
 - [DONE] T25 Playwright 스모크 스크립트 정식화(scripts) + npm script 연결
 - [DONE] T26 README에 자동 스모크 실행/해석 가이드 추가
 - [DONE] T27 경량 성능 측정(초기 로드/FCP) 스크립트 초안 및 기준값 기록
@@ -59,4 +61,5 @@
 - [DONE] T32 릴리즈 산출물(README/release-note/QA matrix) 정합성 폴리싱
 - [BLOCKED] T33 CI 게이트 구축: PR/Push에서 콘솔+Playwright 회귀 자동 검증 (원격 push 권한 부족: PAT에 workflow scope 필요)
 - [DONE] T34 성능 계측 심화: Long Task/TBT 근사치 수집 스크립트 추가
-- [DOING] T35 T23 수동 스모크 핸드오프 양식 추가(기록 누락 방지)
+- [DONE] T35 T23 수동 스모크 핸드오프 양식 추가(기록 누락 방지)
+- [DOING] T36 테스트 신뢰성 강화: Playwright 스크립트 base URL 헬스체크 공통 유틸 도입
